@@ -1,0 +1,47 @@
+# ===================================================
+# ~/.claude/ Knowledge Hub - Whitelist .gitignore
+# ===================================================
+# Strategy: Ignore EVERYTHING, then whitelist only
+# the Knowledge Hub (curated documentation + agents).
+# New files added by Claude Code are automatically
+# ignored — no maintenance needed.
+# ===================================================
+
+# Ignore everything by default
+*
+
+# ===== WHITELIST: Git Config =====
+!.gitignore
+
+# ===== WHITELIST: Global Claude Instructions =====
+!CLAUDE.md
+
+# ===== WHITELIST: Agent Definitions =====
+!agents/
+!agents/*.md
+
+# ===== WHITELIST: Setup Reference Skill (Knowledge Hub) =====
+!skills/
+!skills/setup-reference/
+!skills/setup-reference/**
+
+# ===== EXPLICIT DENIES (safety net) =====
+# Credentials and secrets
+.credentials.json
+settings.json
+settings.local.json
+mcp.json
+
+# Session data (large, ephemeral)
+history.jsonl
+session-env/
+file-history/
+debug/
+plans/
+cache/
+paste-cache/
+shell-snapshots/
+backups/
+plugins/
+projects/
+security_warnings_state_*.json
