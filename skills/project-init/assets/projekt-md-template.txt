@@ -1,0 +1,187 @@
+# {{PROJECT_NAME}} - Projektdokumentation
+
+Letzte Aktualisierung: {{DATE}}
+
+---
+
+## 📊 Executive Summary
+
+**Was:** {{PROJECT_DESCRIPTION}}
+
+**Architektur:** {{ARCHITECTURE_BRIEF}}
+
+**Phase 1 Status:**
+- [ ] Project setup + documentation
+- [ ] Core task-management configured
+- [ ] First session-refresh tested
+
+---
+
+## 🎯 Immediate Next Actions
+
+**Für diese Session:**
+- [ ] **TASK-001:** {{IMMEDIATE_ACTION_1}} ({{CONTEXT_1}})
+- [ ] **TASK-002:** {{IMMEDIATE_ACTION_2}} ({{CONTEXT_2}})
+
+**Entscheidungspunkte:**
+- Option A: {{OPTION_A}} (Aufwand: {{EFFORT_A}})
+- Option B: {{OPTION_B}} (Aufwand: {{EFFORT_B}})
+
+---
+
+## VAULT PATHS / CONFIG (if applicable)
+
+| Component | Path | Status |
+|-----------|------|--------|
+| **Config** | {{CONFIG_PATH}} | ⏳ TBD |
+| **External Data** | {{DATA_PATH}} | ⏳ TBD |
+
+---
+
+## 🎯 Current Phase
+
+<!-- PHASEN-AUSLAGERUNG: Wenn diese Phase abgeschlossen ist, verschiebe den Content nach:
+     {{DOCS_PATH}}/phases/Phase-01-Foundation.md (siehe phase-template.txt)
+     und ersetze diesen Block durch einen Link in "Abgeschlossene Phasen" unten. -->
+
+### Phase 1: Foundation + Setup (AKTIV)
+
+**Definition of Done:**
+- [ ] CLAUDE.md created + reviewed
+- [ ] PROJEKT.md created + task structure defined
+- [ ] Task-Scheduler activated
+- [ ] Session-Refresh tested
+- [ ] First workflow validated
+
+**Tasks:**
+
+| UUID | Task | Status | Dependencies | Effort | Deliverable | Task-File |
+|------|------|--------|--------------|--------|-------------|-----------|
+| **TASK-001** | Project Setup | 📋 pending | None | 1h | docs | [Details](tasks/TASK-001-setup.md) |
+| **TASK-002** | {{FIRST_FEATURE}} | 📋 pending | TASK-001 | {{EST1}} | {{DEL1}} | [Details](tasks/TASK-002-feature.md) |
+| **TASK-003** | {{SECOND_FEATURE}} | 📋 pending | TASK-002 | {{EST2}} | {{DEL2}} | [Details](tasks/TASK-003-feature.md) |
+
+---
+
+## 📈 Phase 2: {{PHASE_2_NAME}} (GEPLANT)
+
+<details>
+<summary>Phase 2 Details - Klick zum Ausklappen</summary>
+
+**Ziel:** {{PHASE_2_GOAL}}
+
+**Geplante Tasks:**
+- [ ] {{PHASE_2_TASK_1}}
+- [ ] {{PHASE_2_TASK_2}}
+- [ ] {{PHASE_2_TASK_3}}
+
+**Abhängigkeiten:**
+- Requires completion of Phase 1
+
+**Tasks:**
+
+| UUID | Task | Status | Dependencies | Effort | Deliverable | Task-File |
+|------|------|--------|--------------|--------|-------------|-----------|
+| **TASK-004** | {{TASK_4_DESC}} | 📋 pending | TASK-003 | {{EST4}} | {{DEL4}} | [Details](tasks/TASK-004-{{TASK_4}}.md) |
+
+</details>
+
+---
+
+## 🔄 Session Execution Model
+
+### Session-Start Checklist
+
+- [ ] Read CLAUDE.md (architecture)
+- [ ] Read PROJEKT.md (current tasks)
+- [ ] Check token budget (>65%? Plan restructure)
+- [ ] List next 2-3 high-priority tasks
+
+### Session-End (10-15 min)
+
+1. Update task status in PROJEKT.md
+2. Note blockers/learnings in SESSION-HANDOFF-YYYY-MM-DD.md
+3. If token budget >65%: Trigger `/session-refresh`
+
+---
+
+## 🏗️ System Architecture (Quick Reference)
+
+**Komponenten:**
+1. {{COMPONENT_1}} - {{COMPONENT_1_DESC}}
+2. {{COMPONENT_2}} - {{COMPONENT_2_DESC}}
+3. {{COMPONENT_3}} - {{COMPONENT_3_DESC}}
+
+**Technologie-Stack:**
+- {{TECH_1}}
+- {{TECH_2}}
+- {{TECH_3}}
+
+→ **Vollständige Details:** Siehe {{ARCHITECTURE_DOC}}
+
+---
+
+## ⚙️ Configuration Status
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| **CLAUDE.md** | ✅ Created | Architecture documented |
+| **PROJEKT.md** | ✅ Created | Task structure defined |
+| **Task-Scheduler** | ⏳ Testing | First task configured |
+| **Session-Refresh** | ⏳ Testing | Tested once |
+
+---
+
+## 📚 Reference Information
+
+<details>
+<summary>Entscheidungslog</summary>
+
+**Track architectural and process decisions - NOT task status or events.**
+
+**Was gehört rein:**
+- Architectural Decisions (Systemdesign, Patterns, Struktur)
+- Process Decisions (Workflow-Prinzipien, Standards)
+- Constraints & Targets (Größenlimits, Metriken)
+
+| Datum | Entscheidung | Begründung | Phase |
+|-------|--------------|-----------|-------|
+| _Noch keine Entscheidungen geloggt_ | | | |
+
+</details>
+
+<details>
+<summary>Offene Fragen</summary>
+
+| # | Frage | Status | Verantwortlich |
+|---|-------|--------|----------------|
+| _No open questions yet_ | | | |
+
+**Verwendung:**
+- Offene Fragen dokumentieren, die die Implementation beeinflussen
+- Status updaten: 🔴 Blocked, 🟡 In Progress, ✅ Resolved
+- Verantwortlichen zuweisen für Follow-up
+
+</details>
+
+---
+
+## Known Issues / Blockers
+
+- None yet
+
+---
+
+## Abgeschlossene Phasen
+
+<!-- Beispiel für ausgelagerte Phasen (nach Abschluss hier einfügen):
+| Phase | Status | Zeitraum | Link |
+|-------|--------|----------|------|
+| Phase 01: Foundation | ✅ | 2025-01-15 - 2025-01-20 | [Details](phases/Phase-01-Foundation.md) |
+-->
+
+_Noch keine abgeschlossenen Phasen. Nach Phase-Completion: Content nach `{{DOCS_PATH}}/phases/Phase-NN-Name.md` verschieben._
+
+---
+
+*Last updated: {{DATE}}*

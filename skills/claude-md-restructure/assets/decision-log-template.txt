@@ -1,0 +1,38 @@
+# Decision Log - {{PROJECT_NAME}}
+
+Architectural Decisions fuer {{PROJECT_NAME}}. Ausgelagert aus CLAUDE.md zur Groessenoptimierung.
+
+> **Zurueck zu:** [CLAUDE.md](../CLAUDE.md)
+
+Letzte Aktualisierung: {{DATE}}
+
+---
+
+## Active Decisions
+
+| Decision | Rationale | Impact | Status | Datum |
+|----------|-----------|--------|--------|-------|
+{{ACTIVE_DECISIONS}}
+
+---
+
+## Resolved / Historical
+
+<details>
+<summary>Historische Entscheidungen ({{RESOLVED_COUNT}} Eintraege)</summary>
+
+| Decision | Rationale | Impact | Status | Datum |
+|----------|-----------|--------|--------|-------|
+{{RESOLVED_DECISIONS}}
+
+</details>
+
+---
+
+## Open Questions
+
+{{OPEN_QUESTIONS}}
+
+---
+
+*Migrated from CLAUDE.md: {{MIGRATION_DATE}}*

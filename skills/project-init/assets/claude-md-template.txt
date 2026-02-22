@@ -1,0 +1,88 @@
+# CLAUDE.md - {{PROJECT_NAME}}
+
+Guidance for Claude Code when working on {{PROJECT_NAME}}.
+
+## Project Overview
+
+**{{PROJECT_NAME}}** - {{PROJECT_DESCRIPTION}}
+
+**Core Goals:**
+- {{GOAL_1}}
+- {{GOAL_2}}
+- {{GOAL_3}}
+
+**Current Phase:** Phase 1 (Setup)
+**Status:** 🚀 Kickoff
+
+---
+
+## Architecture & Tech Stack
+
+**Technology:** {{TECH_STACK}}
+**Key Dependencies:** {{MAIN_LIBRARIES}}
+**Architecture Pattern:** {{ARCHITECTURE_PATTERN}}
+
+---
+
+## Scope
+
+**Was gehört in CLAUDE.md (dieses Dokument):**
+- Architectural Decisions (Systemdesign, Patterns, Struktur)
+- Technology Choices (Stack, Tools, Standards)
+- Process Decisions (Workflow-Prinzipien, Richtlinien)
+- Constraints & Targets (Größenlimits, Metriken, Non-Functional Requirements)
+
+**Was gehört NICHT in CLAUDE.md:**
+- Task-Status oder Task-Historie → PROJEKT.md
+- Operative Events ("TASK-001 completed") → PROJEKT.md
+- Session-Learnings → SESSION-HANDOFF-YYYY-MM-DD.md
+- Aktuelle Phasen-Definition → PROJEKT.md
+
+---
+
+## Development Guidelines
+
+### Code Style
+- Indentation: 2 spaces
+- Naming: camelCase for functions, snake_case for files
+- Comments: Only for non-obvious logic
+
+### Anti-Over-Engineering
+- Only make explicitly requested changes
+- No speculative improvements or refactoring
+- Trust existing patterns + conventions
+
+### Commit Messages (German)
+Format: `[Typ]: Kurzbeschreibung`
+Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+
+---
+
+## Project Management
+
+See **docs/PROJEKT.md** for current phase, tasks, and session execution model.
+
+Use `/session-refresh` at session start to update documentation and optimize context.
+
+**Was gehört in PROJEKT.md:**
+- Task-Tabelle mit aktueller Status (7-Column Schema: UUID | Task | Status | Dependencies | Effort | Deliverable | Task-File)
+- Phase-Definitionen + Definition of Done pro Phase
+- Known Issues / Blockers (aktuelle Probleme)
+- Immediate Next Actions (nächste Schritte)
+
+**Was gehört NICHT in PROJEKT.md:**
+- Architektur-Entscheidungen → CLAUDE.md
+- Technologie-Stack Details → CLAUDE.md
+- Session-abschließende Learnings → SESSION-HANDOFF-YYYY-MM-DD.md
+
+---
+
+## Quick References
+
+- [README](../README.md) - Project overview + setup
+- [docs/PROJEKT.md](docs/PROJEKT.md) - Task status + phase tracking
+- [docs/tasks/](docs/tasks/) - Detailed task tracking
+
+---
+
+*Last updated: {{DATE}}*

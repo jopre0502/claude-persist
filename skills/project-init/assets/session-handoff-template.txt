@@ -1,0 +1,78 @@
+# Session Handoff - {{DATE}}
+
+**Session Duration:** {{START_TIME}} - {{END_TIME}}
+**Developer:** {{DEVELOPER_NAME}}
+
+---
+
+## ✅ What Was Completed
+
+### Tasks Done
+- {{TASK_COMPLETED_1}} - {{STATUS_1}}
+- {{TASK_COMPLETED_2}} - {{STATUS_2}}
+- {{TASK_COMPLETED_3}} - {{STATUS_3}}
+
+### Key Accomplishments
+- {{ACCOMPLISHMENT_1}}
+- {{ACCOMPLISHMENT_2}}
+
+### Documentation Updated
+- {{DOC_1}} - {{CHANGE_1}}
+- {{DOC_2}} - {{CHANGE_2}}
+
+---
+
+## ⏳ What's Still Open
+
+### In-Progress Tasks
+- {{TASK_IP_1}} - {{STATUS_DETAIL_1}}
+- {{TASK_IP_2}} - {{STATUS_DETAIL_2}}
+
+### Pending Tasks
+- {{TASK_PENDING_1}} (Ready, no blockers)
+- {{TASK_PENDING_2}} (Blocked by: {{BLOCKER}})
+
+---
+
+## 🚧 Blockers & Risks
+
+| Blocker | Impact | Suggested Fix |
+|---------|--------|---------------|
+| {{BLOCKER_1}} | {{IMPACT_1}} | {{FIX_1}} |
+| {{BLOCKER_2}} | {{IMPACT_2}} | {{FIX_2}} |
+
+---
+
+## 📚 Learnings & Insights
+
+### Technical Insights
+- {{INSIGHT_1}}
+- {{INSIGHT_2}}
+
+### Process Improvements
+- {{IMPROVEMENT_1}}
+- {{IMPROVEMENT_2}}
+
+### Architecture Decisions Made
+- {{DECISION_1}} - {{RATIONALE_1}}
+- {{DECISION_2}} - {{RATIONALE_2}}
+
+---
+
+## 🎯 Recommended Next Steps
+
+1. {{NEXT_STEP_1}}
+2. {{NEXT_STEP_2}}
+3. {{NEXT_STEP_3}}
+
+---
+
+## 📊 Token Budget
+
+- **Before session:** {{TOKENS_START}} / 200k ({{PERCENT_START}}%)
+- **After session:** {{TOKENS_END}} / 200k ({{PERCENT_END}}%)
+- **Restructure triggered:** {{RESTRUCTURE_YES_NO}}
+
+---
+
+**Next Developer:** Please read CLAUDE.md + PROJEKT.md before starting!

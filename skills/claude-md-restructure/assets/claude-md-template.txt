@@ -1,0 +1,65 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+---
+
+## Projekt-Zweck
+
+{{PROJECT_PURPOSE}}
+
+**Problem:** {{PROBLEM_STATEMENT}}
+
+**Outcome:** {{DESIRED_OUTCOME}}
+
+---
+
+## Scope: Dokumentations-Architektur
+
+**CLAUDE.md:** Architectural Decisions, Tech Stack, Process Guidelines
+**PROJEKT.md:** Task-Status, Phasen, Known Issues, Immediate Actions
+**docs/tasks/:** Task-Dokumente + Outputs (Audit Trail)
+
+---
+
+## Architektur & Tech Stack
+
+{{ARCHITECTURE_OVERVIEW}}
+
+**Stack:** {{TECH_STACK}}
+
+---
+
+## Development Guidelines
+
+{{DEV_GUIDELINES}}
+
+---
+
+<!-- BEGIN:WORKFLOW-INJECTION (aus workflow-block.txt) -->
+<!--
+  WARNUNG: Dieser Block wird von /project-init injiziert.
+  String "Session-Continuous Workflow" ist Marker fuer project-init.
+  Bei manueller Bearbeitung: Block-Grenzen erhalten!
+-->
+{{WORKFLOW_BLOCK}}
+<!-- END:WORKFLOW-INJECTION -->
+
+---
+
+## Decision Log
+
+> Vollstaendiger Decision Log: [docs/DECISION-LOG.md](docs/DECISION-LOG.md)
+
+**Letzte Entscheidungen:**
+{{RECENT_DECISIONS}}
+
+---
+
+## Quick References
+
+{{QUICK_REFS}}
+
+---
+
+*Letzte Aktualisierung: {{DATE}}*

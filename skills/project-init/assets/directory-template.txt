@@ -1,0 +1,24 @@
+# Default-Verzeichnisstruktur fuer /project-init
+# Naming Convention: NN_NAME (zweistellig, Grossbuchstaben, 10er-Schritte)
+#
+# Verwendung: Von init-project.sh gelesen und als mkdir-Befehle ausgefuehrt.
+# Zeilen mit # sind Kommentare. Leere Zeilen werden ignoriert.
+# Format: PFAD | BESCHREIBUNG
+
+# --- Top-Level Ordner ---
+00_KONTEXT | Projekt-Kontext und Rahmenbedingungen (Briefings, Anforderungen, Scope)
+10_INPUT | Alles was ins Projekt hereinkommt (Rohdaten, Zulieferungen, Referenzmaterial)
+10_INPUT/Rohdaten | Kundendaten, CSV, Excel
+10_INPUT/Zulieferungen | Dokumente von Dritten
+10_INPUT/Referenzmaterial | Best Practices, Benchmarks
+10_INPUT/Vorlagen | Templates, Formulare
+20_OUTPUT | Alles was das Projekt produziert (Deliverables, Reports, Exports)
+20_OUTPUT/Deliverables | Finale Ergebnisse fuer Kunden
+20_OUTPUT/Praesentationen | Slides, Pitch Decks
+20_OUTPUT/Reports | Auswertungen, Analysen
+20_OUTPUT/Exports | Generierte Artefakte
+# 90_DOCS wird bereits von init-project.sh erstellt (via --docs-path)
+99_ARCHIV | Abgeschlossenes und Veraltetes
+99_ARCHIV/alte-versionen | Superseded Dokumente
+99_ARCHIV/abgeschlossen | Erledigte Arbeitspakete
+99_ARCHIV/referenz | Historische Referenzen

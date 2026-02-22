@@ -1,0 +1,102 @@
+# TASK-{{TASK_ID}}: {{TASK_NAME}}
+
+> **Task-Erstellung Checkliste:**
+> 1. Kopiere dieses Template → `{{DOCS_PATH}}/tasks/TASK-{{TASK_ID}}-name.md`
+> 2. Erstelle Ordner: `mkdir -p {{DOCS_PATH}}/tasks/TASK-{{TASK_ID}}/{execution-logs,artifacts}`
+> 3. Fülle Template aus (Objective, Steps, Criteria)
+> 4. Trage Task in PROJEKT.md Task-Tabelle ein
+
+**UUID:** TASK-{{TASK_ID}}
+**Status:** 📋 pending | ⏳ in_progress | 📘 ongoing | ✅ completed | 🚫 blocked | ❌ cancelled
+**Created:** {{DATE}}
+**Updated:** {{DATE}}
+**Effort:** {{EFFORT_ESTIMATE}}
+**Dependencies:** {{DEPENDENCIES}}
+
+---
+
+## Objective
+
+{{TASK_OBJECTIVE}}
+
+What should be done? What is the expected outcome?
+
+---
+
+## Pre-Flight Decisions (optional)
+
+> Strategische Entscheidungen, die VOR der Ausfuehrung geklaert werden muessen.
+> Der Task-Orchestrator erkennt diese Section und stellt alle unbeantworteten Fragen
+> via AskUserQuestion gebuendelt (Decision Frontloading).
+
+<!--
+### D1: {{DECISION_NAME}}
+**Kontext:** {{WHY_THIS_MATTERS}}
+**Optionen:**
+- A: {{OPTION_A}} - {{TRADEOFF_A}}
+- B: {{OPTION_B}} - {{TRADEOFF_B}}
+**Empfehlung:** {{RECOMMENDED_OPTION}}
+**Antwort:** ___
+-->
+
+---
+
+## Implementation Steps (Action Tracking)
+
+| # | Action | Status | Zyklus | Commit | Effort |
+|---|--------|--------|--------|--------|--------|
+| 1 | {{STEP_1}} | 📋 pending | — | — | {{EFFORT}} |
+| 2 | {{STEP_2}} | 📋 pending | — | — | {{EFFORT}} |
+| 3 | {{STEP_3}} | 📋 pending | — | — | {{EFFORT}} |
+
+> **Action Tracking:** Zyklus = Session-Nummer, Commit = Git-Hash nach Completion.
+> Der Task-Orchestrator nutzt diese Tabelle fuer Cross-Cycle Continuation.
+
+> **Optional:** Mode-Hints fuer den Task-Orchestrator am Zeilenende:
+> `` `[subagent:haiku]` ``, `` `[subagent:sonnet]` ``, `` `[subagent:opus]` ``, `` `[main]` ``
+> Ohne Hint → Orchestrator entscheidet per Heuristik.
+
+---
+
+## Acceptance Criteria
+
+- [ ] {{CRITERION_1}}
+- [ ] {{CRITERION_2}}
+- [ ] {{CRITERION_3}}
+
+---
+
+## Definition of Done (DoD)
+
+Standard DoD für Task-Completion:
+
+- [ ] Alle Acceptance Criteria erfüllt
+- [ ] Task-Status in PROJEKT.md → `✅ completed`
+- [ ] Audit Trail aktualisiert (Datum + Outcome)
+- [ ] **Projekt-spezifisch:** Relevante Dokumentation aktualisiert (z.B. PKM-WORKFLOW.md, CLAUDE.md)
+
+> **Hinweis:** Falls dieser Task neue Tools, Scripts oder Workflows produziert, müssen diese in der entsprechenden Projekt-Dokumentation nachgetragen werden.
+
+---
+
+## Notes
+
+Any learnings, blockers, or decisions during implementation.
+
+---
+
+## Output Location
+
+All execution outputs for this task go to this task's directory:
+- **Logs:** `{{DOCS_PATH}}/tasks/TASK-{{TASK_ID}}/execution-logs/`
+- **Artifacts:** `{{DOCS_PATH}}/tasks/TASK-{{TASK_ID}}/artifacts/`
+
+> Background agents should write their output to these subdirectories, not to random locations.
+
+---
+
+## Audit Trail
+
+- {{DATE}} - Created
+- {{DATE}} - Started implementation
+- {{DATE}} - Completed

@@ -1,0 +1,64 @@
+---
+
+## Session-Continuous Workflow
+
+This project uses an automated session workflow for context optimization and task tracking.
+
+**Detaillierte Workflow-Dokumentation:** `~/.claude/skills/project-init/references/WORKFLOW.md`
+
+### Quick Reference
+
+| Wann | Aktion | Command |
+|------|--------|---------|
+| Session-Start | Ready-Tasks prüfen | `/run-next-tasks` |
+| Während Arbeit | Task-Status updaten | PROJEKT.md + Task-File |
+| Token >65% | Docs optimieren | `/session-refresh` |
+| Session-Ende | Commit + Optimieren | `/session-refresh` |
+
+### Task-Struktur (⚠️ KRITISCH)
+
+```
+{{DOCS_PATH}}/tasks/
+├── TASK-001-setup.md       ← Task-Dokument DIREKT hier (nicht in Unterordner!)
+├── TASK-001/               ← Output-Ordner (NUR für Logs/Artifacts)
+│   ├── execution-logs/
+│   └── artifacts/
+├── TASK-002-feature.md     ← Nächstes Task-Dokument (direkt)
+└── TASK-002/               ← Dessen Output-Ordner
+```
+
+### Token Budget Schwellwerte
+
+| Budget | Status | Action |
+|--------|--------|--------|
+| <50% | ✅ Healthy | Continue working |
+| 50-65% | ⏳ Monitor | Watch for next trigger |
+| **65-70%** | **⚠️ TRIGGER** | **Run `/session-refresh`** |
+| 70%+ | 🔴 Alert | Plan session end |
+
+### Core Commands
+
+| Command | Zweck | Wann |
+|---------|-------|------|
+| `/run-next-tasks` | Ready-Tasks anzeigen | Session-Start |
+| `/session-refresh` | Docs + Context optimieren | Token >65%, Session-Ende |
+| `/project-doc-restructure` | PROJEKT.md optimieren | Auto via session-refresh |
+
+### Task-Tabellen-Format (7-Column Schema)
+
+| UUID | Task | Status | Dependencies | Effort | Deliverable | Task-File |
+|------|------|--------|--------------|--------|-------------|-----------|
+| **TASK-001** | Setup | ✅ completed | None | 1h | docs | [Details](tasks/TASK-001-setup.md) |
+
+**Status-Werte:** `📋 pending` | `⏳ in_progress` | `📘 ongoing` | `✅ completed` | `🚫 blocked` | `❌ cancelled`
+
+### Neue Task erstellen
+
+1. **UUID:** Nächste freie TASK-NNN Nummer
+2. **Task-Dokument:** `{{DOCS_PATH}}/tasks/TASK-NNN-name.md` (Template: `~/.claude/skills/project-init/assets/task-md-template.txt`)
+3. **Output-Ordner:** `mkdir -p {{DOCS_PATH}}/tasks/TASK-NNN/{execution-logs,artifacts}`
+4. **PROJEKT.md:** Neue Zeile im 7-Column Schema
+
+---
+
+**Vollständige Workflow-Dokumentation:** For complex usage, see `~/.claude/skills/project-init/references/WORKFLOW.md`

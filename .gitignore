@@ -1,10 +1,9 @@
 # ===================================================
-# ~/.claude/ Knowledge Hub - Whitelist .gitignore
+# ~/.claude/ Knowledge Hub - Erweiterte Whitelist
 # ===================================================
-# Strategy: Ignore EVERYTHING, then whitelist only
-# the Knowledge Hub (curated documentation + agents).
-# New files added by Claude Code are automatically
-# ignored — no maintenance needed.
+# Strategy: Ignore EVERYTHING, then whitelist all
+# self-developed elements (skills, agents, commands, hooks)
+# and curated documentation.
 # ===================================================
 
 # Ignore everything by default
@@ -20,10 +19,18 @@
 !agents/
 !agents/*.md
 
-# ===== WHITELIST: Setup Reference Skill (Knowledge Hub) =====
+# ===== WHITELIST: All Skills =====
 !skills/
-!skills/setup-reference/
-!skills/setup-reference/**
+!skills/*/
+!skills/**
+
+# ===== WHITELIST: Commands =====
+!commands/
+!commands/*.md
+
+# ===== WHITELIST: Hooks =====
+!hooks/
+!hooks/*
 
 # ===== EXPLICIT DENIES (safety net) =====
 # Credentials and secrets
@@ -45,3 +52,10 @@ backups/
 plugins/
 projects/
 security_warnings_state_*.json
+
+# Build artifacts
+__pycache__/
+*.pyc
+
+# WSL Zone Identifier metadata
+*:Zone.Identifier

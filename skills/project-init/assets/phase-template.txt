@@ -1,0 +1,60 @@
+# Phase {{PHASE_NUMBER}}: {{PHASE_NAME}}
+
+**Status:** ✅ Completed
+**Zeitraum:** {{START_DATE}} - {{END_DATE}}
+**Dauer:** {{DURATION}}
+
+---
+
+## Definition of Done
+
+- [x] {{DOD_1}}
+- [x] {{DOD_2}}
+- [x] {{DOD_3}}
+
+---
+
+## Tasks (Abgeschlossen)
+
+| UUID | Task | Status | Dependencies | Effort | Deliverable | Task-File |
+|------|------|--------|--------------|--------|-------------|-----------|
+| **TASK-{{TASK_START}}** | {{TASK_1_DESC}} | ✅ completed | {{TASK_1_DEPS}} | {{TASK_1_EFFORT}} | {{TASK_1_DEL}} | [Details](../tasks/TASK-{{TASK_START}}-{{TASK_1_SLUG}}.md) |
+| **TASK-{{TASK_START+1}}** | {{TASK_2_DESC}} | ✅ completed | {{TASK_2_DEPS}} | {{TASK_2_EFFORT}} | {{TASK_2_DEL}} | [Details](../tasks/TASK-{{TASK_START+1}}-{{TASK_2_SLUG}}.md) |
+
+---
+
+## Learnings
+
+### Was gut funktioniert hat
+- {{LEARNING_POSITIVE_1}}
+- {{LEARNING_POSITIVE_2}}
+
+### Was verbessert werden kann
+- {{LEARNING_IMPROVEMENT_1}}
+- {{LEARNING_IMPROVEMENT_2}}
+
+### Erkenntnisse für zukünftige Phasen
+- {{INSIGHT_1}}
+- {{INSIGHT_2}}
+
+---
+
+## Audit Trail
+
+| Datum | Ereignis | Details |
+|-------|----------|---------|
+| {{START_DATE}} | Phase gestartet | {{KICKOFF_NOTES}} |
+| {{END_DATE}} | Phase abgeschlossen | Alle DoD-Kriterien erfüllt |
+
+---
+
+## Referenzen
+
+- **Ursprüngliche Phase in PROJEKT.md:** Zeile {{ORIGINAL_LINE}} (vor Auslagerung)
+- **Nächste Phase:** [Phase {{NEXT_PHASE_NUMBER}}](Phase-{{NEXT_PHASE_NUMBER}}-{{NEXT_PHASE_SLUG}}.md) (falls vorhanden)
+- **Vorherige Phase:** [Phase {{PREV_PHASE_NUMBER}}](Phase-{{PREV_PHASE_NUMBER}}-{{PREV_PHASE_SLUG}}.md) (falls vorhanden)
+
+---
+
+*Ausgelagert am: {{EXPORT_DATE}}*
+*Quelle: {{DOCS_PATH}}/PROJEKT.md*
