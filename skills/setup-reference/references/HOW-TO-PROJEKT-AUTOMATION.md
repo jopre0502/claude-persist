@@ -561,7 +561,7 @@ powershell.exe -ExecutionPolicy Bypass -Command "Start-Process wt.exe -ArgumentL
 ### 4-Layer Modell (ADR-003)
 
 ```
-Layer 1: SECRETS         → ~/.config/secrets/env.d/*.env (chmod 600)
+Layer 1: SECRETS         → ~/.config/secrets/env.d/*.env (SOPS+age verschluesselt)
 Layer 2: GLOBAL SKILLS   → ~/.claude/skills/, ~/.claude/hooks/
 Layer 3: PROJECT CONFIG  → <PWD>/.claude/, .mcp.json, CLAUDE.md
 Layer 4: SESSION         → CLAUDE_ENV_FILE (via SessionStart Hook)
@@ -571,14 +571,14 @@ Layer 4: SESSION         → CLAUDE_ENV_FILE (via SessionStart Hook)
 
 | Hook | Funktion | Timeout |
 |------|----------|---------|
-| `session-env-loader.sh` | Secrets aus env.d → CLAUDE_ENV_FILE | 10s |
+| `session-env-loader.sh` | Secrets aus env.d (SOPS-entschluesselt) → CLAUDE_ENV_FILE | 10s |
 | `session-handoff-loader.sh` | Letztes Handoff + Health-Check → additionalContext | 15s |
 | `session-start-scheduler.sh` | Task-Scheduler auto-trigger (Ready Tasks erkennen) | 10s |
 
 **Wie Env-Vars in die Session kommen:**
-1. Secrets liegen in `~/.config/secrets/env.d/*.env` (KEY=VALUE Format)
-2. SessionStart Hook (`session-env-loader.sh`) liest alle .env-Dateien
-3. Hook schreibt `export KEY=VALUE` in `$CLAUDE_ENV_FILE`
+1. Secrets liegen in `~/.config/secrets/env.d/*.env` (SOPS+age verschluesselt)
+2. SessionStart Hook (`session-env-loader.sh`) setzt `SOPS_AGE_KEY_FILE` und entschluesselt via `sops -d`
+3. Hook schreibt `export KEY=VALUE` in `$CLAUDE_ENV_FILE` (Fallback auf Klartext falls sops fehlschlaegt)
 4. Alle Bash-Commands der Session sehen die Variablen
 
 **Wie Handoff-Injection funktioniert:**
@@ -592,7 +592,50 @@ Layer 4: SESSION         → CLAUDE_ENV_FILE (via SessionStart Hook)
 **Referenzen:**
 - ADR: `projekt-automation-hub/docs/decisions/ADR-003-config-architecture.md`
 - Kurzreferenz: `projekt-automation-hub/docs/CONFIG-ARCHITECTURE.md`
-- Blueprint: `~/.claude/skills/secrets-blueprint/BLUEPRINT.md` (Sektion 13)
+- Blueprint: `~/.claude/skills/secrets-blueprint/BLUEPRINT.md` (Sektion 14)
+
+### Secrets verwalten (SOPS + age)
+
+Seit TASK-047 (2026-02-23) sind alle Secrets at rest mit **SOPS + age** verschluesselt. Die Entschluesselung erfolgt nur zur Laufzeit (in-memory).
+
+**Dateien:**
+```
+~/.config/secrets/
+├── age-key.txt          # age Private Key (chmod 600) - Backup in 1Password!
+├── .sops.yaml           # SOPS Config (creation rules)
+└── env.d/
+    ├── vault.env        # SOPS-verschluesselt
+    ├── n8n.env          # SOPS-verschluesselt
+    └── obsidian.env     # SOPS-verschluesselt
+```
+
+**Alltags-Befehle:**
+
+| Aktion | Befehl |
+|--------|--------|
+| Secret editieren | `SOPS_AGE_KEY_FILE=~/.config/secrets/age-key.txt sops edit ~/.config/secrets/env.d/vault.env` |
+| Klartext anzeigen | `SOPS_AGE_KEY_FILE=~/.config/secrets/age-key.txt sops -d ~/.config/secrets/env.d/vault.env` |
+| Neues Profil verschluesseln | `cd ~/.config/secrets && sops --encrypt --in-place --config .sops.yaml env.d/neues.env` |
+| Verifizieren (Terminal) | `secret-run vault -- env \| grep OBSIDIAN` |
+
+**Wie SOPS in die Toolchain integriert ist:**
+
+| Tool | SOPS-Integration |
+|------|-----------------|
+| `session-env-loader.sh` | `sops -d` mit `SOPS_AGE_KEY_FILE` hardcoded, Fallback auf Klartext |
+| `secret-run` | `load_env()` versucht zuerst `sops -d`, dann Klartext-Parse |
+| MCP-Server | Nutzen `${VAR}` Substitution aus Session-Environment (kein eigenes Decrypt) |
+
+**Neues Secret-Profil hinzufuegen:**
+1. Klartext `.env` erstellen (`KEY=VALUE` Format, kein `export`)
+2. `chmod 600` setzen
+3. Mit SOPS verschluesseln (siehe Befehle oben)
+4. Naechste Claude-Session laedt es automatisch
+
+**Troubleshooting:**
+- `sops -d` fehlschlaegt? → `SOPS_AGE_KEY_FILE` pruefen: `ls -la ~/.config/secrets/age-key.txt`
+- Datei nicht verschluesselt? → `head -1 datei.env` pruefen (SOPS-Dateien zeigen JSON/YAML Metadaten)
+- Vollstaendiges Troubleshooting: BLUEPRINT.md Sektion 10
 
 ---
 
