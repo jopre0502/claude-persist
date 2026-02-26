@@ -1,71 +1,114 @@
-# Claude Code Windows Notification Script
-# Enhanced with session information display
-# Uses BurntToast if available, fallback to native API
+# Claude Code Windows Notification Hook
+# Reads JSON from stdin (Claude Code hook format)
+# Uses BurntToast if available, fallback to native Toast API
 
-param(
-    [string]$Title = "Claude Code",
-    [string]$Message = "Task abgeschlossen",
-    [string]$SessionId = "",
-    [string]$SessionName = "",
-    [string]$Model = "",
-    [string]$TokenUsage = ""
-)
+# 1. Read JSON from stdin
+$jsonInput = ""
+try {
+    $jsonInput = [Console]::In.ReadToEnd()
+} catch {
+    $jsonInput = ""
+}
 
-# 1. Play system sound
+# 2. Parse JSON
+$data = $null
+if ($jsonInput) {
+    try {
+        $data = $jsonInput | ConvertFrom-Json
+    } catch {
+        $data = $null
+    }
+}
+
+# 3. Extract notification type and map to German messages
+$notifType = if ($data -and $data.type) { $data.type } else { "notification" }
+
+switch ($notifType) {
+    "permission_prompt" {
+        $Title = "Claude Code - Berechtigung"
+        $Message = "Deine Eingabe wird benoetigt"
+    }
+    "idle_prompt" {
+        $Title = "Claude Code - Wartet"
+        $Message = "Claude wartet auf deine Antwort"
+    }
+    "max_turns_reached" {
+        $Title = "Claude Code - Limit"
+        $Message = "Maximale Anzahl Turns erreicht"
+    }
+    "task_completed" {
+        $Title = "Claude Code - Fertig"
+        $Message = "Aufgabe abgeschlossen"
+    }
+    default {
+        $Title = "Claude Code"
+        $Message = "Aufgabe abgeschlossen"
+    }
+}
+
+# 4. Extract session info
+$SessionName = ""
+if ($data) {
+    if ($data.session -and $data.session.name) { $SessionName = $data.session.name }
+    elseif ($data.session_name) { $SessionName = $data.session_name }
+}
+
+$Model = ""
+if ($data) {
+    if ($data.model -and $data.model.display_name) { $Model = $data.model.display_name }
+    elseif ($data.model -and $data.model -is [string]) { $Model = $data.model }
+}
+
+# 5. Extract token usage
+$TokenUsage = ""
+if ($data -and $data.context_window -and $data.context_window.current_usage) {
+    try {
+        $usage = $data.context_window.current_usage
+        $inputTok = if ($usage.input_tokens) { $usage.input_tokens } else { 0 }
+        $cacheCr = if ($usage.cache_creation_input_tokens) { $usage.cache_creation_input_tokens } else { 0 }
+        $cacheRd = if ($usage.cache_read_input_tokens) { $usage.cache_read_input_tokens } else { 0 }
+        $curr = $inputTok + $cacheCr + $cacheRd
+        $size = if ($data.context_window.context_window_size) { $data.context_window.context_window_size } else { 0 }
+        if ($size -gt 0) {
+            $pct = [math]::Floor($curr * 100 / $size)
+            $currK = [math]::Floor($curr / 1000)
+            $sizeK = [math]::Floor($size / 1000)
+            $TokenUsage = "${currK}K/${sizeK}K (${pct}%)"
+        }
+    } catch {}
+}
+
+# 6. Build subtitle
+$details = @()
+if ($SessionName -and $SessionName -ne "null") { $details += "Session: $SessionName" }
+if ($Model -and $Model -ne "null") { $details += $Model }
+if ($TokenUsage) { $details += $TokenUsage }
+$details += (Get-Date -Format "HH:mm:ss")
+$subtitle = $details -join " | "
+
+# 7. Play system sound
 [System.Media.SystemSounds]::Asterisk.Play()
 
-# 2. Build notification body with session info
-$details = @()
-if ($SessionName -and $SessionName -ne "null" -and $SessionName -ne "") {
-    $details += "Session: $SessionName"
-}
-if ($Model -and $Model -ne "null" -and $Model -ne "") {
-    $details += $Model
-}
-if ($TokenUsage -and $TokenUsage -ne "null" -and $TokenUsage -ne "") {
-    $details += $TokenUsage
-}
-
-# Add timestamp
-$timestamp = Get-Date -Format "HH:mm:ss"
-$details += $timestamp
-
-$subtitle = ""
-if ($details.Count -gt 0) {
-    $subtitle = $details -join " | "
-}
-
-# 3. Try BurntToast first (if installed), then native API
+# 8. Try BurntToast first (if installed), then native API
 $usedBurntToast = $false
 
 if (Get-Module -ListAvailable -Name BurntToast -ErrorAction SilentlyContinue) {
     try {
         Import-Module BurntToast -ErrorAction Stop
-        if ($subtitle) {
-            New-BurntToastNotification -Text $Title, $Message, $subtitle -Sound Default
-        } else {
-            New-BurntToastNotification -Text $Title, $Message -Sound Default
-        }
+        New-BurntToastNotification -Text $Title, $Message, $subtitle -Sound Default
         $usedBurntToast = $true
     } catch {
         $usedBurntToast = $false
     }
 }
 
-# 4. Fallback: Native Windows Toast API
+# 9. Fallback: Native Windows Toast API
 if (-not $usedBurntToast) {
     try {
-        # Load required assemblies
         [void][Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime]
         [void][Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom.XmlDocument, ContentType = WindowsRuntime]
 
-        # Build full message
-        $fullMessage = $Message
-        if ($subtitle) {
-            $fullMessage = "$Message`r`n$subtitle"
-        }
-
-        # Escape XML special characters
+        $fullMessage = "$Message`r`n$subtitle"
         $escapedTitle = [System.Security.SecurityElement]::Escape($Title)
         $escapedMessage = [System.Security.SecurityElement]::Escape($fullMessage)
 
@@ -84,13 +127,12 @@ if (-not $usedBurntToast) {
         $xml = New-Object Windows.Data.Xml.Dom.XmlDocument
         $xml.LoadXml($toastXml)
 
-        # Use PowerShell's AppId
         $appId = '{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe'
         $toast = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($appId)
         $notification = [Windows.UI.Notifications.ToastNotification]::new($xml)
         $toast.Show($notification)
     } catch {
-        # Ultimate fallback: Just use balloon tip via Windows Forms
+        # Ultimate fallback: balloon tip
         try {
             Add-Type -AssemblyName System.Windows.Forms
             $balloon = New-Object System.Windows.Forms.NotifyIcon
@@ -103,7 +145,7 @@ if (-not $usedBurntToast) {
             Start-Sleep -Milliseconds 100
             $balloon.Dispose()
         } catch {
-            # All notification methods failed, at least sound played
+            # All methods failed, at least sound played
         }
     }
 }
