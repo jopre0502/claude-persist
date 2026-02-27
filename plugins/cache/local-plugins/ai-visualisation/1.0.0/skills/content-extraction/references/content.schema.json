@@ -1,0 +1,660 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "content.schema.json",
+  "title": "Content Schema für Visualisierungen",
+  "description": "Definiert die Struktur für extrahierte Inhalte, die von Visualisierungs-Agenten verarbeitet werden.",
+  "type": "object",
+  "required": ["title", "sections"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Haupttitel der Visualisierung",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Optionaler Untertitel",
+      "maxLength": 300
+    },
+    "visualProfile": {
+      "$ref": "#/definitions/visualProfile",
+      "description": "Visual Profile: Kombination aus Theme und Layout-Style"
+    },
+    "sections": {
+      "type": "array",
+      "description": "Liste der Inhalts-Sektionen",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/section"
+      }
+    },
+    "assets": {
+      "type": "array",
+      "description": "Liste externer Assets (Bilder, SVGs)",
+      "items": {
+        "$ref": "#/definitions/asset"
+      }
+    },
+    "metadata": {
+      "$ref": "#/definitions/metadata"
+    }
+  },
+  "definitions": {
+    "section": {
+      "type": "object",
+      "required": ["id", "heading"],
+      "description": "Eine Section kann entweder ein einzelnes Element (type+content) oder mehrere Elemente (elements-Array) enthalten.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Eindeutige ID der Sektion",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "heading": {
+          "type": ["string", "null"],
+          "description": "Überschrift der Sektion"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text", "diagram", "mindmap", "chart", "icon-grid", "comparison", "quote", "smartart"],
+          "description": "Typ bei Single-Element Section (legacy/shorthand)"
+        },
+        "content": {
+          "description": "Inhalt bei Single-Element Section",
+          "oneOf": [
+            { "$ref": "#/definitions/textContent" },
+            { "$ref": "#/definitions/diagramContent" },
+            { "$ref": "#/definitions/chartContent" },
+            { "$ref": "#/definitions/iconGridContent" },
+            { "$ref": "#/definitions/comparisonContent" },
+            { "$ref": "#/definitions/quoteContent" },
+            { "$ref": "#/definitions/mindmapContent" },
+            { "$ref": "#/definitions/smartartContent" }
+          ]
+        },
+        "elements": {
+          "type": "array",
+          "description": "Multi-Element Section: Array von Elementen (max. 3 für KISS)",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/definitions/element"
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["type", "content"],
+          "not": { "required": ["elements"] }
+        },
+        {
+          "required": ["elements"],
+          "not": { "required": ["type", "content"] }
+        }
+      ]
+    },
+    "element": {
+      "type": "object",
+      "description": "Ein einzelnes Element innerhalb einer Multi-Element Section",
+      "required": ["type", "content"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["text", "diagram", "mindmap", "chart", "icon-grid", "comparison", "quote", "smartart"],
+          "description": "Typ des Elements"
+        },
+        "content": {
+          "description": "Inhalt abhängig vom Typ",
+          "oneOf": [
+            { "$ref": "#/definitions/textContent" },
+            { "$ref": "#/definitions/diagramContent" },
+            { "$ref": "#/definitions/chartContent" },
+            { "$ref": "#/definitions/iconGridContent" },
+            { "$ref": "#/definitions/comparisonContent" },
+            { "$ref": "#/definitions/quoteContent" },
+            { "$ref": "#/definitions/mindmapContent" },
+            { "$ref": "#/definitions/smartartContent" }
+          ]
+        },
+        "layout": {
+          "type": "string",
+          "enum": ["full", "half", "third"],
+          "default": "full",
+          "description": "Layout-Breite des Elements (für Side-by-Side)"
+        }
+      }
+    },
+    "textContent": {
+      "type": "object",
+      "description": "Inhalt für type: text",
+      "properties": {
+        "paragraphs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "bullets": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "numbered": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "diagramContent": {
+      "type": "object",
+      "description": "Inhalt für type: diagram",
+      "required": ["diagramType", "elements"],
+      "properties": {
+        "diagramType": {
+          "type": "string",
+          "enum": ["mermaid", "d2"],
+          "description": "Mermaid (Standard) oder D2 (komplex)"
+        },
+        "mermaidType": {
+          "type": "string",
+          "enum": ["flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", "erDiagram", "gantt", "pie", "mindmap", "timeline", "quadrantChart"],
+          "description": "Spezifischer Mermaid-Diagrammtyp"
+        },
+        "description": {
+          "type": "string",
+          "description": "Beschreibung was dargestellt werden soll"
+        },
+        "elements": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Knoten/Elemente im Diagramm"
+        },
+        "relationships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "label": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["arrow", "dotted", "bidirectional"],
+                "default": "arrow"
+              }
+            }
+          }
+        },
+        "groups": {
+          "type": "array",
+          "description": "Gruppierungen/Container",
+          "items": {
+            "type": "object",
+            "required": ["name", "elements"],
+            "properties": {
+              "name": { "type": "string" },
+              "elements": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "chartContent": {
+      "type": "object",
+      "description": "Inhalt für type: chart",
+      "required": ["chartType", "data"],
+      "properties": {
+        "chartType": {
+          "type": "string",
+          "enum": ["bar", "line", "pie", "scatter", "heatmap", "area", "donut"],
+          "description": "Typ des Daten-Charts"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Datenpunkte als Array von Objekten"
+        },
+        "xAxis": {
+          "type": "string",
+          "description": "Feld für X-Achse"
+        },
+        "yAxis": {
+          "type": "string",
+          "description": "Feld für Y-Achse"
+        },
+        "colorField": {
+          "type": "string",
+          "description": "Feld für Farbkodierung"
+        },
+        "title": {
+          "type": "string",
+          "description": "Chart-Titel"
+        }
+      }
+    },
+    "iconGridContent": {
+      "type": "object",
+      "description": "Inhalt für type: icon-grid",
+      "required": ["items"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["icon", "title"],
+            "properties": {
+              "icon": {
+                "type": "string",
+                "description": "Lucide-Icon-Name (z.B. 'heart', 'target', 'clock')"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6,
+          "default": 3,
+          "description": "Anzahl Spalten im Grid"
+        }
+      }
+    },
+    "comparisonContent": {
+      "type": "object",
+      "description": "Inhalt für type: comparison",
+      "required": ["headers", "rows"],
+      "properties": {
+        "headers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 2,
+          "description": "Spaltenüberschriften"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "description": "Tabellenzeilen"
+        },
+        "highlightColumn": {
+          "type": "integer",
+          "description": "Index der hervorzuhebenden Spalte"
+        }
+      }
+    },
+    "quoteContent": {
+      "type": "object",
+      "description": "Inhalt für type: quote",
+      "required": ["text"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Der Zitattext"
+        },
+        "author": {
+          "type": "string",
+          "description": "Autor des Zitats"
+        },
+        "source": {
+          "type": "string",
+          "description": "Quelle des Zitats"
+        }
+      }
+    },
+    "mindmapContent": {
+      "type": "object",
+      "description": "Inhalt für type: mindmap (interaktiv via Markmap)",
+      "required": ["root"],
+      "properties": {
+        "root": {
+          "type": "string",
+          "description": "Zentraler Knoten der Mindmap"
+        },
+        "branches": {
+          "type": "array",
+          "description": "Hauptäste mit Unterpunkten",
+          "items": {
+            "type": "object",
+            "required": ["title"],
+            "properties": {
+              "title": { "type": "string" },
+              "items": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "caption": {
+          "type": "string",
+          "description": "Bildunterschrift für die Mindmap"
+        }
+      }
+    },
+    "smartartContent": {
+      "type": "object",
+      "description": "Inhalt für type: smartart (Inline-SVG Consulting-Visuals)",
+      "required": ["smartartType", "data"],
+      "properties": {
+        "smartartType": {
+          "type": "string",
+          "enum": ["matrix_2x2", "chevron_process", "pillars", "timeline", "hierarchy"],
+          "description": "Typ des SmartArt-Visuals (MVP: 5 Templates)"
+        },
+        "caption": {
+          "type": "string",
+          "description": "Bildunterschrift"
+        },
+        "alt": {
+          "type": "string",
+          "description": "Alt-Text für Barrierefreiheit"
+        },
+        "style": {
+          "type": "object",
+          "description": "Optionale Style-Anpassungen (keine CI-Farben!)",
+          "properties": {
+            "density": {
+              "type": "string",
+              "enum": ["compact", "normal", "spacious"],
+              "default": "normal"
+            },
+            "emphasis": {
+              "type": "string",
+              "enum": ["low", "medium", "high"],
+              "default": "medium"
+            }
+          }
+        },
+        "data": {
+          "description": "Daten abhängig vom smartartType",
+          "oneOf": [
+            { "$ref": "#/definitions/matrix2x2Data" },
+            { "$ref": "#/definitions/chevronProcessData" },
+            { "$ref": "#/definitions/pillarsData" },
+            { "$ref": "#/definitions/timelineData" },
+            { "$ref": "#/definitions/hierarchyData" }
+          ]
+        }
+      }
+    },
+    "matrix2x2Data": {
+      "type": "object",
+      "description": "Daten für matrix_2x2 SmartArt",
+      "required": ["x", "y", "points"],
+      "properties": {
+        "x": {
+          "type": "object",
+          "required": ["label"],
+          "properties": {
+            "label": { "type": "string", "description": "X-Achsen-Bezeichnung" },
+            "minLabel": { "type": "string", "default": "niedrig" },
+            "maxLabel": { "type": "string", "default": "hoch" }
+          }
+        },
+        "y": {
+          "type": "object",
+          "required": ["label"],
+          "properties": {
+            "label": { "type": "string", "description": "Y-Achsen-Bezeichnung" },
+            "minLabel": { "type": "string", "default": "niedrig" },
+            "maxLabel": { "type": "string", "default": "hoch" }
+          }
+        },
+        "quadrantLabels": {
+          "type": "object",
+          "description": "Optionale Quadranten-Beschriftung",
+          "properties": {
+            "topLeft": { "type": "string" },
+            "topRight": { "type": "string" },
+            "bottomLeft": { "type": "string" },
+            "bottomRight": { "type": "string" }
+          }
+        },
+        "points": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": ["label", "x", "y"],
+            "properties": {
+              "label": { "type": "string", "maxLength": 22 },
+              "x": { "type": "number", "minimum": 0, "maximum": 1 },
+              "y": { "type": "number", "minimum": 0, "maximum": 1 },
+              "group": { "type": "string", "description": "Optionale Gruppierung für Farbkodierung" }
+            }
+          }
+        }
+      }
+    },
+    "chevronProcessData": {
+      "type": "object",
+      "description": "Daten für chevron_process SmartArt",
+      "required": ["steps"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 7,
+          "items": {
+            "type": "object",
+            "required": ["label"],
+            "properties": {
+              "label": { "type": "string", "maxLength": 30 },
+              "sublabel": { "type": "string", "maxLength": 40 },
+              "highlight": { "type": "boolean", "default": false }
+            }
+          }
+        }
+      }
+    },
+    "pillarsData": {
+      "type": "object",
+      "description": "Daten für pillars SmartArt",
+      "required": ["pillars"],
+      "properties": {
+        "foundation": {
+          "type": "string",
+          "description": "Optionales Fundament unter allen Säulen"
+        },
+        "roof": {
+          "type": "string",
+          "description": "Optionales Dach über allen Säulen"
+        },
+        "pillars": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": ["label"],
+            "properties": {
+              "label": { "type": "string", "maxLength": 30 },
+              "items": {
+                "type": "array",
+                "maxItems": 4,
+                "items": { "type": "string", "maxLength": 25 }
+              },
+              "highlight": { "type": "boolean", "default": false }
+            }
+          }
+        }
+      }
+    },
+    "timelineData": {
+      "type": "object",
+      "description": "Daten für timeline SmartArt",
+      "required": ["items"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": ["date", "label"],
+            "properties": {
+              "date": { "type": "string", "description": "Datum oder Zeitangabe" },
+              "label": { "type": "string", "maxLength": 40 },
+              "status": {
+                "type": "string",
+                "enum": ["done", "current", "upcoming"],
+                "default": "upcoming"
+              }
+            }
+          }
+        }
+      }
+    },
+    "hierarchyData": {
+      "type": "object",
+      "description": "Daten für hierarchy SmartArt (Org-Chart Style)",
+      "required": ["root"],
+      "properties": {
+        "root": {
+          "$ref": "#/definitions/hierarchyNode"
+        }
+      }
+    },
+    "hierarchyNode": {
+      "type": "object",
+      "required": ["label"],
+      "properties": {
+        "label": { "type": "string", "maxLength": 30 },
+        "sublabel": { "type": "string", "maxLength": 40 },
+        "children": {
+          "type": "array",
+          "maxItems": 6,
+          "items": { "$ref": "#/definitions/hierarchyNode" }
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": ["filename", "type"],
+      "properties": {
+        "filename": {
+          "type": "string",
+          "description": "Dateiname im assets/-Ordner"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["image", "svg", "d2-output"],
+          "description": "Asset-Typ"
+        },
+        "alt": {
+          "type": "string",
+          "description": "Alt-Text für Barrierefreiheit"
+        },
+        "caption": {
+          "type": "string",
+          "description": "Bildunterschrift"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Ursprung der Daten"
+        },
+        "extractedWith": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Verwendete Extraktionsmethoden"
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "Erstellungsdatum"
+        },
+        "author": {
+          "type": "string",
+          "description": "Autor der Visualisierung"
+        },
+        "version": {
+          "type": "string",
+          "description": "Versionsnummer"
+        }
+      }
+    },
+    "visualProfile": {
+      "type": "object",
+      "description": "Visual Profile: Kombination aus Theme (CI-Tokens) und Layout-Style (Patterns)",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": ["default", "dark-gradient"],
+          "default": "default",
+          "description": "Theme für Farben, Fonts, Spacing. Verfügbar: default (heller Hintergrund), dark-gradient (dunkler Gradient)."
+        },
+        "layoutStyle": {
+          "type": "string",
+          "enum": ["presentation", "feed-timeline"],
+          "default": "presentation",
+          "description": "Layout-Style für Komponenten-Patterns. Verfügbar: presentation (Sections, Grids, Tabellen), feed-timeline (Timeline mit Phasen-Cards)."
+        },
+        "navigation": {
+          "type": "object",
+          "description": "Optionale Navigation Features (Page Counter & Sidebar Index)",
+          "properties": {
+            "pageCounter": {
+              "type": "object",
+              "description": "Seiten-Counter (z.B. '5 / 17') oben rechts",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Counter aktiviert/deaktiviert"
+                },
+                "position": {
+                  "type": "string",
+                  "enum": ["top-right", "top-left", "bottom-right", "bottom-left"],
+                  "default": "top-right",
+                  "description": "Position des Counters auf der Seite"
+                }
+              },
+              "additionalProperties": false
+            },
+            "sidebarNav": {
+              "type": "object",
+              "description": "Sidebar Navigation mit Inhaltsverzeichnis",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Sidebar Navigation aktiviert/deaktiviert"
+                },
+                "clickable": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Items klickbar für Scroll-to-Section"
+                },
+                "showOnMobile": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Sidebar auf Mobile-Geräten sichtbar (normalerweise hidden)"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

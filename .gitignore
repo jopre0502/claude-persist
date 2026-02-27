@@ -40,6 +40,17 @@
 !assets/
 !assets/*
 
+# ===== WHITELIST: Local Plugins (self-developed) =====
+!plugins/
+!plugins/cache/
+!plugins/cache/local-plugins/
+!plugins/cache/local-plugins/ai-visualisation/
+!plugins/cache/local-plugins/ai-visualisation/**
+
+# ===== WHITELIST: Secrets Setup (Example Files Only) =====
+!secrets-setup/
+!secrets-setup/**
+
 # ===== EXPLICIT DENIES (safety net) =====
 # Credentials and secrets
 .credentials.json
@@ -53,11 +64,12 @@ session-env/
 file-history/
 debug/
 plans/
-cache/
+/cache/
 paste-cache/
 shell-snapshots/
 backups/
-plugins/
+plugins/cache/marketplace/
+plugins/installed_plugins.json
 projects/
 security_warnings_state_*.json
 
