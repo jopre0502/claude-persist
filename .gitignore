@@ -36,6 +36,11 @@
 !output-styles/
 !output-styles/*
 
+# ===== WHITELIST: Analysis & Documentation =====
+!docs/
+!docs/analysis/
+!docs/analysis/*
+
 # ===== WHITELIST: Assets =====
 !assets/
 !assets/*
