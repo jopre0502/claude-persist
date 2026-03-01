@@ -53,11 +53,23 @@ if ($data) {
     elseif ($data.session_name) { $SessionName = $data.session_name }
 }
 
+$Cwd = ""
+if ($data) {
+    if ($data.cwd) { $Cwd = $data.cwd }
+    elseif ($data.session -and $data.session.cwd) { $Cwd = $data.session.cwd }
+}
+# Fallback: extract leaf folder from CWD for compact display
+$CwdShort = if ($Cwd) { Split-Path $Cwd -Leaf } else { "" }
+
 $Model = ""
 if ($data) {
     if ($data.model -and $data.model.display_name) { $Model = $data.model.display_name }
     elseif ($data.model -and $data.model -is [string]) { $Model = $data.model }
 }
+
+# 4b. Resolve Claude icon path
+$IconPath = Join-Path $HOME ".claude\assets\claude-icon.png"
+if (-not (Test-Path $IconPath)) { $IconPath = "" }
 
 # 5. Extract token usage
 $TokenUsage = ""
@@ -78,9 +90,10 @@ if ($data -and $data.context_window -and $data.context_window.current_usage) {
     } catch {}
 }
 
-# 6. Build subtitle
+# 6. Build subtitle with session/PWD info
 $details = @()
-if ($SessionName -and $SessionName -ne "null") { $details += "Session: $SessionName" }
+if ($CwdShort) { $details += $CwdShort }
+elseif ($SessionName -and $SessionName -ne "null") { $details += $SessionName }
 if ($Model -and $Model -ne "null") { $details += $Model }
 if ($TokenUsage) { $details += $TokenUsage }
 $details += (Get-Date -Format "HH:mm:ss")
@@ -95,7 +108,12 @@ $usedBurntToast = $false
 if (Get-Module -ListAvailable -Name BurntToast -ErrorAction SilentlyContinue) {
     try {
         Import-Module BurntToast -ErrorAction Stop
-        New-BurntToastNotification -Text $Title, $Message, $subtitle -Sound Default
+        $btParams = @{
+            Text  = $Title, $Message, $subtitle
+            Sound = 'Default'
+        }
+        if ($IconPath) { $btParams.AppLogo = $IconPath }
+        New-BurntToastNotification @btParams
         $usedBurntToast = $true
     } catch {
         $usedBurntToast = $false
@@ -112,12 +130,19 @@ if (-not $usedBurntToast) {
         $escapedTitle = [System.Security.SecurityElement]::Escape($Title)
         $escapedMessage = [System.Security.SecurityElement]::Escape($fullMessage)
 
+        $imageTag = ""
+        if ($IconPath) {
+            $escapedIcon = [System.Security.SecurityElement]::Escape($IconPath)
+            $imageTag = "<image placement=`"appLogoOverride`" src=`"$escapedIcon`"/>"
+        }
+
         $toastXml = @"
 <toast>
     <visual>
         <binding template="ToastGeneric">
             <text>$escapedTitle</text>
             <text>$escapedMessage</text>
+            $imageTag
         </binding>
     </visual>
     <audio src="ms-winsoundevent:Notification.Default"/>

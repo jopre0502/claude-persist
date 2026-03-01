@@ -143,4 +143,54 @@ Nach Subagent Completion:
 
 ---
 
+## Environment-Bootstrap für Sub-Agents
+
+### Problem
+
+Sub-Agents (Agent tool) erben **keine** env vars aus dem SessionStart Hook (`CLAUDE_ENV_FILE`).
+Betrifft: `$OBSIDIAN_VAULT`, `$N8N_BASE_URL`, und alle via `~/.config/secrets/env.d/*.env` geladenen Variablen.
+
+### Bootstrap-Pattern: `sops -d` Inline
+
+Jeder Bash-Call im Sub-Agent, der env vars braucht, muss diese selbst entschlüsseln:
+
+```bash
+# Vault-Operationen im Sub-Agent:
+source <(sops -d ~/.config/secrets/env.d/vault.env) && obsidian.com search query="test"
+
+# n8n-Operationen im Sub-Agent:
+source <(sops -d ~/.config/secrets/env.d/n8n.env) && curl "$N8N_BASE_URL/api/v1/workflows"
+```
+
+**Wichtig:** `source <(sops -d ...)` setzt env vars nur für den aktuellen Bash-Call. Jeder neue Bash-Call braucht das Prefix erneut — es gibt kein `export` über Tool-Calls hinweg.
+
+### Delegation-Entscheidung: Pfade vs. Secrets
+
+| Kategorie | Beispiele | Sub-Agent Bootstrap? | Methode |
+|-----------|-----------|---------------------|---------|
+| **Pfade** | `OBSIDIAN_VAULT`, `N8N_BASE_URL` | ✅ Ja | `sops -d <profil>.env` |
+| **API Keys** | `N8N_API_KEY`, `GITHUB_TOKEN` | ❌ Nein | Main-Session auflösen, Ergebnis übergeben |
+
+**Regel:** Wenn ein Sub-Agent nur Pfade/URLs braucht → Bootstrap via `sops -d`. Wenn API Keys nötig → Main-Session führt den Call aus und übergibt das Ergebnis als Klartext im Prompt.
+
+### Prompt-Template für Vault-fähige Sub-Agents
+
+Wenn ein Sub-Agent Vault-Zugriff braucht, dieses Pattern im `prompt:`-Parameter verwenden:
+
+```
+Du hast Zugriff auf den Obsidian Vault via CLI.
+Für jeden Bash-Call der $OBSIDIAN_VAULT braucht, prefixe mit:
+  source <(sops -d ~/.config/secrets/env.d/vault.env) &&
+
+Beispiel: source <(sops -d ~/.config/secrets/env.d/vault.env) && obsidian.com read file="notiz.md"
+```
+
+### Wann NICHT delegieren (trotz Bootstrap)
+
+- Vault-Operation braucht **Kontext aus der Konversation** (z.B. User hat gerade ein Dokument bearbeitet)
+- Operation braucht **echte Secrets** (API Keys) — Main-Session only
+- Operation ist **interaktiv** (braucht AskUserQuestion)
+
+---
+
 *Referenz für task-orchestrator Phase 2*

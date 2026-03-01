@@ -96,7 +96,7 @@ extract_task_table() {
     fi
 
     # Parse markdown table: | UUID | Task | Status | Dependencies | ... |
-    mawk '
+    awk '
         /^\|.*UUID.*Task.*Status/ {
             in_table = 1
             next
@@ -106,6 +106,7 @@ extract_task_table() {
         }
         in_table && /^\|/ {
             line = $0
+            gsub(/\r/, "", line)
             gsub(/^\||\|$/, "", line)
             gsub(/^ +| +$/, "", line)
 
@@ -133,6 +134,10 @@ extract_task_table() {
                 else if (status ~ /pending/) status = "pending"
 
                 if (status ~ /^(pending|in_progress|completed|blocked|cancelled)$/) {
+                    # Escape double quotes in string fields to produce valid JSON
+                    gsub(/"/, "\\\"", task_name)
+                    gsub(/"/, "\\\"", deliverable)
+                    gsub(/"/, "\\\"", deps)
                     printf "{\"uuid\":\"%s\",\"name\":\"%s\",\"status\":\"%s\",\"dependencies\":\"%s\",\"effort\":\"%s\",\"deliverable\":\"%s\"}\n", uuid, task_name, status, deps, effort, deliverable
                 }
             }
@@ -149,7 +154,7 @@ extract_task_table() {
 extract_known_issues() {
     local projekt_file="$1"
 
-    mawk '
+    awk '
         BEGIN { in_issues = 0; in_table = 0 }
 
         # Start of Known Issues section
@@ -159,8 +164,8 @@ extract_known_issues() {
             next
         }
 
-        # End of section (new ## header)
-        in_issues && /^##[^#]/ {
+        # End of section (new ## header, horizontal rule, or HTML tag)
+        in_issues && /^##[^#]|^---|^</ {
             in_issues = 0
             in_table = 0
         }
@@ -179,6 +184,7 @@ extract_known_issues() {
         # Parse table rows
         in_issues && in_table && /^\|/ {
             line = $0
+            gsub(/\r/, "", line)
             gsub(/^\||\|$/, "", line)
             split(line, cols, "|")
             for (i in cols) gsub(/^ +| +$/, "", cols[i])
@@ -207,6 +213,7 @@ extract_known_issues() {
         # Parse bullet-list items (original format)
         in_issues && !in_table && /^-.*\*\*|^[0-9]+\./ {
             line = $0
+            gsub(/\r/, "", line)
 
             # Extract issue description
             gsub(/^[-0-9.]+\s*\*\*/, "", line)

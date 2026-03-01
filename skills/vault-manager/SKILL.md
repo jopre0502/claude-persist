@@ -168,6 +168,24 @@ OBSIDIAN_VAULT must be set to your vault path, e.g.:
    - Automatic via SessionStart Hook (`~/.config/secrets/env.d/vault.env`)
    - Manual: `export OBSIDIAN_VAULT="/path/to/vault"`
 
+### Sub-Agent-Nutzung (Environment Bootstrap)
+
+Sub-Agents (Agent tool) erben keine env vars aus dem SessionStart Hook.
+Fuer Vault-Zugriff in Sub-Agents jeden Bash-Call prefixen:
+
+```bash
+# Windows (Git Bash / MINGW) — cygpath -w noetig fuer SOPS (native Windows Binary)
+export SOPS_AGE_KEY_FILE="$(cygpath -w "$HOME/.config/secrets/age-key.txt")" && \
+source <(sops -d "$(cygpath -w "$HOME/.config/secrets/env.d/vault.env")" | sed 's|/mnt/c/|/c/|g') && \
+<vault-command>
+```
+
+**Warum `cygpath -w`?** SOPS ist ein natives Windows-Binary (WinGet) und versteht keine MINGW-Pfade (`/c/Users/...`), nur Windows-Pfade (`C:\Users\...`). Die `/mnt/c/` → `/c/` Translation korrigiert WSL2-Pfade in den entschluesselten env-Dateien.
+
+Beispiel: `export SOPS_AGE_KEY_FILE="$(cygpath -w "$HOME/.config/secrets/age-key.txt")" && source <(sops -d "$(cygpath -w "$HOME/.config/secrets/env.d/vault.env")" | sed 's|/mnt/c/|/c/|g') && obsidian.com search query="test"`
+
+Siehe auch: `~/.claude/skills/task-orchestrator/references/delegation-patterns.md`
+
 3. ✅ `obsidian.com` im PATH
    - WSL2: Automatisch via Windows-Interop (`/mnt/c/.../obsidian.com`)
    - Check: `which obsidian.com`

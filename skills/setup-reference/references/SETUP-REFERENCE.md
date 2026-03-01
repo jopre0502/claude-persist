@@ -1,4 +1,4 @@
-# SETUP-REFERENCE — Auto-generated: 2026-02-25 18:08
+# SETUP-REFERENCE — Auto-generated: 2026-03-01 17:37
 
 Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
@@ -8,24 +8,24 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 | Skill | Beschreibung |
 |-------|-------------|
-| `claude-md-restructure` | Optimize CLAUDE.md files for size (<8KB target) while preserving workflow-block.txt injection and Session-Continuous ... |
-| `github-init` | Verknüpft aktuelles Working Directory mit GitHub-Repo und erstellt Pro-Projekt Config (.claude/github.json). Use when... |
-| `github-ops` | Shared Library für GitHub-Operations Skills. Enthält lib/, assets/, references/. NICHT direkt aufrufen. Nutze stattde... |
-| `github-push` | Committed und pusht alle Änderungen zum konfigurierten GitHub-Repo mit Sync-Message (Sync YYYY-MM-DD-NN). Use when: U... |
-| `github-status` | Zeigt GitHub Sync-Status: letzter Commit, ausstehende Änderungen, Repo-Info. Use when: User wants to check sync statu... |
-| `granola-export` | TODO: Complete and informative explanation of what the skill does and when to use it. Include WHEN to use this skill - specific scenarios, file types, or tasks that trigger it. |
-| `permission-audit` | Analysiert Tool-Call-Logs gegen Permission Allow/Deny-Regeln. Zeigt welche Calls nicht von Allow-Rules gedeckt waren.... |
-| `prioritize-tasks` | Analysiert und priorisiert Tasks in PROJEKT.md basierend auf Dependencies, Effort und Known Issues. Berechnet Priorit... |
-| `project-doc-restructure` | Transform project documentation to follow session-continuous patterns with Inverted Pyramid structure. Use when worki... |
-| `project-init` | Complete session-continuous project initialization infrastructure. Creates CLAUDE.md, PROJEKT.md, task tracking syste... |
-| `prompt-improver` | Analysiert und verbessert Prompt-Entwürfe für Claude 4.x Modelle (Sonnet, Opus, Haiku). Wendet offizielle Anthropic Best Practices an: XML-Strukturierung, explizite Anweisungen, Kontext/Motivation (WARUM), Variablen {{NAME}}, Extended Thinking Konfiguration, Tool Use Optimierungen und modell-spezifische Empfehlungen. Nutze diesen Skill wenn du einen Prompt siehst der verbessert werden sollte, oder wenn explizit nach Prompt-Optimierung gefragt wird. |
+| `claude-md-restructure` | (keine Beschreibung) |
+| `github-init` | (keine Beschreibung) |
+| `github-ops` | (keine Beschreibung) |
+| `github-push` | (keine Beschreibung) |
+| `github-status` | (keine Beschreibung) |
+| `granola-export` | (keine Beschreibung) |
+| `permission-audit` | (keine Beschreibung) |
+| `prioritize-tasks` | (keine Beschreibung) |
+| `project-doc-restructure` | (keine Beschreibung) |
+| `project-init` | (keine Beschreibung) |
+| `prompt-improver` | (keine Beschreibung) |
 | `secrets-blueprint` | (keine Beschreibung) |
-| `session-refresh` | **SESSION END / HIGH TOKEN BUDGET** - Use when token budget >65% or before ending a session. Complete session refresh... |
-| `setup-reference` | Generiert eine vollstaendige SETUP-REFERENCE.md aus dem Live-System (~/.claude/). Scannt Skills, Agents, Commands, Ho... |
-| `skill-creator` | Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations. |
-| `task-orchestrator` | Orchestriert strukturierte Task-Ausführung mit Subagent Delegation. Trigger-Patterns (automatisch aktivieren bei): - ... |
-| `task-scheduler` | Automatically orchestrate and execute project tasks from PROJEKT.md. Use this skill when you want to analyze pending ... |
-| `vault-manager` | Use this skill when the user references Vault documents via vault: prefix notation (e.g., "vault:ai-workflows"), requ... |
+| `session-refresh` | (keine Beschreibung) |
+| `setup-reference` | (keine Beschreibung) |
+| `skill-creator` | (keine Beschreibung) |
+| `task-orchestrator` | (keine Beschreibung) |
+| `task-scheduler` | (keine Beschreibung) |
+| `vault-manager` | (keine Beschreibung) |
 
 **Gesamt:** 18 Skills
 
@@ -35,9 +35,9 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 | Agent | Beschreibung |
 |-------|-------------|
-| `my-setup-guide` | Beantwortet Fragen zur persoenlichen Claude Code Installation, Konfiguration, Skills, Workflows und Conventions. Kenn... |
-| `obsidian-pilot` | Navigates Obsidian CLI commands dynamically. Use for complex vault operations that go beyond simple read/search: base... |
-| `prompt-architect` | Meta-Orchestrator für Prompt-Engineering und Skill-Architektur. Analysiert komplexe Anfragen, empfiehlt proaktiv Skill-Auslagerung, koordiniert prompt-improver Skill und skill-creator. Für Architektur-Entscheidungen und Multi-Skill-Workflows. |
+| `my-setup-guide` | (keine Beschreibung) |
+| `obsidian-pilot` | (keine Beschreibung) |
+| `prompt-architect` | (keine Beschreibung) |
 
 **Gesamt:** 3 Agents
 
@@ -47,11 +47,11 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 | Command | Beschreibung |
 |---------|-------------|
-| `/obsidian-sync` | Obsidian Vault zu GitHub pushen - funktioniert von jedem Working Directory |
-| `/refresh-reference` | Generiert SETUP-REFERENCE.md aus dem Live-System (~/.claude/). Scannt Skills, Agents, Commands, Hooks, Permissions, Plugins und zeigt Inventar-Zusammenfassung. |
-| `/run-next-tasks` | Manually trigger the task scheduler to identify and start ready tasks |
-| `/vault-export` | Export content to Obsidian Vault with Fileclass-based templates |
-| `/vault-work` | Load a Vault document for editing, work with it in session, then save changes back with diff preview |
+| `/obsidian-sync` | (keine Beschreibung) |
+| `/refresh-reference` | (keine Beschreibung) |
+| `/run-next-tasks` | (keine Beschreibung) |
+| `/vault-export` | (keine Beschreibung) |
+| `/vault-work` | (keine Beschreibung) |
 
 **Gesamt:** 5 Commands
 
@@ -65,10 +65,9 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | PreToolUse | `auto-approve-readonly.sh` | 5s |
 | SessionStart | `session-env-loader.sh` | 10s |
 | SessionStart | `session-handoff-loader.sh` | 15s |
-| Notification | `notify.sh` | defaults |
-| (jq Fehler) | — | — |
+| Notification | `notify.ps1` | defaults |
 
-**Gesamt:** 6 Hooks
+**Gesamt:** 5 Hooks
 
 ---
 
@@ -76,88 +75,104 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 ### Allow-Rules
 
-- `Edit`
-- `Write`
-- `Skill(*)`
-- `Task(*)`
-- `mcp__obsidian__*`
-- `WebSearch`
-- `WebFetch`
-- `Bash(git *)`
-- `Bash(gh *)`
-- `Bash(source *)`
-- `Bash(bash *)`
-- `Bash(chmod *)`
-- `Bash(echo *)`
-- `Bash(env)`
-- `Bash(env *)`
-- `Bash(unset *)`
-- `Bash(command *)`
-- `Bash(which *)`
-- `Bash(ls)`
-- `Bash(ls *)`
-- `Bash(tree *)`
-- `Bash(find *)`
-- `Bash(mkdir *)`
-- `Bash(cp *)`
-- `Bash(mv *)`
-- `Bash(cat *)`
-- `Bash(head *)`
-- `Bash(tail *)`
-- `Bash(wc *)`
-- `Bash(wc)`
-- `Bash(sort *)`
-- `Bash(diff *)`
-- `Bash(stat *)`
-- `Bash(realpath *)`
-- `Bash(readlink *)`
-- `Bash(grep *)`
-- `Bash(sed *)`
-- `Bash(awk *)`
-- `Bash(jq *)`
-- `Bash(xargs *)`
-- `Bash(python3 *)`
-- `Bash(python *)`
-- `Bash(date)`
-- `Bash(date *)`
-- `Bash(pwd)`
-- `Bash(whoami)`
-- `Bash(id)`
-- `Bash(uname *)`
-- `Bash(uname)`
-- `Bash(npm *)`
-- `Bash(npx *)`
-- `Bash(node *)`
-- `Bash(touch *)`
-- `Bash(rm *)`
-- `Bash(tee *)`
-- `Bash(claude *)`
-- `Bash(~/.claude/skills/*)`
-- `Bash(/home/jopre/.claude/skills/*)`
-- `Bash(/home/jopre/.claude/hooks/*)`
-- `Bash(cd *)`
-- `Bash(test *)`
-- `Bash(file *)`
-- `Bash(xxd *)`
-- `Bash(od *)`
-- `Bash(export *)`
-- `Bash(secret-run *)`
+- `Edit`
+- `Write`
+- `Skill(*)`
+- `Task(*)`
+- `mcp__obsidian__*`
+- `WebSearch`
+- `WebFetch`
+- `Bash(git *)`
+- `Bash(gh *)`
+- `Bash(source *)`
+- `Bash(bash *)`
+- `Bash(chmod *)`
+- `Bash(echo *)`
+- `Bash(env)`
+- `Bash(env *)`
+- `Bash(unset *)`
+- `Bash(command *)`
+- `Bash(which *)`
+- `Bash(ls)`
+- `Bash(ls *)`
+- `Bash(tree *)`
+- `Bash(find *)`
+- `Bash(mkdir *)`
+- `Bash(cp *)`
+- `Bash(mv *)`
+- `Bash(cat *)`
+- `Bash(head *)`
+- `Bash(tail *)`
+- `Bash(wc *)`
+- `Bash(wc)`
+- `Bash(sort *)`
+- `Bash(diff *)`
+- `Bash(stat *)`
+- `Bash(realpath *)`
+- `Bash(readlink *)`
+- `Bash(grep *)`
+- `Bash(sed *)`
+- `Bash(awk *)`
+- `Bash(jq *)`
+- `Bash(xargs *)`
+- `Bash(python3 *)`
+- `Bash(python *)`
+- `Bash(date)`
+- `Bash(date *)`
+- `Bash(pwd)`
+- `Bash(whoami)`
+- `Bash(id)`
+- `Bash(uname *)`
+- `Bash(uname)`
+- `Bash(npm *)`
+- `Bash(npx *)`
+- `Bash(node *)`
+- `Bash(touch *)`
+- `Bash(rm *)`
+- `Bash(tee *)`
+- `Bash(claude *)`
+- `Bash($HOME/.claude/skills/*)`
+- `Bash($HOME/.claude/hooks/*)`
+- `Bash(cd *)`
+- `Bash(test *)`
+- `Bash(file *)`
+- `Bash(xxd *)`
+- `Bash(od *)`
+- `Bash(export *)`
+- `Bash(secret-run *)`
+- `Bash(./run-headless-test.sh *)`
+- `Bash(mount *)`
+- `Bash(wsl.exe *)`
+- `WebFetch(domain:blog.korny.info)`
+- `WebFetch(domain:smartscope.blog)`
+- `Bash(git commit:*)`
+- `Bash(cat:*)`
+- `Bash(echo NOT_INSTALLED:*)`
+- `Bash(echo OP_EXE_NOT_FOUND:*)`
+- `Bash(op:*)`
+- `Bash(echo:*)`
+- `Bash(age:*)`
+- `Bash(sops:*)`
+- `Bash(grep:*)`
+- `Bash(head:*)`
+- `Bash(curl:*)`
+- `Bash(git add:*)`
 
 ### Deny-Rules
 
-- `Read(./.env)`
-- `Read(./.env.*)`
-- `Read(./secrets/**)`
-- `Bash(rm -rf *)`
-- `Bash(rm -r *)`
-- `Bash(git push --force *)`
-- `Bash(git push -f *)`
-- `Bash(git reset --hard *)`
-- `TaskCreate`
-- `TaskUpdate`
-- `TaskList`
-- `TaskGet`
-- `TodoWrite`
+- `Read(./.env)`
+- `Read(./.env.*)`
+- `Read(./secrets/**)`
+- `Bash(rm -rf *)`
+- `Bash(rm -r *)`
+- `Bash(git push --force *)`
+- `Bash(git push -f *)`
+- `Bash(git reset --hard *)`
+- `TaskCreate`
+- `TaskUpdate`
+- `TaskList`
+- `TaskGet`
+- `TodoWrite`
 
 ---
 
@@ -209,7 +224,7 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | Dokument | Pfad | Groesse |
 |----------|------|---------|
 | `HOW-TO-PROJEKT-AUTOMATION.md` | `~/.claude/skills/setup-reference/references/` | 28KB |
-| `PKM-WORKFLOW-VAULT-MANAGER.md` | `~/.claude/skills/setup-reference/references/` | 12KB |
+| `PKM-WORKFLOW-VAULT-MANAGER.md` | `~/.claude/skills/setup-reference/references/` | 13KB |
 
 ---
 
@@ -288,5 +303,5 @@ ENDE   -> Commit -> /session-refresh -> Optional: Session-Handoff
 
 ---
 
-*Generiert: 2026-02-25 18:08 | Script: generate-reference.sh*
+*Generiert: 2026-03-01 17:37 | Script: generate-reference.sh*
 *Naechste Aktualisierung: /refresh-reference ausfuehren*

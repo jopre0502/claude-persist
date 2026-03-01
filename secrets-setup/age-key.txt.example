@@ -1,0 +1,7 @@
+# BEISPIEL — Nicht verwenden! Generiere deinen eigenen Key:
+#   age-keygen -o ~/.config/secrets/age-key.txt
+#   chmod 600 ~/.config/secrets/age-key.txt
+#
+# created: 2026-01-01T00:00:00Z
+# public key: age1BEISPIEL_NICHT_VERWENDEN_GENERIERE_EIGENEN_KEY
+AGE-SECRET-KEY-1BEISPIELWERTGENERIEREEIGENENKEYMITAGEKEYGEN00000

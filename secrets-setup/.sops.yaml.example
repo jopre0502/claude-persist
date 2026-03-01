@@ -1,0 +1,8 @@
+# SOPS Configuration
+# Kopiere nach: ~/.config/secrets/.sops.yaml
+# Ersetze <DEIN_AGE_PUBLIC_KEY> durch den Output von:
+#   grep "public key:" ~/.config/secrets/age-key.txt
+creation_rules:
+  - path_regex: \.env$
+    age: >-
+      <DEIN_AGE_PUBLIC_KEY_HIER>

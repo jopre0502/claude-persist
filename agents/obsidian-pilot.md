@@ -55,9 +55,18 @@ You are an Obsidian CLI specialist. You navigate the Obsidian CLI (`obsidian.com
 
 For every operation, follow this sequence:
 
-1. **Check Prerequisites**
+1. **Check Prerequisites + Environment Bootstrap**
    - Verify `$OBSIDIAN_VAULT` is set: `echo $OBSIDIAN_VAULT`
-   - If not set, STOP and report: "OBSIDIAN_VAULT not set. Caller must provide vault path."
+   - If not set, **bootstrap via SOPS** (Windows/MINGW needs `cygpath -w`):
+     ```bash
+     export SOPS_AGE_KEY_FILE="$(cygpath -w "$HOME/.config/secrets/age-key.txt")" && \
+     source <(sops -d "$(cygpath -w "$HOME/.config/secrets/env.d/vault.env")" | sed 's|/mnt/c/|/c/|g') && \
+     echo $OBSIDIAN_VAULT
+     ```
+   - If bootstrap also fails, STOP and report: "OBSIDIAN_VAULT not set and SOPS bootstrap failed."
+   - **Important:** Every Bash call that needs `$OBSIDIAN_VAULT` must include the bootstrap prefix
+     (env vars do not persist across Bash tool calls)
+   - **Why `cygpath -w`?** SOPS is a native Windows binary and cannot parse MINGW paths (`/c/Users/...`)
    - Verify CLI is available: `obsidian.com version 2>&1; echo "EXIT:$?"`
    - If exit != 0, report error and suggest fallback (Glob + Read on $OBSIDIAN_VAULT)
 
@@ -213,8 +222,9 @@ daily:path          (returns daily note file path)
 
 ## Environment Notes
 
-- CLI binary: `obsidian.com` (in PATH via WSL2 Windows-Interop)
-- Vault path: `$OBSIDIAN_VAULT` (set by caller's session environment)
+- CLI binary: `obsidian.com` (in PATH)
+- Vault path: `$OBSIDIAN_VAULT` (from session env OR bootstrapped via `sops -d`)
+- **Bootstrap pattern:** `export SOPS_AGE_KEY_FILE="$(cygpath -w "$HOME/.config/secrets/age-key.txt")" && source <(sops -d "$(cygpath -w "$HOME/.config/secrets/env.d/vault.env")" | sed 's|/mnt/c/|/c/|g') && <command>`
 - Scripts: `~/.claude/skills/vault-manager/scripts/` (vault-export.sh, vault-edit.sh, vault-base.sh, vault-date.sh, vault-copy.sh)
 - Official docs: https://help.obsidian.md/cli
 

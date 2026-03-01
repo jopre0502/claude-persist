@@ -73,8 +73,8 @@ extract_task_table() {
 
     # Parse markdown table: | UUID | Task | Status | Dependencies | ... |
     # Output: JSON array of tasks
-    # KRITISCH: mawk verwenden statt awk (compatibility)
-    mawk '
+    # Plattformunabhaengig: awk (funktioniert auf Linux, macOS, Windows/Git Bash)
+    awk '
         /^\|.*UUID.*Task.*Status/ {
             in_table = 1
             next
@@ -86,6 +86,7 @@ extract_task_table() {
             # Parse table row - KRITISCH: Lokale Variable verwenden, nicht $0 modifizieren
             # (AWK Pattern-Matching wird durch $0-Modifikation beeinflusst)
             line = $0
+            gsub(/\r/, "", line)       # Strip Windows CR
             gsub(/^\||\|$/, "", line)  # Remove leading/trailing pipes
             gsub(/^ +| +$/, "", line)  # Trim spaces
 

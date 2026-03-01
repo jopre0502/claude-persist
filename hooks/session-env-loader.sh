@@ -4,14 +4,29 @@
 # Siehe: ADR-003 (projekt-automation-hub/docs/decisions/ADR-003-config-architecture.md)
 
 ENV_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/secrets/env.d"
-export SOPS_AGE_KEY_FILE="$HOME/.config/secrets/age-key.txt"
+IS_MINGW=false
+if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]]; then
+  IS_MINGW=true
+fi
+
+# SOPS braucht Windows-Pfade auf MINGW/MSYS (nicht /c/Users/... sondern C:\Users\...)
+if $IS_MINGW; then
+  export SOPS_AGE_KEY_FILE="$(cygpath -w "$HOME/.config/secrets/age-key.txt")"
+else
+  export SOPS_AGE_KEY_FILE="$HOME/.config/secrets/age-key.txt"
+fi
+
+# Helper: Pfad fuer sops konvertieren (MINGW → Windows)
+sops_path() {
+  if $IS_MINGW; then cygpath -w "$1"; else echo "$1"; fi
+}
 LOADED=0
 
 if [ -n "$CLAUDE_ENV_FILE" ] && [ -d "$ENV_DIR" ]; then
   for env_file in "$ENV_DIR"/*.env; do
     [ -f "$env_file" ] || continue
     # Entschluesseln via sops, Fallback auf Klartext (Migration-Phase)
-    decrypted=$(sops -d "$env_file" 2>/dev/null)
+    decrypted=$(sops -d "$(sops_path "$env_file")" 2>/dev/null)
     if [ $? -ne 0 ]; then
       decrypted=$(cat "$env_file")
     fi
@@ -24,7 +39,7 @@ if [ -n "$CLAUDE_ENV_FILE" ] && [ -d "$ENV_DIR" ]; then
     done <<< "$decrypted"
   done
   # Platform-Translation: WSL2-Pfade (/mnt/c/) auf MINGW-Format (/c/) konvertieren
-  if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]]; then
+  if $IS_MINGW; then
     sed -i 's|/mnt/c/|/c/|g' "$CLAUDE_ENV_FILE"
   fi
   echo '{"systemMessage":"env-loader: '"$LOADED"' vars loaded from env.d (sops+age), platform='"$(uname -s)"'"}'
@@ -38,7 +53,7 @@ else
   if [ -d "$ENV_DIR" ]; then
     for env_file in "$ENV_DIR"/*.env; do
       [ -f "$env_file" ] || continue
-      decrypted=$(sops -d "$env_file" 2>/dev/null)
+      decrypted=$(sops -d "$(sops_path "$env_file")" 2>/dev/null)
       if [ $? -ne 0 ]; then
         decrypted=$(cat "$env_file")
       fi
@@ -47,7 +62,7 @@ else
         [[ "$line" =~ ^[[:space:]]*# ]] && continue
         [[ -z "${line// }" ]] && continue
         # Platform-Translation: /mnt/c/ → /c/ auf MINGW/MSYS
-        if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]]; then
+        if $IS_MINGW; then
           line=$(echo "$line" | sed 's|/mnt/c/|/c/|g')
         fi
         # Nur Whitelist-Variablen im Klartext, Rest als KEY=*** maskieren
