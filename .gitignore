@@ -78,6 +78,9 @@ plugins/installed_plugins.json
 projects/
 security_warnings_state_*.json
 
+# Permission-Audit Logs (generated at runtime by hook)
+skills/permission-audit/artifacts/*.log
+
 # Build artifacts
 __pycache__/
 *.pyc
