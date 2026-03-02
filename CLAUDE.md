@@ -184,7 +184,7 @@ Mache einen kurzen **Final-Check**:
 
 **Secrets/API-Keys — gleiches Prinzip:**
 - API-Calls die Secrets brauchen → Main-Session ausführen, Ergebnis an Subagent
-- Oder: Secret via `secret-run` im Bash-Befehl des Subagents laden (`secret-run <profil> -- <command>`)
+- Oder: In Bash `source ~/.config/secrets/.env-cache` (wird bei Session-Start vom Hook geschrieben)
 
 **Warum:** SessionStart Hook setzt `CLAUDE_ENV_FILE` → Main-Session lädt env vars. Task-Subagents starten in isoliertem Kontext ohne diese env vars. Das ist by design (Sicherheit), aber erfordert bewusstes Handling.
 

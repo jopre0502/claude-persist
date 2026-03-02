@@ -401,6 +401,32 @@ Details: `references/uncertainty-handling.md`
 - Markiere erledigte Criteria automatisch
 - Bei unvollständiger DoD → Task bleibt in_progress
 
+### Task-File Metablock Guardrail (TASK-057)
+
+Wenn der Orchestrator ein Task-File **erstellt oder aktualisiert**, MUSS der Metablock vollstaendig sein:
+
+**Pflicht-Felder (Metablock):**
+```
+**UUID:** TASK-NNN
+**Status:** [📋 pending | ⏳ in_progress | 📘 ongoing | ✅ completed | 🚫 blocked | ❌ cancelled]
+**Created:** YYYY-MM-DD
+**Updated:** YYYY-MM-DD
+**Effort:** [1h | 2h | 4h | 1d | 2d | 3d+]
+**Dependencies:** [None | TASK-NNN, TASK-MMM]
+```
+
+**Pflicht-Sections:**
+- `## Objective`
+- `## Acceptance Criteria`
+- `## Audit Trail`
+
+**Erlaubte Status-Werte (SSOT: task-scheduler/SKILL.md):**
+`pending`, `in_progress`, `ongoing`, `completed`, `blocked`, `cancelled`
+
+**Validierung:** Pre-Commit Hook (`scripts/task-lint.sh --staged`) blockiert Commits mit fehlerhaften Task-Files. Der Orchestrator stellt sicher, dass es gar nicht erst dazu kommt.
+
+---
+
 ### SATE-Invarianten (Session-Autonomous Task Execution)
 
 Harte Regeln, die NIEMALS verletzt werden duerfen:

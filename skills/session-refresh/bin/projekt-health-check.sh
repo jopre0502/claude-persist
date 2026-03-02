@@ -116,17 +116,18 @@ while IFS= read -r line; do
     [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*UUID ]] && continue
 
     # Parse task row: | TASK-XXX | Name | Status | Deps | Effort | Deliverable | File |
-    if [[ "$line" =~ \|[[:space:]]*\*?\*?(TASK-[0-9]+)\*?\*?[[:space:]]*\| ]]; then
+    # Must start with | to avoid matching TASK refs in prose text
+    if [[ "$line" =~ ^[[:space:]]*\| ]] && [[ "$line" =~ \|[[:space:]]*\*?\*?(TASK-[0-9]+)\*?\*?[[:space:]]*\| ]]; then
         uuid="${BASH_REMATCH[1]}"
 
         # Extract fields using awk (more robust than bash regex for multiple fields)
         IFS='|' read -ra fields <<< "$line"
 
-        if [[ ${#fields[@]} -ge 7 ]]; then
+        if [[ ${#fields[@]} -ge 8 ]]; then
             # Field indices: 0=empty, 1=UUID, 2=Task, 3=Status, 4=Deps, 5=Effort, 6=Deliverable, 7=File
             status=$(echo "${fields[3]}" | xargs)
             deps=$(echo "${fields[4]}" | xargs)
-            task_file=$(echo "${fields[7]}" | xargs | sed 's/\[Details\](\(.*\))/\1/' | sed 's/.*](\([^)]*\)).*/\1/')
+            task_file=$(echo "${fields[7]:-}" | xargs | sed 's/\[Details\](\(.*\))/\1/' | sed 's/.*](\([^)]*\)).*/\1/')
 
             TASK_STATUS["$uuid"]=$(normalize_status "$status")
             TASK_DEPS["$uuid"]="$deps"
