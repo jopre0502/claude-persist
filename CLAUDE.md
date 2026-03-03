@@ -126,6 +126,13 @@ Mache einen kurzen **Final-Check**:
 - `wc -c` → `${#var}` | `$(date)` → `printf -v var '%(%F %T)T' -1`
 - Einzelne Aufrufe ausserhalb von Loops sind OK
 
+### Bash Scripts: CRLF-Defensive Patterns (Windows)
+- **jq-Output:** IMMER `| tr -d '\r'` anhaengen wenn Output in Variablen/Vergleichen genutzt wird
+- **Datei-Input in while-Loops:** `line="${line%$'\r'}"` am Loop-Anfang
+- **awk-Processing:** `gsub(/\r/, "")` in awk-Skripten
+- **Praevention:** `.gitattributes` (`* text=auto eol=lf`), `.editorconfig` (`end_of_line = lf`), `core.autocrlf=input`
+- Bestehende defensive Patterns NICHT entfernen (Belt-and-Suspenders auch nach LF-Normalisierung)
+
 ### Security & Quality Requirements
 - No security vulnerabilities (SQL injection, XSS, command injection, OWASP Top 10)
 - Validate user input at system boundaries
@@ -178,23 +185,19 @@ Mache einen kurzen **Final-Check**:
 
 ### CRITICAL: Environment-Isolation bei Subagents (Task Tool)
 
-**Problem:** Sub-Agents (Task tool) erben KEINE Environment-Variablen aus dem SessionStart Hook (`CLAUDE_ENV_FILE`). Betrifft: `$OBSIDIAN_VAULT`, `$N8N_API_KEY`, und alle via `~/.config/secrets/env.d/*.env` geladenen Variablen.
+**Problem:** Sub-Agents (Task tool) erben KEINE Environment-Variablen aus dem SessionStart Hook (`CLAUDE_ENV_FILE`). Betrifft: `$N8N_API_KEY` und alle via `~/.config/secrets/env.d/*.env` geladenen Secrets.
 
-**Regel:** Alles, was auf SessionStart-Environment angewiesen ist, MUSS in der **Main-Session** aufgelöst werden — BEVOR es an einen Subagent delegiert wird.
+**Vault Read/Search/Tags/Backlinks — Sub-Agents nutzen CLI direkt:**
+- CLI (`obsidian.com`) nutzt Named Pipe (OS-Level) → funktioniert in Sub-Agents ohne env vars
+- `vault:` Referenzen direkt in Sub-Agents aufloesen (CLI search + read). Kein Main-Session-Preflight noetig.
+- Bash-Scripts: `vault-lib.sh` mit `get_vault_path()` handled Vault-Pfad automatisch (CLI primary, Env fallback)
+- Voraussetzung: Obsidian App muss laufen
 
-**Vault-Referenzen (`vault:`) — Pflicht-Workflow:**
-1. User gibt `vault:"Dokumentname"` als Input → **Main-Session** löst auf:
-   - CLI: `obsidian.com search "query"` für Discovery
-   - CLI: `obsidian.com read "Dokumentname"` für Content
-   - (Voraussetzung: Obsidian App muss laufen)
-2. Aufgelösten **Klartext** an Subagent übergeben (im `prompt:` Parameter)
-3. **NIEMALS** eine `vault:` Referenz unaufgelöst an einen Subagent weiterreichen
-
-**Secrets/API-Keys — gleiches Prinzip:**
+**Secrets/API-Keys — weiterhin Main-Session-Pflicht:**
 - API-Calls die Secrets brauchen → Main-Session ausführen, Ergebnis an Subagent
 - Oder: In Bash `source ~/.config/secrets/.env-cache` (wird bei Session-Start vom Hook geschrieben)
 
-**Warum:** SessionStart Hook setzt `CLAUDE_ENV_FILE` → Main-Session lädt env vars. Task-Subagents starten in isoliertem Kontext ohne diese env vars. Das ist by design (Sicherheit), aber erfordert bewusstes Handling.
+**Warum:** SessionStart Hook setzt `CLAUDE_ENV_FILE` → Main-Session lädt env vars. Task-Subagents starten in isoliertem Kontext ohne diese env vars. Vault-CLI ist davon nicht betroffen (Named Pipe, OS-Level).
 
 ---
 

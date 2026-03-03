@@ -160,14 +160,14 @@ class PhaseMigrator:
         for i in range(start_line + 1, len(self.lines)):
             line = self.lines[i]
 
-            # Track <details> blocks
+            # Legacy: Track <details> blocks for backward-compatible parsing of older documents
             if '<details>' in line:
                 in_details = True
             if '</details>' in line:
                 in_details = False
                 continue
 
-            # Don't break inside <details>
+            # Legacy: Don't break inside <details>
             if in_details:
                 continue
 
@@ -243,7 +243,7 @@ class PhaseMigrator:
         # Clean up content - remove collapsed details wrapper if present
         content_lines = phase.content.copy()
 
-        # Remove outer <details>/<summary> if the whole phase was collapsed
+        # Legacy: Remove outer <details>/<summary> if the whole phase was collapsed (backward compat)
         if content_lines and '<details>' in content_lines[0]:
             content_lines = self._unwrap_details(content_lines)
 
@@ -277,7 +277,7 @@ class PhaseMigrator:
         return header + body + '\n'
 
     def _unwrap_details(self, lines: List[str]) -> List[str]:
-        """Remove outer <details>/<summary> wrapper if present."""
+        """Legacy: Remove outer <details>/<summary> wrapper if present (backward compat for older docs)."""
         result = []
         in_wrapper = False
         depth = 0

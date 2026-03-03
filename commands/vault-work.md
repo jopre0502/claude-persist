@@ -43,7 +43,7 @@ Finde und lade das Dokument via Obsidian CLI (Voraussetzung: Obsidian App muss l
    - Liest Inhalt inkl. Frontmatter
    - Zeigt Metadaten + Content an
 
-**Fallback** (wenn Obsidian nicht laeuft): Glob Tool mit Pattern `**/*$ARGUMENTS*.md` auf `$OBSIDIAN_VAULT`, dann Read Tool.
+**Fallback** (wenn Obsidian nicht laeuft): Vault-Pfad via `$OBSIDIAN_VAULT` (Offline-Fallback), dann Glob Tool mit Pattern `**/*$ARGUMENTS*.md`, dann Read Tool.
 
 ### 2. Dokument anzeigen
 
@@ -113,15 +113,14 @@ echo "<neuer-content>" | ~/.claude/skills/vault-manager/scripts/vault-edit.sh --
 
 ## Fehlerbehandlung
 
-### OBSIDIAN_VAULT nicht gesetzt
+### Vault nicht erreichbar
 
 ```
-OBSIDIAN_VAULT Umgebungsvariable nicht gesetzt.
+Vault-Pfad nicht ermittelt.
 
-Setup:
-1. Erstelle ~/.config/secrets/env.d/vault.env
-2. Inhalt: OBSIDIAN_VAULT="/pfad/zu/deinem/vault"
-3. Neue Claude Code Session starten
+Loesung:
+1. Obsidian App starten (CLI liefert Pfad automatisch)
+2. Offline-Fallback: export OBSIDIAN_VAULT="/pfad/zu/deinem/vault"
 ```
 
 ### Dokument nicht gefunden

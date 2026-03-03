@@ -108,23 +108,23 @@ class DocMetricsValidator:
             }
 
     def check_collapsed_sections(self):
-        """Check if long documents use collapsed sections."""
+        """Check if long documents have migrated completed phases to separate files."""
         line_count = len(self.lines)
-        details_count = self.content.count('<details>')
+        migrated_count = self.content.count('docs/phases/') + self.content.count('Ausgelagert:')
 
-        if line_count > 500 and details_count < 3:
+        if line_count > 500 and migrated_count < 1:
             self.metrics['collapsed_sections'] = {
                 'total_lines': line_count,
-                'collapsed_count': details_count,
+                'collapsed_count': migrated_count,
                 'status': 'WARNING',
-                'message': f'{line_count} lines but only {details_count} collapsed sections. Consider using <details> for completed phases.'
+                'message': f'{line_count} lines but no migrated phases found. Consider migrating completed phases to docs/phases/.'
             }
         else:
             self.metrics['collapsed_sections'] = {
                 'total_lines': line_count,
-                'collapsed_count': details_count,
+                'collapsed_count': migrated_count,
                 'status': 'OK',
-                'message': f'{details_count} collapsed sections for {line_count} lines'
+                'message': f'{migrated_count} migrated phases for {line_count} lines'
             }
 
     def calculate_signal_to_noise(self):

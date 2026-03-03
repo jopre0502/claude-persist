@@ -39,15 +39,10 @@ LAYER 3: ARCHIVE
 ```markdown
 ## Phase B: MVP (COMPLETED)
 
-<details>
-<summary>Click to expand completed work</summary>
-
-[... task details, dates, outcomes ...]
-
-</details>
+> Ausgelagert: [Details](docs/phases/Phase-02-MVP.md) | Abgeschlossen: YYYY-MM-DD
 ```
 
-**Why:** Reduces visible context while preserving audit trail.
+**Why:** Moves completed content to separate files. Reduces main document size while preserving full audit trail in dedicated phase files.
 
 ---
 

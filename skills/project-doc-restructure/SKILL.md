@@ -58,15 +58,15 @@ LAYER 2: CONTEXT LAYER (What's the status?)
 └─ 🔄 Active Phase Details (expanded)
 
 LAYER 3: ARCHIVE LAYER (What was/comes?)
-├─ 🚀 Planned Phases (collapsed)
-├─ 📋 Completed Phases (collapsed)
-└─ 📚 Reference Information (collapsed)
+├─ 🚀 Planned Phases (summary inline, details on demand)
+├─ 📋 Completed Phases (migrated to docs/phases/)
+└─ 📚 Reference Information (separate files with links)
 ```
 
 ### 2. Progressive Disclosure
 
 - **Expanded:** Active work, blocked items
-- **Collapsed (`<details>`):** Completed, planned, archived content
+- **Migrated (separate file with link):** Completed, planned, archived content
 - **Criterion:** Status + recency determines visibility
 
 ### 3. Quality Metrics
@@ -139,7 +139,7 @@ python3 scripts/restructure_document.py PROJECT.md PROJECT_NEW.md
 3. Extract Immediate Actions from uncompleted checkboxes
 4. Build Phase Status Overview table
 5. Apply emoji system (📊🎯📈🔄📋🚀📚)
-6. Collapse non-active sections with `<details>`
+6. Migrate non-active sections to `docs/phases/` (with inline link)
 7. Add Decision Log and Reference sections
 
 **Post-restructure tasks:**
@@ -356,13 +356,7 @@ The script recognizes completed phases via:
 ```markdown
 ## 📋 Phase 1: Foundation (ABGESCHLOSSEN)
 
-<details>
-<summary>Alle Tasks abgeschlossen (100%)</summary>
-
-**Abschlussdatum:** 2026-01-15
-... 50+ lines of content ...
-
-</details>
+> Ausgelagert: [Details](docs/phases/Phase-01-Foundation.md) | Abgeschlossen: 2026-01-15
 ```
 
 ### Example: After Migration
@@ -409,7 +403,7 @@ To migrate, run:
 | Phase without number | Warning issued, uses "XX" as placeholder |
 | Phase already migrated | Skipped (detected via link presence) |
 | Multiple phases | All migratable phases processed |
-| Phase inside `<details>` | Content extracted and preserved |
+| Phase with legacy `<details>` wrapper | Content extracted, wrapper stripped |
 
 ### Best Practices
 
@@ -427,7 +421,7 @@ A successfully restructured document has:
 - ✅ TTO < 1 minute (test: close doc, wait 1 week, reopen, time to first action)
 - ✅ Executive Summary in top 20 lines
 - ✅ No high-severity anti-patterns
-- ✅ Active work visible, past/future collapsed
+- ✅ Active work visible, past/future migrated to separate files
 - ✅ Actionable "Immediate Next Actions" section
 - ✅ Current timestamp (< 7 days for active projects)
 - ✅ Completed phases migrated to `docs/phases/` (for multi-phase projects)

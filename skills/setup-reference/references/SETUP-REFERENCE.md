@@ -1,4 +1,4 @@
-# SETUP-REFERENCE — Auto-generated: 2026-03-02 13:51
+# SETUP-REFERENCE — Auto-generated: 2026-03-03 08:13
 
 Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
@@ -47,13 +47,14 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 | Command | Beschreibung |
 |---------|-------------|
+| `/knowledge-hub-sync` | (keine Beschreibung) |
 | `/obsidian-sync` | (keine Beschreibung) |
 | `/refresh-reference` | (keine Beschreibung) |
 | `/run-next-tasks` | (keine Beschreibung) |
 | `/vault-export` | (keine Beschreibung) |
 | `/vault-work` | (keine Beschreibung) |
 
-**Gesamt:** 5 Commands
+**Gesamt:** 6 Commands
 
 ---
 
@@ -90,7 +91,6 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 - `Write`
 - `Skill(*)`
 - `Task(*)`
-- `mcp__obsidian__*`
 - `WebSearch`
 - `WebFetch`
 - `Bash(git *)`
@@ -150,10 +150,8 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 - `Bash(xxd *)`
 - `Bash(od *)`
 - `Bash(export *)`
-- `Bash(secret-run *)`
 - `Bash(./run-headless-test.sh *)`
 - `Bash(mount *)`
-- `Bash(wsl.exe *)`
 - `WebFetch(domain:blog.korny.info)`
 - `WebFetch(domain:smartscope.blog)`
 - `Bash(git commit:*)`
@@ -388,5 +386,5 @@ source ~/.config/secrets/.env-cache
 
 ---
 
-*Generiert: 2026-03-02 13:51 | Script: generate-reference.sh*
+*Generiert: 2026-03-03 08:13 | Script: generate-reference.sh*
 *Naechste Aktualisierung: /refresh-reference ausfuehren*

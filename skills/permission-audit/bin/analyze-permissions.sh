@@ -22,7 +22,7 @@ UNMATCHED_LINES=""
 AUTO_TOOLS="Read Grep Glob LS NotebookRead AskUserQuestion TaskOutput"
 
 # Allow-Rules aus settings.json laden
-ALLOW_RULES=$(jq -r '.permissions.allow[]' "$SETTINGS" 2>/dev/null)
+ALLOW_RULES=$(jq -r '.permissions.allow[]' "$SETTINGS" 2>/dev/null | tr -d '\r')
 
 while IFS='|' read -r TIME TOOL SIG; do
   # Auto-approved?

@@ -26,7 +26,9 @@
 
 set -uo pipefail
 
-VAULT_PATH="${OBSIDIAN_VAULT:-.}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vault-lib.sh"
+VAULT_PATH=$(get_vault_path) || { echo -e "\033[0;31mError: Vault nicht erreichbar. Obsidian starten oder OBSIDIAN_VAULT setzen.\033[0m"; exit 1; }
 
 # Colors
 RED='\033[0;31m'
@@ -35,12 +37,9 @@ BLUE='\033[0;34m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
-# Validate vault path
+# Validate vault path (already resolved by get_vault_path, but extra safety)
 if [ ! -d "$VAULT_PATH" ]; then
-    echo -e "${RED}Error: Vault path not found${NC}"
-    echo "OBSIDIAN_VAULT=$VAULT_PATH does not exist"
-    echo ""
-    echo "Setup: echo 'OBSIDIAN_VAULT=\"/pfad/zum/vault\"' >> ~/.config/secrets/env.d/vault.env"
+    echo -e "${RED}Error: Vault path not found: $VAULT_PATH${NC}"
     exit 1
 fi
 

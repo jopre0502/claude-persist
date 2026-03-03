@@ -19,7 +19,9 @@
 set -euo pipefail
 
 # --- Configuration ---
-VAULT_ROOT="${OBSIDIAN_VAULT:-}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vault-lib.sh"
+VAULT_ROOT=""  # resolved later (after --dry-run check)
 DEFAULT_TARGET="04 RESSOURCEN"
 
 # --- Functions ---
@@ -43,7 +45,7 @@ Options:
   --help       Show this help
 
 Environment:
-  OBSIDIAN_VAULT    Path to Obsidian vault (required)
+  OBSIDIAN_VAULT    Path to Obsidian vault (optional fallback, CLI-primary)
 
 Examples:
   vault-copy.sh /tmp/report.md                          # External -> Vault
@@ -111,13 +113,10 @@ if [[ -z "$SOURCE" ]]; then
     error "Missing source. Usage: vault-copy.sh <source> [target-folder]"
 fi
 
-if [[ -z "$VAULT_ROOT" ]]; then
-    if [[ "$DRY_RUN" == "true" ]]; then
-        info "OBSIDIAN_VAULT not set (dry-run mode, using placeholder)"
-        VAULT_ROOT="<VAULT>"
-    else
-        error "OBSIDIAN_VAULT environment variable not set."
-    fi
+if [[ "$DRY_RUN" == "true" ]]; then
+    VAULT_ROOT=$(get_vault_path 2>/dev/null) || VAULT_ROOT="<VAULT>"
+else
+    VAULT_ROOT=$(get_vault_path) || error "Vault nicht erreichbar. Obsidian starten oder OBSIDIAN_VAULT setzen."
 fi
 
 # --- Source Resolution (CLI+Bash Hybrid — ADR-005) ---

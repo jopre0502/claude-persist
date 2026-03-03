@@ -66,10 +66,7 @@ Frage den User: "Soll ich den Session-Inhalt zu [Thema] als Content verwenden?"
 Rufe das Bash-Script auf:
 
 ```bash
-# Guard: Vault-Pfad verifizieren
-if [ ! -d "$OBSIDIAN_VAULT/.obsidian" ]; then
-  echo "ERROR: $OBSIDIAN_VAULT ist kein Obsidian Vault (.obsidian/ fehlt)"; exit 1
-fi
+# Guard: Vault-Pfad verifizieren (vault-export.sh nutzt vault-lib.sh intern)
 
 # Dry-run zuerst zeigen
 ~/.claude/skills/vault-manager/scripts/vault-export.sh --dry-run "<Fileclass>" "<Titel>" "<Content>"
@@ -87,21 +84,21 @@ Zeige dem User:
 
 ## Fehlerbehandlung
 
-### OBSIDIAN_VAULT nicht gesetzt
+### Vault nicht erreichbar
 
 ```
-⚠️ OBSIDIAN_VAULT Umgebungsvariable nicht gesetzt.
+⚠️ Vault-Pfad nicht ermittelt.
 
-Setup:
-1. Erstelle ~/.config/secrets/env.d/vault.env
-2. Inhalt: OBSIDIAN_VAULT="/pfad/zu/deinem/vault"
-3. Führe /vault-export erneut aus
+Loesung:
+1. Obsidian App starten (CLI liefert Pfad automatisch)
+2. Offline-Fallback: export OBSIDIAN_VAULT="/pfad/zu/deinem/vault"
+3. Fuehre /vault-export erneut aus
 ```
 
 ### Datei existiert bereits
 
 ```
-⚠️ Datei existiert bereits: $OBSIDIAN_VAULT/04-RESSOURCEN/Titel.md
+⚠️ Datei existiert bereits: $VAULT_PATH/04-RESSOURCEN/Titel.md
 
 Optionen:
 1. Anderen Titel wählen
@@ -132,7 +129,7 @@ Claude:
 === VORSCHAU (Dry-Run) ===
 Fileclass: Werk
 Titel: PKM-Workflows mit Claude Code
-Ziel: $OBSIDIAN_VAULT/04-RESSOURCEN/PKM-Workflows mit Claude Code.md
+Ziel: $VAULT_PATH/04-RESSOURCEN/PKM-Workflows mit Claude Code.md
 
 ---
 fileClass: Werk
@@ -161,7 +158,7 @@ Claude: ✅ Dokument erstellt: /pfad/zum/vault/04-RESSOURCEN/PKM-Workflows mit C
 ## Technische Details
 
 - **Script:** `~/.claude/skills/vault-manager/scripts/vault-export.sh`
-- **Zielordner:** `$OBSIDIAN_VAULT/04-RESSOURCEN/`
+- **Zielordner:** `$VAULT_PATH/04-RESSOURCEN/`
 - **Frontmatter:** Dynamisch basierend auf Fileclass (siehe fileclass-mapping.json)
 - **Encoding:** UTF-8
 

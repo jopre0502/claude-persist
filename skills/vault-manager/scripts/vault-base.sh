@@ -22,8 +22,9 @@
 
 set -uo pipefail
 
-VAULT_PATH="${OBSIDIAN_VAULT:-.}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vault-lib.sh"
+VAULT_PATH=$(get_vault_path) || { echo -e "\033[0;31m[ERROR] Vault nicht erreichbar. Obsidian starten oder OBSIDIAN_VAULT setzen.\033[0m" >&2; exit 1; }
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; BLUE='\033[0;34m'
 YELLOW='\033[0;33m'; NC='\033[0m'
@@ -47,7 +48,7 @@ Arguments:
   <name>    Name or partial name of a .base file (case-insensitive)
 
 Environment:
-  OBSIDIAN_VAULT    Path to Obsidian vault (required)
+  OBSIDIAN_VAULT    Path to Obsidian vault (optional fallback, CLI-primary)
 
 Examples:
   vault-base.sh Bewerbungen         Run Bewerbungen_Dashboard query
@@ -63,11 +64,16 @@ EOF
 # --- Base Discovery ---
 
 find_base_file() {
-    local name="$1" result
-    result=$(find "$VAULT_PATH" -iname "${name}.base" -type f 2>/dev/null | head -1)
-    [[ -n "$result" ]] && { echo "$result"; return 0; }
-    result=$(find "$VAULT_PATH" -iname "*${name}*.base" -type f 2>/dev/null | head -1)
-    [[ -n "$result" ]] && { echo "$result"; return 0; }
+    local name="$1" exact="" partial=""
+    while IFS= read -r path; do
+        local base="${path##*/}"
+        base="${base%.base}"
+        if [[ "${base,,}" == "${name,,}" ]]; then
+            echo "$path"; return 0
+        fi
+        [[ -z "$partial" ]] && partial="$path"
+    done < <(find "$VAULT_PATH" -iname "*${name}*.base" -type f 2>/dev/null)
+    [[ -n "$partial" ]] && { echo "$partial"; return 0; }
     return 1
 }
 
@@ -172,7 +178,7 @@ filter_frontmatter_date_cmp() {
 filter_tags() {
     local tags_csv="$1"
     echo "$tags_csv" | tr ',' '\n' | while read -r tag; do
-        tag=$(echo "$tag" | sed 's/^[[:space:]]*"//; s/"[[:space:]]*$//')
+        tag="${tag#"${tag%%[![:space:]]*}"}"; tag="${tag#\"}"; tag="${tag%\"}"; tag="${tag%"${tag##*[![:space:]]}"}"
         [[ -z "$tag" ]] && continue
 
         # Primary: obsidian.com CLI tag search (10x faster, uses internal index)
@@ -182,7 +188,7 @@ filter_tags() {
             if [[ -n "$cli_result" ]]; then
                 # CLI outputs relative paths — prepend vault path, filter .md files
                 echo "$cli_result" | grep '\.md' | while IFS= read -r line; do
-                    line=$(echo "$line" | sed 's/^[[:space:]]*//')
+                    line="${line#"${line%%[![:space:]]*}"}"
                     [[ -z "$line" ]] && continue
                     if [[ "$line" == /* ]]; then
                         echo "$line"
@@ -270,7 +276,7 @@ run_filter_block() {
         ((idx++))
         local outfile="$tmpdir/f_${idx}.txt"
         if exec_filter "$expr" 2>/dev/null | sort -u > "$outfile"; then
-            local cnt; cnt=$(wc -l < "$outfile")
+            local cnt=0; while IFS= read -r _; do ((cnt++)); done < "$outfile"
             info "Filter $idx: '$expr' → $cnt matches"
         else
             ((skipped++))

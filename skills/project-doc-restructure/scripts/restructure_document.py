@@ -276,19 +276,14 @@ class DocumentRestructurer:
         if not collapsed:
             return [header, ""] + section['content']
         else:
-            # Collapsed format
+            # Migrated format — link to separate file instead of inline content
             content_preview = '\n'.join(section['content'][:2])
-            summary_line = content_preview.split('\n')[0] if content_preview else "Details collapsed"
+            summary_line = content_preview.split('\n')[0] if content_preview else "Details migrated"
 
             return [
                 header,
                 "",
-                "<details>",
-                f"<summary>{summary_line}</summary>",
-                "",
-            ] + section['content'] + [
-                "",
-                "</details>"
+                f"> {summary_line} — Details in separater Datei oder bei Bedarf inline ergaenzen.",
             ]
 
     def _generate_reference_section(self) -> List[str]:
@@ -298,14 +293,11 @@ class DocumentRestructurer:
         return [
             "## 📚 Reference Information",
             "",
-            "<details>",
-            "<summary>Entscheidungslog</summary>",
+            "### Entscheidungslog",
             "",
             "| Datum | Entscheidung | Begründung | Phase |",
             "|-------|--------------|------------|-------|",
             f"| {current_date} | Dokument restructured | Improved session continuity | - |",
-            "",
-            "</details>",
             "",
             "---",
             "",

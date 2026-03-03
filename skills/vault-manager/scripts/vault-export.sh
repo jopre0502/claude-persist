@@ -14,8 +14,10 @@
 set -euo pipefail
 
 # --- Configuration ---
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vault-lib.sh"
 MAPPING_FILE="${FILECLASS_MAPPING:-$HOME/.claude/skills/vault-manager/config/fileclass-mapping.json}"
-VAULT_ROOT="${OBSIDIAN_VAULT:-}"
+VAULT_ROOT=""  # resolved later (after --dry-run check)
 EXPORT_DIR="04 RESSOURCEN"
 
 # --- Functions ---
@@ -31,7 +33,7 @@ Options:
   --help       Show this help
 
 Environment:
-  OBSIDIAN_VAULT    Path to Obsidian vault (required)
+  OBSIDIAN_VAULT    Path to Obsidian vault (optional fallback, CLI-primary)
   FILECLASS_MAPPING Path to fileclass-mapping.json (optional)
 
 Examples:
@@ -296,9 +298,9 @@ if [[ -z "$TITLE" ]]; then
     error "Title cannot be empty"
 fi
 
-# Check vault path (only if not dry-run)
-if [[ "$DRY_RUN" == "false" ]] && [[ -z "$VAULT_ROOT" ]]; then
-    error "OBSIDIAN_VAULT environment variable not set. Set it or use --dry-run"
+# Resolve vault path (only if not dry-run)
+if [[ "$DRY_RUN" == "false" ]]; then
+    VAULT_ROOT=$(get_vault_path) || error "Vault nicht erreichbar. Obsidian starten oder OBSIDIAN_VAULT setzen."
 fi
 
 # Generate document

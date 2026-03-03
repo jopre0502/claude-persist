@@ -25,6 +25,20 @@ git -C "$HUB_DIR" remote -v
 
 **Falls kein Git-Repo:** Zeige Fehler und stoppe.
 
+### Step 1b: Branch pruefen
+
+```bash
+HUB_DIR="$HOME/.claude"
+current_branch=$(git -C "$HUB_DIR" branch --show-current)
+if [ "$current_branch" != "main" ]; then
+  echo "⚠️ Knowledge Hub ist auf Branch '$current_branch' statt 'main'."
+  echo "Wechsle zu main..."
+  git -C "$HUB_DIR" checkout main
+fi
+```
+
+**Wichtig:** Knowledge Hub arbeitet immer auf `main`. Kein Feature-Branch-Workflow.
+
 ### Step 2: Aenderungen pruefen
 
 ```bash

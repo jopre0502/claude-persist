@@ -22,6 +22,7 @@ set -euo pipefail
 
 # --- Configuration ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vault-lib.sh"
 TODAY=$(date +%Y-%m-%d)
 
 # --- Functions ---
@@ -37,7 +38,7 @@ Options:
   --help           Show this help
 
 Environment:
-  OBSIDIAN_VAULT    Path to Obsidian vault (required)
+  OBSIDIAN_VAULT    Path to Obsidian vault (optional fallback, CLI-primary)
 
 Examples:
   vault-edit.sh "my-document" "Updated content here"
@@ -154,10 +155,8 @@ if [[ -z "$NEW_CONTENT" ]]; then
     error "No new content provided. Pass as argument or pipe via stdin."
 fi
 
-# Check vault path
-if [[ -z "${OBSIDIAN_VAULT:-}" ]]; then
-    error "OBSIDIAN_VAULT environment variable not set."
-fi
+# Resolve vault path
+OBSIDIAN_VAULT=$(get_vault_path) || error "Vault nicht erreichbar. Obsidian starten oder OBSIDIAN_VAULT setzen."
 
 # --- Step 1: Find document ---
 if [[ -n "$DIRECT_PATH" ]]; then

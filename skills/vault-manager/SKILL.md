@@ -10,321 +10,231 @@ description: |
 model: sonnet
 ---
 
-# Vault Manager Skill
+# Vault Manager — CLI-First
 
-**Purpose:** Read-only Obsidian Vault integration for Claude Code. Triggered via `vault:` prefix notation for document referencing.
-
-**UC1 Focus:** Read-Only Vault-Referenz via `vault:` Notation
-- Discover documents by name (recursive search)
-- Load document content and metadata
-- Parse YAML frontmatter
-- Make content available as context
+**One skill, one entry point.** Obsidian CLI (`obsidian.com`) ist Primary fuer alle Vault-Operationen. Filesystem (Glob + Read) ist Fallback wenn CLI nicht verfuegbar.
 
 ---
 
-## Triggering Logic
+## Command Routing
 
-### Detection Patterns
-
-This skill is triggered when user input matches any of these patterns:
-
-1. **vault: Prefix Notation:** `vault:document-name`, `vault:ai-workflows`
-   - Triggers: Document lookup + context loading
-   - Example: "Nutze vault:ai-workflows als Kontext"
-
-2. **Explicit Skill Reference:** `vault` or `obsidian` keywords
-   - Triggers: Skill activation for document operations
-   - Example: "Search my Vault for X"
-
-3. **Context Loading:** "load", "read", "fetch" + vault document reference
-   - Triggers: Read-only access
-   - Example: "Lade vault:project-x und zeige mir..."
-
-4. **Backlinks/Related:** "backlinks", "related", "verlinkt", "linked to"
-   - Triggers: Backlink analysis for a document
-   - Example: "Zeige mir alle Backlinks zu vault:project-x"
-
-5. **Vault Health:** "orphans", "deadends", "unresolved", "vault health", "vault status"
-   - Triggers: Vault-wide graph analysis
-   - Example: "Wie gesund ist mein Vault?" or "Zeige verwaiste Notizen"
-
-### Implementation
-
-Claude Code performs **semantic matching** on skill description:
-- User input analyzed against this description
-- `vault:` prefix or vault/obsidian keywords detected → Skill activates
-- User approval requested before loading skill
-- Full skill loaded after approval
-
-### Important: No @ Symbol
-
-This skill intentionally does NOT use `@` notation to avoid collision with Claude Code's
-native `@file` auto-completion feature. Always use `vault:` prefix for Vault references.
+| User Intent | CLI Command | Fallback |
+|-------------|-------------|----------|
+| `vault:name` | `search query="<name>"` → `read file="<path>"` | Glob + Read Tool |
+| "suche im vault" | `search query="<text>"` | Glob |
+| "zeige tags" | `tags all counts` | grep |
+| "tag X finden" | `tag name="<tag>" verbose` | grep |
+| "backlinks zu X" | `backlinks file="<name>"` | nicht verfuegbar |
+| "base Bewerbungen" | `base:query path=<path>` | vault-base.sh |
+| "daily note" | `daily:read` | Glob + Read |
+| "property lesen" | `property:read name=<n> file=<path>` | YAML parse |
+| "exportiere als Werk" | `create name=<n> template=<t>` + `append` | vault-export.sh |
+| "bearbeite" | vault-edit.sh | — |
+| "vault health" | `orphans`, `deadends`, `unresolved`, `vault info` | nicht verfuegbar |
+| unbekannter command | `help` → retry | User informieren |
 
 ---
 
-## UC1: Read-Only Vault Reference Implementation
+## Workflow
 
-### Workflow (mit CLI Healthcheck + Fallback-Kaskade)
-
-```
-1. User Input Detection
-   └─ Does input contain vault: prefix or vault/obsidian keywords?
-      ├─ YES → Continue
-      └─ NO → Skill not triggered
-
-2. CLI Healthcheck (EINMAL pro Session, Ergebnis merken)
-   └─ Bash: obsidian.com version > /tmp/obsidian-cli-check.txt 2>&1; echo $?
-      ├─ Exit 0 + sinnvoller Output? → CLI_AVAILABLE=true
-      └─ Exit != 0 ODER "Error"/"not found" im Output?
-         → CLI_AVAILABLE=false
-         → KEIN weiterer CLI-Versuch in dieser Session
-         → Hinweis: "CLI nicht verfuegbar, nutze Filesystem-Fallback"
-
-3. Document Discovery
-   └─ CLI_AVAILABLE?
-      ├─ TRUE → obsidian.com search query="<name>" format=json
-      └─ FALSE → Glob Tool: $OBSIDIAN_VAULT/**/*<name>*.md
-         (Nur Dateinamen-Match, kein Content-Search)
-
-4. Content Loading
-   └─ CLI_AVAILABLE?
-      ├─ TRUE → obsidian.com read file="<path>"
-      │         + obsidian.com properties file="<path>" format=yaml
-      └─ FALSE → Read Tool direkt auf $OBSIDIAN_VAULT/<path>
-         (Frontmatter manuell aus YAML-Block parsen)
-
-5. Context Presentation
-   └─ Display metadata + content (identisch fuer beide Pfade)
-      ├─ Show frontmatter (dates, tags, status)
-      ├─ Make content available as context
-      ├─ Ready for Claude to use in analysis/writing
-      └─ NO WRITES (read-only)
-
-6. Error Handling
-   └─ If any step fails:
-      ├─ CLI Healthcheck failed → Automatisch Fallback (kein User-Eingriff)
-      ├─ Glob findet nichts → Suggest alternative search terms
-      ├─ $OBSIDIAN_VAULT nicht gesetzt → Setup-Anleitung zeigen
-      └─ Provide setup guidance if needed
-```
-
-**WICHTIG:** Nach einem fehlgeschlagenen CLI-Healthcheck KEINE weiteren CLI-Calls in
-dieser Session versuchen. Der Fallback (Glob + Read) deckt alle Read-Operationen ab.
-Nur CLI-exklusive Features (Backlinks, Vault Health) sind im Fallback nicht verfuegbar.
-
-### Tools (CLI+Bash Hybrid — ADR-005)
-
-**CLI Commands** (Obsidian 1.12+, requires running Obsidian App):
-- `obsidian.com search query="<name>" format=json` - Document discovery via Obsidian index
-- `obsidian.com read file="<path>"` - File content (full)
-- `obsidian.com properties file="<path>" format=yaml` - Metadata/frontmatter extraction
-- `obsidian.com tags all counts` - List all unique tags in vault
-- `obsidian.com tag name="<tag>" verbose` - Find documents by tag
-- `obsidian.com backlinks path="<path>" [counts|total|format=json]` - Incoming links to a file
-- `obsidian.com links path="<path>" [total]` - Outgoing links from a file
-- `obsidian.com orphans [total|all]` - Files with no incoming links
-- `obsidian.com deadends [total|all]` - Files with no outgoing links
-- `obsidian.com unresolved [total|counts|verbose|format=json]` - Broken/unresolved links
-- `obsidian.com vault [info=name|path|files|folders|size]` - Vault statistics
-
-**Bash Scripts** (scripts/):
-- `vault-date.sh --last <dur>` - Find documents by date range (erstellt/modified/file.mtime)
-- `vault-export.sh <fileclass> <title> [content]` - Export to Vault (UC2)
-- `vault-copy.sh <source> [target-folder]` - Copy/move files into/within Vault (external path, vault: prefix, or document name)
-- `vault-base.sh <name>` - Execute Obsidian Base query (parse .base filters)
-- `vault-base.sh --list` - List all .base files in vault
-- `vault-base.sh --explain <name>` - Show parsed filters human-readable
-- `vault-edit.sh <name> [content]` - Edit document with diff + backup (UC3, Cold-Start)
-- `vault-edit.sh --path <full-path> [content]` - Edit with known path (UC3, Warm-Path)
-
-**Script Location:** `~/.claude/skills/vault-manager/scripts/`
-
----
-
-## Edit-Effizienz
-
-- **Cold-Start:** `/vault-work <name>` (CLI search → read → edit via vault-edit.sh)
-- **Warm-Path:** Wenn Dokument bereits im Kontext → direkt `vault-edit.sh --path` aufrufen
-- **Entscheidungsregel:** Ist der Dateipfad bereits bekannt? → `--path` nutzen, spart CLI-Aufrufe
-
----
-
-## Configuration & Secrets
-
-### Environment Variables
-
-OBSIDIAN_VAULT must be set to your vault path, e.g.:
-C:/Users/Jonas/Google Drive/01. Prechtel_Documents/250_Obsidian/PKM
-
-### Setup Requirements
-
-**Before using this skill:**
-
-1. ✅ **Obsidian App muss laufen** (CLI kommuniziert via Named Pipe)
-   - Check: `obsidian.com vault` (sollte Vault-Info zurueckgeben)
-
-2. ✅ `OBSIDIAN_VAULT` environment variable set (fuer Bash-Scripts)
-   - Automatic via SessionStart Hook (`~/.config/secrets/env.d/vault.env`)
-   - Manual: `export OBSIDIAN_VAULT="/path/to/vault"`
-
-### Sub-Agent-Nutzung (Environment Bootstrap)
-
-Sub-Agents (Agent tool) erben keine env vars aus dem SessionStart Hook.
-Fuer Vault-Zugriff in Sub-Agents jeden Bash-Call prefixen:
+### 1. CLI Health Check (einmal pro Session)
 
 ```bash
-# .env-cache wird vom SessionStart Hook geschrieben
-source ~/.config/secrets/.env-cache && <vault-command>
+obsidian.com version 2>&1; echo "EXIT:$?"
+```
+- Exit 0 + sinnvoller Output → **CLI verfuegbar**
+- Exit != 0 → **Fallback-Modus** (kein weiterer CLI-Versuch in dieser Session)
+- Meldung: "CLI nicht verfuegbar, nutze Filesystem-Fallback"
+
+### 2. Document Discovery + Loading
+
+**CLI-Pfad:**
+```bash
+obsidian.com search query="<name>"       # Discovery
+obsidian.com read file="<path>"          # Content
+obsidian.com properties file="<path>"    # Metadata (optional)
 ```
 
-Siehe auch: `~/.claude/skills/task-orchestrator/references/delegation-patterns.md`
+**Fallback-Pfad (CLI nicht verfuegbar):**
+- Vault-Pfad via `$OBSIDIAN_VAULT` (Offline-Fallback, optional)
+- Glob Tool: `<vault-path>/**/*<name>*.md` (nur Dateinamen-Match)
+- Read Tool: Direkt auf `<vault-path>/<path>`
+- Frontmatter: Manuell aus YAML-Block parsen
 
-3. ✅ `obsidian.com` im PATH
-   - Check: `which obsidian.com`
+### 3. Fehlerbehandlung
 
-4. ✅ Scripts executable (fuer Bash-Scripts)
-   - Location: `~/.claude/skills/vault-manager/scripts/`
-   - Check: `ls -la ~/.claude/skills/vault-manager/scripts/*.sh`
+Bei CLI-Fehlern: `obsidian.com help <command>` konsultieren, Syntax pruefen, retry.
+Erst wenn help keine Loesung liefert → User den Fehler + help-Output melden.
 
----
-
-## Error Handling
-
-### Common Issues & Solutions
-
-**Issue 1: OBSIDIAN_VAULT not set**
-Setup: Configure via `~/.config/secrets/env.d/vault.env` + SessionStart Hook
-File: ~/.config/secrets/env.d/vault.env
-
-**Issue 2: Obsidian App nicht gestartet**
-Symptom: CLI-Commands hängen oder geben "connection refused"
-Solution: Obsidian App starten, dann erneut versuchen
-Fallback: Glob + Read Tools direkt auf `$OBSIDIAN_VAULT` verwenden
-
-**Issue 5: CLI broken (Session-Token Bug o.ae.)**
-Symptom: `obsidian.com version` → "Error: Command session=... not found"
-Root Cause: Shim/App Version-Mismatch nach Auto-Update
-Workaround: Fallback-Kaskade greift automatisch (Glob + Read)
-Fix: Obsidian Installer auf gleiche Version wie App aktualisieren
-Hinweis: KEIN wiederholtes CLI-Probieren — nach einem Fehlschlag sofort Fallback
-
-**Issue 3: Document not found**
-Solution:
-1. Test discovery: `obsidian.com search query="name"`
-2. Verify document exists in Vault
-3. Check spelling/name
-
-**Issue 4: Frontmatter parse error**
-Fallback: Show raw frontmatter block
-Content still fully available
+**NIEMALS:** Parameter-Kombinationen raten oder experimentell ausprobieren.
 
 ---
 
-## UC1 Examples
+## CLI Command Reference
 
-### Example 1: Simple vault: Reference
+Alle Commands mit Prefix `obsidian.com`. Obsidian App muss laufen (Named Pipe).
 
-User: "Nutze vault:ai-workflows als Kontext für deine Antwort"
+### Read & Search
+```
+read file=<name> | path=<path>
+search query=<text> [path= limit= format=]
+file file=<name> | path=<path>
+files [folder= ext= total]
+outline file=<name> [format=tree|md|json]
+```
 
-Skill Flow:
-1. Detect: vault:ai-workflows pattern
-2. Discover: Find $VAULT/02_Areas/ai-workflows.md
-3. Load: Read content + frontmatter
-4. Display: Show metadata and content
-5. Ready: Claude has context for analysis
+### Properties & Tags
+```
+properties [file= counts sort= format=]
+tags [file= counts sort= format=]
+tag name=<tag> [total verbose]
+property:read name=<n> [file=<path>]
+property:set name=<n> value=<v> file=<path>
+property:remove name=<n> file=<path>
+```
 
-### Example 2: Multi-Document Reference
+### Links & Vault Health
+```
+backlinks file=<name> [counts format=]
+links file=<name> [total]
+orphans [total all]
+deadends [total all]
+unresolved [total counts verbose format=]
+aliases [file= format=]
+```
 
-User: "Vergleiche vault:ai-workflows und vault:project-x"
+### Bases
+```
+bases                                    — list all .base files
+base:query path=<base-path> [view=<name>] [format=json]
+base:views                               — views of currently active base
+base:create file=<base-path> [name= content=]
+```
+**Hinweis:** `base:query path=...` arbeitet im Hintergrund (Base wird NICHT als Tab geoeffnet).
 
-Skill Flow:
-1. Detect: Two vault: prefix patterns
-2. Discover + Load both documents
-3. Present comparison
-4. Claude analyzes connections
+### Daily Notes
+```
+daily                                    — open daily note
+daily:read                               — read today's content
+daily:path                               — get file path
+daily:append content=<text>
+daily:prepend content=<text>
+```
 
----
+### Write Operations
+```
+create name=<n> [content= template= overwrite]
+append file=<n> content=<text>
+prepend file=<n> content=<text>
+move file=<n> to=<path>
+rename file=<n> name=<new>
+delete file=<n> [permanent]
+```
 
-## Discovery: Fallback-Kaskade
+### Tasks
+```
+tasks [file= done todo status= verbose format=]
+task ref=<path:line> [toggle done todo]
+```
 
-### Stufe 1: CLI Search (wenn verfuegbar)
+### System & Navigation
+```
+vault [info=name|path|files|size]
+folders [folder= total]
+open path=<path> [newtab]
+version
+plugins
+bookmarks
+recents
+workspace
+```
 
-Method: `obsidian.com search query="<name>" format=json`
-Performance: Fast (uses Obsidian's internal index, not filesystem scan)
-Features: Case-insensitive, content + filename matching, context snippets
-Prerequisite: CLI Healthcheck muss bestanden sein (siehe UC1 Workflow Schritt 2)
-
-### Stufe 2: Glob Fallback (wenn CLI nicht verfuegbar)
-
-Method: Glob tool mit Pattern `**/*<name>*.md` auf `$OBSIDIAN_VAULT`
-Performance: ~500-1000ms (filesystem scan)
-Hinweis: Nur Dateinamen-Match, kein Content-Search
-Trigger: Automatisch wenn CLI Healthcheck fehlschlaegt
-
-### Stufe 3: Fehlermeldung (wenn Glob nichts findet)
-
-Dokument nicht gefunden → alternative Suchbegriffe vorschlagen, Pfad prüfen
-
-### Nicht verfuegbar im Fallback-Modus
-
-Folgende CLI-exklusive Features funktionieren NUR mit laufender Obsidian App:
-- `backlinks` / `links` (Incoming/Outgoing Links)
-- `orphans` / `deadends` / `unresolved` (Vault Health)
-- `vault info` (Vault-Statistiken)
-- Content-Search (Volltext-Suche innerhalb von Dokumenten)
-
-Bei Anfrage dieser Features im Fallback-Modus → klare Meldung:
-"Diese Funktion erfordert eine laufende Obsidian App. Bitte Obsidian starten und erneut versuchen."
-
----
-
-## Metadata Extraction
-
-### Frontmatter Schema
-
-Extracted from YAML frontmatter:
-- created: YYYY-MM-DD
-- modified: YYYY-MM-DD
-- tags: [tag1, tag2]
-- status: draft|active|done
-- type: note|project|meeting
-
----
-
-## Known Limitations
-
-- **Obsidian muss laufen:** CLI kommuniziert via Named Pipe — ohne Obsidian App kein CLI-Zugriff (Fallback: Glob/Read)
-- **No Semantic Search:** CLI bietet Fulltext, aber kein Embedding/Similarity Search (Phase 6+ MCP/RAG)
-- **Backlinks + Vault Health:** Vollstaendig via CLI verfuegbar (backlinks, orphans, deadends, unresolved, vault stats)
-- UTF-8 Assumption: Non-UTF-8 files may display incorrectly
-- No @ Symbol: Uses vault: prefix to avoid collision with Claude Code native @ completion
-
----
-
-## References
-
-CLI: `obsidian.com` (Obsidian 1.12+, im PATH via WSL2-Interop)
-Scripts: `~/.claude/skills/vault-manager/scripts/` (vault-export, vault-edit, vault-date, vault-base, vault-copy)
-
-Documentation:
-- ADR-005: `docs/decisions/ADR-005-obsidian-cli-architecture.md` (Hybrid-Strategie)
-- SETUP.md: Installation guide
-- REFERENCE.md: Scripts reference
+### Developer Tools
+```
+eval code="<javascript>"               — JS in Obsidian context
+diff file=<path>
+history / history:list / history:read / history:restore
+sync / sync:status / sync:history
+web url=<url>
+```
 
 ---
 
-## Current Status
+## Bash Scripts (Write-Ops + Complex Filters)
 
-- UC1 Read: ✅ (CLI: search, read, properties)
-- UC2 Export: ✅ (vault-export.sh, 7 Fileclass-Typen)
-- UC3 Edit: ✅ (vault-edit.sh, /vault-work Command)
-- Phase 4 Search: ✅ (CLI: tags/tag + vault-date.sh, vault-base.sh)
-- Phase 5b: CLI Migration ✅ (ADR-005 Hybrid)
-- Backlinks: ✅ (CLI: backlinks, links — incoming + outgoing)
-- Vault Health: ✅ (CLI: orphans, deadends, unresolved, vault stats)
-- Phase 6+: MCP/RAG Evaluation (Semantic Search, Graph-Clustering)
+Scripts unter `~/.claude/skills/vault-manager/scripts/`:
+
+| Script | Zweck | Wann nutzen |
+|--------|-------|-------------|
+| `vault-export.sh <fileclass> <title>` | Export zu Vault (7 Fileclass-Typen) | Session-Output exportieren |
+| `vault-edit.sh <name> [content]` | Edit mit Diff + Backup | Vault-Dokument bearbeiten |
+| `vault-edit.sh --path <path>` | Edit mit bekanntem Pfad (Warm-Path) | Dokument bereits im Kontext |
+| `vault-base.sh <name>` | Obsidian Base Query ausfuehren | Komplexe Filter-Queries |
+| `vault-base.sh --list` | Alle .base Dateien listen | Discovery |
+| `vault-date.sh --last <dur>` | Date-Range Filter | Dokumente nach Datum finden |
+| `vault-copy.sh <source> [target]` | Copy/Move in Vault | Dateien verschieben |
+
+---
+
+## Configuration
+
+### Prerequisites
+- `obsidian.com` im PATH
+- Obsidian App muss laufen (CLI kommuniziert via Named Pipe)
+- `OBSIDIAN_VAULT` — Optional, Offline-Fallback (auto via SessionStart Hook aus `~/.config/secrets/env.d/vault.env`)
+
+### Sub-Agent-Nutzung
+Sub-Agents koennen CLI direkt nutzen (Named Pipe ist OS-Level, kein env var noetig).
+Kein Bootstrap oder env-Prefixing erforderlich.
+
+### Vault-Pfad-Resolution (Scripts)
+Bash-Scripts nutzen `vault-lib.sh` mit `get_vault_path()`:
+1. **CLI primary:** `obsidian.com vault` → Pfad (funktioniert auch in Sub-Agents)
+2. **Env fallback:** `$OBSIDIAN_VAULT` (wenn CLI nicht verfuegbar)
+
+### Setup-Pruefung
+```bash
+obsidian.com vault           # CLI + App OK? (liefert auch Vault-Pfad)
+ls ~/.claude/skills/vault-manager/scripts/*.sh  # Scripts vorhanden?
+```
+
+---
+
+## Triggering
+
+| Pattern | Aktion |
+|---------|--------|
+| `vault:document-name` | Document lookup + context loading |
+| `vault`, `obsidian` keywords | Skill activation |
+| `backlinks`, `related`, `verlinkt` | Backlink analysis |
+| `orphans`, `deadends`, `vault health` | Vault-wide graph analysis |
+| `tags`, `tag suche` | Tag operations |
+
+**Wichtig:** Kein `@` Symbol — `vault:` Prefix vermeidet Kollision mit Claude Code native `@file` Completion.
+
+---
+
+## Nicht verfuegbar im Fallback-Modus
+
+Folgende Features funktionieren NUR mit laufender Obsidian App:
+- Backlinks / Links (Incoming/Outgoing)
+- Orphans / Deadends / Unresolved (Vault Health)
+- Vault Info (Statistiken)
+- Content-Search (Volltext innerhalb von Dokumenten)
+
+Meldung: "Diese Funktion erfordert eine laufende Obsidian App."
+
+---
+
+## Status
+
+- Read: ✅ CLI search + read + properties
+- Export: ✅ vault-export.sh (7 Fileclass-Typen)
+- Edit: ✅ vault-edit.sh + /vault-work Command
+- Search: ✅ CLI tags/tag + vault-date.sh + vault-base.sh
+- Links: ✅ CLI backlinks + links
+- Health: ✅ CLI orphans + deadends + unresolved + vault stats
 
 **Strategy:** CLI+Bash Hybrid (ADR-005). CLI fuer Read/Search/Tags, Bash fuer Export/Edit/Base/Date.
 
-Last Updated: 2026-02-19
+Last Updated: 2026-03-03

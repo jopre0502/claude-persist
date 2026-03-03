@@ -11,23 +11,24 @@ Pusht den Obsidian Vault zu GitHub. Kann von **jedem Working Directory** aufgeru
 
 ## Workflow
 
-### Step 1: OBSIDIAN_VAULT ermitteln
+### Step 1: Vault-Pfad ermitteln (CLI-first)
 
 ```bash
-echo "OBSIDIAN_VAULT=${OBSIDIAN_VAULT:-nicht gesetzt}"
+# Primary: CLI (funktioniert auch ohne env var)
+VAULT_PATH=$(obsidian.com vault 2>/dev/null | awk -F'\t' '/^path/{print $2}' | tr -d '\r')
+# Fallback: Environment variable
+if [ -z "$VAULT_PATH" ] || [ ! -d "$VAULT_PATH" ]; then
+  VAULT_PATH="${OBSIDIAN_VAULT:-}"
+fi
+echo "VAULT_PATH=${VAULT_PATH:-nicht ermittelt}"
 ```
 
-**Falls `OBSIDIAN_VAULT` nicht gesetzt:**
+**Falls Vault-Pfad nicht ermittelt werden konnte:**
 ```
-❌ OBSIDIAN_VAULT Environment Variable nicht gesetzt.
+❌ Vault-Pfad nicht ermittelt. Obsidian App starten oder OBSIDIAN_VAULT setzen.
 
-Setup (SessionStart Hook — automatisch bei jeder Session):
-  1. echo 'OBSIDIAN_VAULT="/pfad/zum/vault"' >> ~/.config/secrets/env.d/vault.env
-  2. chmod 600 ~/.config/secrets/env.d/vault.env
-  3. Neue Claude Code Session starten (Hook laedt vault.env automatisch)
-
-Alternativ (einmalig): export OBSIDIAN_VAULT="/pfad/zum/vault"
-Siehe: ADR-003 (Config-Architektur)
+Option A (empfohlen): Obsidian App starten — CLI liefert Pfad automatisch
+Option B (Offline-Fallback): export OBSIDIAN_VAULT="/pfad/zum/vault"
 ```
 Stoppe hier.
 
@@ -35,12 +36,12 @@ Stoppe hier.
 
 ```bash
 # Guard: Ist es wirklich ein Obsidian Vault?
-if [ ! -d "$OBSIDIAN_VAULT/.obsidian" ]; then
-  echo "ERROR: $OBSIDIAN_VAULT ist kein Obsidian Vault (.obsidian/ fehlt)"
+if [ ! -d "$VAULT_PATH/.obsidian" ]; then
+  echo "ERROR: $VAULT_PATH ist kein Obsidian Vault (.obsidian/ fehlt)"
   exit 1
 fi
-ls -la "$OBSIDIAN_VAULT/.claude/github.json" 2>/dev/null
-ls -la "$OBSIDIAN_VAULT/.git" 2>/dev/null
+ls -la "$VAULT_PATH/.claude/github.json" 2>/dev/null
+ls -la "$VAULT_PATH/.git" 2>/dev/null
 ```
 
 **Falls Config fehlt (`.claude/github.json` nicht vorhanden):**
@@ -48,7 +49,7 @@ ls -la "$OBSIDIAN_VAULT/.git" 2>/dev/null
 ❌ Keine GitHub-Config im Vault gefunden.
 
 Bitte erst im Vault-Verzeichnis /github-init --vault ausführen:
-  cd $OBSIDIAN_VAULT
+  cd $VAULT_PATH
   /github-init --vault
 ```
 Stoppe hier.
@@ -58,7 +59,7 @@ Stoppe hier.
 ❌ Vault ist kein Git-Repository.
 
 Bitte im Vault-Verzeichnis initialisieren:
-  cd $OBSIDIAN_VAULT
+  cd $VAULT_PATH
   git init
   gh repo create vault-name --private --source=. --push
   /github-init --vault
@@ -68,7 +69,7 @@ Stoppe hier.
 ### Step 3: Config laden
 
 ```bash
-GITHUB_CONFIG="$OBSIDIAN_VAULT/.claude/github.json" source ~/.claude/skills/github-ops/lib/config-reader.sh && read_github_config
+GITHUB_CONFIG="$VAULT_PATH/.claude/github.json" source ~/.claude/skills/github-ops/lib/config-reader.sh && read_github_config
 ```
 
 **Bei Fehler:** Zeige Fehlermeldung und stoppe.
@@ -77,15 +78,15 @@ GITHUB_CONFIG="$OBSIDIAN_VAULT/.claude/github.json" source ~/.claude/skills/gith
 
 ```bash
 # WSL2/9P Fix: Git Stat-Cache refreshen (Timestamps unzuverlaessig auf 9P-Mounts)
-git -C "$OBSIDIAN_VAULT" update-index --really-refresh 2>/dev/null || true
-git -C "$OBSIDIAN_VAULT" status --short
+git -C "$VAULT_PATH" update-index --really-refresh 2>/dev/null || true
+git -C "$VAULT_PATH" status --short
 ```
 
 **Falls keine Änderungen:**
 ```
 ℹ️ Vault ist synchron - keine Änderungen.
 
-Vault: $OBSIDIAN_VAULT
+Vault: $VAULT_PATH
 Repo:  $GITHUB_REPO
 ```
 Stoppe hier.
@@ -110,15 +111,15 @@ Fortfahren?
 
 ```bash
 # Commit-Message generieren (git -C fuer korrektes Repo)
-GIT_WORK_DIR="$OBSIDIAN_VAULT" source ~/.claude/skills/github-ops/lib/commit-counter.sh
+GIT_WORK_DIR="$VAULT_PATH" source ~/.claude/skills/github-ops/lib/commit-counter.sh
 COMMIT_MSG=$(get_sync_message)
 
 # Falls --message Argument: Custom Message verwenden
 # Sonst: Default Sync-Message
 
-git -C "$OBSIDIAN_VAULT" add -A
-git -C "$OBSIDIAN_VAULT" commit -m "$COMMIT_MSG"
-git -C "$OBSIDIAN_VAULT" push
+git -C "$VAULT_PATH" add -A
+git -C "$VAULT_PATH" commit -m "$COMMIT_MSG"
+git -C "$VAULT_PATH" push
 ```
 
 ### Step 7: Bestätigung
@@ -126,7 +127,7 @@ git -C "$OBSIDIAN_VAULT" push
 ```
 ✅ Vault erfolgreich gepusht
 
-Vault:   $OBSIDIAN_VAULT
+Vault:   $VAULT_PATH
 Repo:    $GITHUB_REPO
 Commit:  $COMMIT_MSG
 Dateien: [Anzahl] geändert
@@ -136,8 +137,8 @@ Dateien: [Anzahl] geändert
 
 ## Error Handling
 
-### OBSIDIAN_VAULT nicht gesetzt
-Zeige Anleitung zum Setzen der Environment Variable.
+### Vault-Pfad nicht ermittelt
+Zeige Anleitung: Obsidian App starten (CLI-first) oder OBSIDIAN_VAULT setzen (Offline-Fallback).
 
 ### Push fehlgeschlagen
 ```

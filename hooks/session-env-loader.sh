@@ -67,7 +67,7 @@ if [ -n "$CLAUDE_ENV_FILE" ]; then
   echo '{"systemMessage":"env-loader: '"$LOADED"' vars loaded into CLAUDE_ENV_FILE + cache, platform='"$(uname -s)"'"}'
 else
   # --- Path 2: Fallback (Bug #15840) — cache file + additionalContext ---
-  SAFE_VARS="OBSIDIAN_VAULT OBSIDIAN_HOST OBSIDIAN_PORT N8N_BASE_URL"
+  SAFE_VARS="OBSIDIAN_VAULT N8N_BASE_URL"
   CONTEXT_LINES=""
   while IFS= read -r line || [ -n "$line" ]; do
     [ -z "$line" ] && continue

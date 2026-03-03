@@ -2,7 +2,7 @@
 
 **SSOT für Claude Code Integration mit User's Obsidian Vault**
 
-*Erstellt: 2026-02-04 | Aktualisiert: 2026-02-19 (Phase 5b CLI Migration — ADR-005)*
+*Erstellt: 2026-02-04 | Aktualisiert: 2026-03-03 (TASK-041 CLI-first Vault Path)*
 
 ---
 
@@ -37,6 +37,7 @@
 | **Dokument bearbeiten** | `vault-edit.sh <name> [content]` | ✅ UC3 |
 
 **Skill:** `vault-manager` (auto-triggered via `vault:` Prefix)
+**Vault-Pfad:** CLI-first (`obsidian.com vault`), `$OBSIDIAN_VAULT` nur Offline-Fallback. Scripts nutzen `vault-lib.sh`.
 
 ### Claude Code Commands
 
