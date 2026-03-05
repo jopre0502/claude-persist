@@ -93,9 +93,13 @@ Mache einen kurzen **Final-Check**:
 
 ### Strukturierung
 - Verwende Markdown für strukturierte Ausgaben
-- Code-Blöcke **immer** mit Sprachkennzeichnung (```python, ```bash, etc.)
 - Bei langen Ausgaben: **Zusammenfassung zuerst**, Details danach (Inverted Pyramid)
 - Bullet Points für Listen, Tabellen für Vergleiche
+
+### Markdown Formatting (fuer alle .md Dateien die geschrieben/editiert werden)
+- Code-Fences **IMMER** mit Sprache: ```bash, ```text, ```json (NIEMALS bare ```)
+- Leerzeile VOR und NACH jedem Code-Fence
+- Headings (#/##/###/####) statt **Bold** als Struktur-Element (MD036)
 
 ### Response Guidance
 - Bei einfachen Fragen: Kurze, direkte Antworten

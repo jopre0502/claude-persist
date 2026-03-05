@@ -123,15 +123,28 @@ parse_duration_to_date() {
         exit 1
     fi
 
-    case "$unit" in
-        d|D) date -d "$num days ago" +%Y-%m-%d ;;
-        w|W) date -d "$((num * 7)) days ago" +%Y-%m-%d ;;
-        m|M) date -d "$num months ago" +%Y-%m-%d ;;
-        *)
-            echo -e "${RED}Error: Unknown unit '$unit'. Use d (days), w (weeks), m (months)${NC}" >&2
-            exit 1
-            ;;
-    esac
+    # Portable date: macOS (BSD) uses -v, GNU (Linux/Git Bash) uses -d
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        case "$unit" in
+            d|D) date -v-${num}d +%Y-%m-%d ;;
+            w|W) date -v-$(( num * 7 ))d +%Y-%m-%d ;;
+            m|M) date -v-${num}m +%Y-%m-%d ;;
+            *)
+                echo -e "${RED}Error: Unknown unit '$unit'. Use d (days), w (weeks), m (months)${NC}" >&2
+                exit 1
+                ;;
+        esac
+    else
+        case "$unit" in
+            d|D) date -d "$num days ago" +%Y-%m-%d ;;
+            w|W) date -d "$((num * 7)) days ago" +%Y-%m-%d ;;
+            m|M) date -d "$num months ago" +%Y-%m-%d ;;
+            *)
+                echo -e "${RED}Error: Unknown unit '$unit'. Use d (days), w (weeks), m (months)${NC}" >&2
+                exit 1
+                ;;
+        esac
+    fi
 }
 
 # Resolve dates

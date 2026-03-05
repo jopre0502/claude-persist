@@ -182,24 +182,24 @@ Das Claude Code Ecosystem explodiert: **70.000 GitHub Stars** für Claude Code s
 
 ### Launch-Strategie (Konkret)
 
-**Phase 1 (Sofort): Repo-Readiness**
+#### Phase 1 (Sofort): Repo-Readiness
 - [ ] Englisches README.md mit Architektur-Diagramm
 - [ ] `install.sh` für One-Liner-Setup
 - [ ] CONTRIBUTING.md + Issue-Templates
 - [ ] GIF einer typischen Session
 
-**Phase 2 (Woche 1-2): Seeding**
+#### Phase 2 (Woche 1-2): Seeding
 - [ ] Eintrag bei [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) beantragen
 - [ ] Eintrag bei [awesome-claude-skills](https://github.com/travisvn/awesome-claude-skills) beantragen
 - [ ] Post auf r/ClaudeAI, r/ChatGPTPro, r/ObsidianMD
 - [ ] Dev.to Artikel: "How I built an anti-hallucination workflow for Claude Code"
 
-**Phase 3 (Woche 3-4): Amplification**
+#### Phase 3 (Woche 3-4): Amplification
 - [ ] "Show HN" Post auf Hacker News
 - [ ] Twitter/X Thread mit konkreten Beispielen
 - [ ] YouTube Screencast
 
-**Phase 4 (Monat 2+): Community-Building**
+#### Phase 4 (Monat 2+): Community-Building
 - [ ] GitHub Discussions aktivieren
 - [ ] "Good First Issue"-Labels
 - [ ] Launch-Week-Stil: Alle 4-6 Wochen gebündelte Updates
@@ -327,7 +327,8 @@ Die **Verpackung und Distribution**:
 Der Claude Code Markt wächst mit ~100% YoY. Das Timing-Fenster ist **jetzt offen, aber schließt sich**. Superpowers (42k Stars) und SuperClaude (20k Stars) wachsen schnell. Wer jetzt nicht positioniert ist, wird in 6 Monaten in einem gesättigten Markt kämpfen.
 
 **Die Kill-Feature-Kombination**, die kein anderes Repo hat:
-```
+
+```text
 Anti-Halluzination + Obsidian + Session-Kontinuität = "The Structured AI Workflow"
 ```
 

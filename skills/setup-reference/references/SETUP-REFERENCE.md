@@ -1,4 +1,4 @@
-# SETUP-REFERENCE — Auto-generated: 2026-03-03 08:13
+# SETUP-REFERENCE — Auto-generated: 2026-03-03 17:40
 
 Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
@@ -8,24 +8,24 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 | Skill | Beschreibung |
 |-------|-------------|
-| `_archived-secrets-blueprint` | (keine Beschreibung) |
-| `claude-md-restructure` | (keine Beschreibung) |
-| `github-init` | (keine Beschreibung) |
-| `github-ops` | (keine Beschreibung) |
-| `github-push` | (keine Beschreibung) |
-| `github-status` | (keine Beschreibung) |
-| `granola-export` | (keine Beschreibung) |
-| `permission-audit` | (keine Beschreibung) |
-| `prioritize-tasks` | (keine Beschreibung) |
-| `project-doc-restructure` | (keine Beschreibung) |
-| `project-init` | (keine Beschreibung) |
-| `prompt-improver` | (keine Beschreibung) |
-| `session-refresh` | (keine Beschreibung) |
-| `setup-reference` | (keine Beschreibung) |
-| `skill-creator` | (keine Beschreibung) |
-| `task-orchestrator` | (keine Beschreibung) |
-| `task-scheduler` | (keine Beschreibung) |
-| `vault-manager` | (keine Beschreibung) |
+| `_archived-secrets-blueprint` | KISS-Blueprint für robustes Secrets-Handling (WSL2 Ubuntu) + MCP (docker & lokal) + Claude Code Integration (CLAUDE_ENV_FILE SessionStart Hook). Keine Secrets in Shell-Init. Keine Secrets in Tool-Konfigs. Nutze für Setup/Erweiterung/Review. |
+| `claude-md-restructure` | Optimize CLAUDE.md files for size (<8KB target) while preserving workflow-block.txt injection and Session-Continuous ... |
+| `github-init` | Verknüpft aktuelles Working Directory mit GitHub-Repo und erstellt Pro-Projekt Config (.claude/github.json). Use whe... |
+| `github-ops` | Shared Library für GitHub-Operations Skills. Enthält lib/, assets/, references/. NICHT direkt aufrufen. Nutze statt... |
+| `github-push` | Committed und pusht alle Änderungen zum konfigurierten GitHub-Repo mit Sync-Message (Sync YYYY-MM-DD-NN). Use when: ... |
+| `github-status` | Zeigt GitHub Sync-Status: letzter Commit, ausstehende Änderungen, Repo-Info. Use when: User wants to check sync stat... |
+| `granola-export` | TODO: Complete and informative explanation of what the skill does and when to use it. Include WHEN to use this skill - specific scenarios, file types, or tasks that trigger it. |
+| `permission-audit` | Analysiert Tool-Call-Logs gegen Permission Allow/Deny-Regeln. Zeigt welche Calls nicht von Allow-Rules gedeckt waren.... |
+| `prioritize-tasks` | Analysiert und priorisiert Tasks in PROJEKT.md basierend auf Dependencies, Effort und Known Issues. Berechnet Priorit... |
+| `project-doc-restructure` | Transform project documentation to follow session-continuous patterns with Inverted Pyramid structure. Use when worki... |
+| `project-init` | Complete session-continuous project initialization infrastructure. Creates CLAUDE.md, PROJEKT.md, task tracking syste... |
+| `prompt-improver` | Analysiert und verbessert Prompt-Entwürfe für Claude 4.x Modelle (Sonnet, Opus, Haiku). Wendet offizielle Anthropic Best Practices an: XML-Strukturierung, explizite Anweisungen, Kontext/Motivation (WARUM), Variablen {{NAME}}, Extended Thinking Konfiguration, Tool Use Optimierungen und modell-spezifische Empfehlungen. Nutze diesen Skill wenn du einen Prompt siehst der verbessert werden sollte, oder wenn explizit nach Prompt-Optimierung gefragt wird. |
+| `session-refresh` | **SESSION END / HIGH TOKEN BUDGET** - Use when token budget >65% or before ending a session. Complete session refresh... |
+| `setup-reference` | Generiert eine vollstaendige SETUP-REFERENCE.md aus dem Live-System (~/.claude/). Scannt Skills, Agents, Commands, Ho... |
+| `skill-creator` | Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations. |
+| `task-orchestrator` | Orchestriert strukturierte Task-Ausführung mit Subagent Delegation. Trigger-Patterns (automatisch aktivieren bei): -... |
+| `task-scheduler` | Automatically orchestrate and execute project tasks from PROJEKT.md. Use this skill when you want to analyze pending ... |
+| `vault-manager` | Use this skill when the user references Vault documents via vault: prefix notation (e.g., "vault:ai-workflows"), requ... |
 
 **Gesamt:** 18 Skills
 
@@ -35,11 +35,10 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 | Agent | Beschreibung |
 |-------|-------------|
-| `my-setup-guide` | (keine Beschreibung) |
-| `obsidian-pilot` | (keine Beschreibung) |
-| `prompt-architect` | (keine Beschreibung) |
+| `my-setup-guide` | Beantwortet Fragen zur persoenlichen Claude Code Installation, Konfiguration, Skills, Workflows und Conventions. Kenn... |
+| `prompt-architect` | Meta-Orchestrator für Prompt-Engineering und Skill-Architektur. Analysiert komplexe Anfragen, empfiehlt proaktiv Skill-Auslagerung, koordiniert prompt-improver Skill und skill-creator. Für Architektur-Entscheidungen und Multi-Skill-Workflows. |
 
-**Gesamt:** 3 Agents
+**Gesamt:** 2 Agents
 
 ---
 
@@ -47,12 +46,12 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 | Command | Beschreibung |
 |---------|-------------|
-| `/knowledge-hub-sync` | (keine Beschreibung) |
-| `/obsidian-sync` | (keine Beschreibung) |
-| `/refresh-reference` | (keine Beschreibung) |
-| `/run-next-tasks` | (keine Beschreibung) |
-| `/vault-export` | (keine Beschreibung) |
-| `/vault-work` | (keine Beschreibung) |
+| `/knowledge-hub-sync` | Knowledge Hub (~/.claude/) zu GitHub committen und pushen - von jedem Working Directory |
+| `/obsidian-sync` | Obsidian Vault zu GitHub pushen - funktioniert von jedem Working Directory |
+| `/refresh-reference` | Generiert SETUP-REFERENCE.md aus dem Live-System (~/.claude/). Scannt Skills, Agents, Commands, Hooks, Permissions, Plugins und zeigt Inventar-Zusammenfassung. |
+| `/run-next-tasks` | Manually trigger the task scheduler to identify and start ready tasks |
+| `/vault-export` | Export content to Obsidian Vault with Fileclass-based templates |
+| `/vault-work` | Load a Vault document for editing, work with it in session, then save changes back with diff preview |
 
 **Gesamt:** 6 Commands
 
@@ -91,6 +90,8 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 - `Write`
 - `Skill(*)`
 - `Task(*)`
+- `Agent(*)`
+- `Bash(~/.claude/*)`
 - `WebSearch`
 - `WebFetch`
 - `Bash(git *)`
@@ -223,7 +224,6 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | Datei | Groesse |
 |-------|---------|
 | `n8n.env` | 1204B |
-| `obsidian.env` | 1883B |
 | `vault.env` | 1637B |
 
 ---
@@ -386,5 +386,5 @@ source ~/.config/secrets/.env-cache
 
 ---
 
-*Generiert: 2026-03-03 08:13 | Script: generate-reference.sh*
+*Generiert: 2026-03-03 17:40 | Script: generate-reference.sh*
 *Naechste Aktualisierung: /refresh-reference ausfuehren*

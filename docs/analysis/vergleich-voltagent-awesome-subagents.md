@@ -27,7 +27,7 @@ Beide Projekte erweitern Claude Code durch spezialisierte Agents/Skills, verfolg
 
 **VoltAgent** organisiert 127+ Agents in 10 thematischen Kategorien:
 
-```
+```text
 categories/
 ├── 01-core-development/     (10 Agents: api-designer, fullstack-developer, ...)
 ├── 02-language-specialists/  (27 Agents: typescript-pro, python-pro, rust-engineer, ...)
@@ -40,11 +40,12 @@ categories/
 ├── 09-meta-orchestration/    (11 Agents: workflow-orchestrator, task-distributor, ...)
 └── 10-research-analysis/     (6 Agents: research-analyst, trend-analyst, ...)
 ```
+
 *Quelle: GitHub API Tree, README.md*
 
 **my-claude-knowledge-hub** baut ein integriertes Ökosystem:
 
-```
+```text
 ├── skills/     (18 Skills mit Sub-Struktur: references/, scripts/, assets/)
 ├── agents/     (3 spezialisierte Agents)
 ├── commands/   (6 manuelle Commands)

@@ -103,7 +103,12 @@ if [[ -f "$SETUP_REF" ]]; then
   # Extract timestamp from first line: "# SETUP-REFERENCE — Auto-generated: YYYY-MM-DD HH:MM"
   REF_DATE=$(head -1 "$SETUP_REF" | grep -oP '\d{4}-\d{2}-\d{2}' || true)
   if [[ -n "$REF_DATE" ]]; then
-    REF_EPOCH=$(date -d "$REF_DATE" +%s 2>/dev/null || echo 0)
+    # Portable date: macOS (BSD) uses -jf, GNU (Linux/Git Bash) uses -d
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+      REF_EPOCH=$(date -jf "%Y-%m-%d" "$REF_DATE" +%s 2>/dev/null || echo 0)
+    else
+      REF_EPOCH=$(date -d "$REF_DATE" +%s 2>/dev/null || echo 0)
+    fi
     NOW_EPOCH=$(date +%s)
     DAYS_OLD=$(( (NOW_EPOCH - REF_EPOCH) / 86400 ))
     if [[ $DAYS_OLD -gt 7 ]]; then

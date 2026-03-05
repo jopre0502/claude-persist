@@ -77,6 +77,20 @@
 settings.json
 settings.local.json
 mcp.json
+*.env
+!*.env.example
+*.secret
+*.token
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.cert
+id_rsa*
+id_ed25519*
+id_ecdsa*
 
 # Session data (large, ephemeral)
 history.jsonl
