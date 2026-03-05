@@ -39,6 +39,17 @@ fi
 
 **Wichtig:** Knowledge Hub arbeitet immer auf `main`. Kein Feature-Branch-Workflow.
 
+### Step 1c: SETUP-REFERENCE.md regenerieren
+
+Stelle sicher, dass die Inventar-Referenz aktuell ist bevor wir syncen:
+
+```bash
+HUB_DIR="$HOME/.claude"
+bash "$HUB_DIR/skills/setup-reference/scripts/generate-reference.sh"
+```
+
+Zeige die Inventar-Zusammenfassung aus dem Script-Output (Skills, Agents, Commands, Hooks, Plugins Anzahl).
+
 ### Step 2: Aenderungen pruefen
 
 ```bash

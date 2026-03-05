@@ -116,7 +116,11 @@ Decision Logs grow with project maturity. When >10 entries (~2KB), externalize t
 *20 Eintraege insgesamt.*
 ```
 
-### 3. Modular Disclosure
+### 3. No HTML `<details>` Blocks
+
+**Anti-Pattern:** `<details>` tags hide content inline instead of migrating it to separate files. This keeps file size high while giving the illusion of "Progressive Disclosure". Use Modular Disclosure (file migration with links) instead.
+
+### 4. Modular Disclosure
 
 Outsource historical/resolved content to separate files:
 

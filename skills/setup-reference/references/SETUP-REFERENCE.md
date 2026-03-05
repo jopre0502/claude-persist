@@ -1,4 +1,4 @@
-# SETUP-REFERENCE — Auto-generated: 2026-03-03 17:40
+# SETUP-REFERENCE — Auto-generated: 2026-03-05 13:26
 
 Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
@@ -8,7 +8,6 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 | Skill | Beschreibung |
 |-------|-------------|
-| `_archived-secrets-blueprint` | KISS-Blueprint für robustes Secrets-Handling (WSL2 Ubuntu) + MCP (docker & lokal) + Claude Code Integration (CLAUDE_ENV_FILE SessionStart Hook). Keine Secrets in Shell-Init. Keine Secrets in Tool-Konfigs. Nutze für Setup/Erweiterung/Review. |
 | `claude-md-restructure` | Optimize CLAUDE.md files for size (<8KB target) while preserving workflow-block.txt injection and Session-Continuous ... |
 | `github-init` | Verknüpft aktuelles Working Directory mit GitHub-Repo und erstellt Pro-Projekt Config (.claude/github.json). Use whe... |
 | `github-ops` | Shared Library für GitHub-Operations Skills. Enthält lib/, assets/, references/. NICHT direkt aufrufen. Nutze statt... |
@@ -27,7 +26,7 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | `task-scheduler` | Automatically orchestrate and execute project tasks from PROJEKT.md. Use this skill when you want to analyze pending ... |
 | `vault-manager` | Use this skill when the user references Vault documents via vault: prefix notation (e.g., "vault:ai-workflows"), requ... |
 
-**Gesamt:** 18 Skills
+**Gesamt:** 17 Skills
 
 ---
 
@@ -65,7 +64,7 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | PreToolUse | `auto-approve-readonly.sh` | 5s |
 | SessionStart | `session-env-loader.sh` | 10s |
 | SessionStart | `session-handoff-loader.sh` | 15s |
-| Notification | `notify.ps1` | defaults |
+| Notification | `notify.sh` | defaults |
 
 **Gesamt:** 5 Hooks
 
@@ -170,8 +169,8 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
 ### Deny-Rules
 
-- `Read(./.env)`
-- `Read(./.env.*)`
+- `Read(.env)`
+- `Read(.env.*)`
 - `Read(./secrets/**)`
 - `Bash(rm -rf *)`
 - `Bash(rm -r *)`
@@ -214,7 +213,7 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 |---------|------|
 | `model` | default |
 | `outputStyle` | Executive Communication |
-| `effortLevel` | medium |
+| `effortLevel` | default |
 | `preferredNotifChannel` | terminal_bell |
 
 ---
@@ -386,5 +385,5 @@ source ~/.config/secrets/.env-cache
 
 ---
 
-*Generiert: 2026-03-03 17:40 | Script: generate-reference.sh*
+*Generiert: 2026-03-05 13:26 | Script: generate-reference.sh*
 *Naechste Aktualisierung: /refresh-reference ausfuehren*

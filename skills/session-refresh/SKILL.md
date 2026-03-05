@@ -89,27 +89,21 @@ Ask for confirmation or adjustments.
 **WICHTIG:** CLI Built-in zur Kontextreduktion kann NICHT programmatisch aufgerufen werden.
 Weise User an: "Token-Budget manuell reduzieren (CLI Built-in)"
 
-### 6. GitHub-Push anbieten (Optional)
+### 6. Commit + Push (automatisch, ohne Rueckfrage)
 
-```bash
-if [ -f ".claude/github.json" ]; then
-    source ~/.claude/skills/github-ops/lib/config-reader.sh
-    read_github_config > /dev/null 2>&1
-fi
-```
+**Default: Automatisch committen + pushen. Nur stoppen wenn User explizit "nicht committen" sagt.**
 
-- **Kein `.claude/github.json`:** Schritt komplett ueberspringen
-- **Config existiert:** Frage User "Push zu $GITHUB_REPO?" via AskUserQuestion
-  - JA: `git add -A && git commit -m "$COMMIT_MSG" && git push`
-  - NEIN: Weiter
+- `git add -A && git commit -m "$COMMIT_MSG" && git push`
+- Falls kein Remote konfiguriert: nur lokaler Commit
+- Commit-Message: Deutsche Sprache, Format `[Typ]: Kurzbeschreibung`
 
-### 7. Session-Handoff anbieten
+### 7. Session-Handoff (automatisch, ohne Rueckfrage)
 
-- Frage User: "Soll ich ein Session-Handoff erstellen?"
-- JA: Erstelle `docs/handoffs/SESSION-HANDOFF-YYYY-MM-DD.md`
+**Default: Automatisch erstellen. Nur ueberspringen wenn User explizit "kein Handoff" sagt.**
+
+- Erstelle `docs/handoffs/SESSION-HANDOFF-YYYY-MM-DD.md` (oder Projekt-Root falls kein docs/)
   - Template: `assets/session-handoff-template.md`
   - Inhalt: Erreichte Tasks, Blocker, Learnings, Empfehlungen, Token-Trend
-- NEIN: Weiter
 
 ### 8. Final Report (Compact)
 

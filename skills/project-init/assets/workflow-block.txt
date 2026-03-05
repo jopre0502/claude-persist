@@ -41,7 +41,7 @@ This project uses an automated session workflow for context optimization and tas
    - Guides: Verify PROJEKT.md task status
    - Auto-runs: `/project-doc-restructure` (optimization)
    - User reduziert Token-Budget manuell (CLI Built-in)
-4. **Commit changes** to git
+4. **Commit + Handoff automatisch** (ohne Rueckfrage, es sei denn User sagt explizit "nicht committen")
 
 > **Why at END, not START?** Learnings are fresh in context → can be captured accurately.
 > Next session starts with optimized docs → no overhead.

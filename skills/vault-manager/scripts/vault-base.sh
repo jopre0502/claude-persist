@@ -110,7 +110,7 @@ filter_frontmatter_eq() {
     local prop="$1" val="$2"
     grep -rl --include="*.md" "${prop}:" "$VAULT_PATH" 2>/dev/null \
         | grep -v "$EXCLUDE_PATTERN" \
-        | xargs -d '\n' awk -v prop="$prop" -v val="$val" '
+        | tr '\n' '\0' | xargs -0 awk -v prop="$prop" -v val="$val" '
         FNR==1 { in_fm=0 }
         FNR==1 && /^---$/ { in_fm=1; next }
         FNR==1 && !/^---$/ { nextfile }
@@ -131,7 +131,7 @@ filter_frontmatter_notempty() {
     local prop="$1"
     grep -rl --include="*.md" "${prop}:" "$VAULT_PATH" 2>/dev/null \
         | grep -v "$EXCLUDE_PATTERN" \
-        | xargs -d '\n' awk -v prop="$prop" '
+        | tr '\n' '\0' | xargs -0 awk -v prop="$prop" '
         FNR==1 { in_fm=0 }
         FNR==1 && /^---$/ { in_fm=1; next }
         FNR==1 && !/^---$/ { nextfile }
@@ -151,7 +151,7 @@ filter_frontmatter_date_cmp() {
     local prop="$1" op="$2" ref_date="$3"
     grep -rl --include="*.md" "${prop}:" "$VAULT_PATH" 2>/dev/null \
         | grep -v "$EXCLUDE_PATTERN" \
-        | xargs -d '\n' awk -v prop="$prop" -v op="$op" -v ref="$ref_date" '
+        | tr '\n' '\0' | xargs -0 awk -v prop="$prop" -v op="$op" -v ref="$ref_date" '
         FNR==1 { in_fm=0 }
         FNR==1 && /^---$/ { in_fm=1; next }
         FNR==1 && !/^---$/ { nextfile }

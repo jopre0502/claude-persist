@@ -24,6 +24,7 @@ class AntiPatternDetector:
         self.detect_wall_of_text()
         self.detect_premature_optimization()
         self.detect_assumed_context()
+        self.detect_details_blocks()
         return self.anti_patterns
 
     def detect_chronicle_pattern(self):
@@ -188,6 +189,26 @@ class AntiPatternDetector:
                         'recommendation': f'Include context: "Task {task_refs[0]} (Phase {phase}: Description)"'
                     })
                     break
+
+    def detect_details_blocks(self):
+        """Detect HTML <details> blocks — anti-pattern since TASK-064."""
+        details_matches = re.findall(r'<details\b', self.content, re.IGNORECASE)
+        count = len(details_matches)
+
+        if count > 0:
+            # Find line numbers for context
+            detail_lines = [i + 1 for i, line in enumerate(self.lines)
+                            if '<details' in line.lower()]
+            lines_str = ', '.join(str(ln) for ln in detail_lines[:5])
+
+            self.anti_patterns.append({
+                'type': 'HTML_DETAILS_BLOCK',
+                'severity': 'HIGH',
+                'message': f'Found {count} <details> block(s) (lines: {lines_str}). '
+                           f'HTML details hides content inline instead of migrating it.',
+                'recommendation': 'Migrate content to separate files (docs/phases/) with '
+                                  'inline link. Use Modular Disclosure instead of HTML details.'
+            })
 
 
 def main():

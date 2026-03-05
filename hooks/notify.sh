@@ -1,7 +1,7 @@
 #!/bin/bash
 #------------------------------------------------------------------------------
-# CLAUDE CODE NOTIFICATION HOOK - WSL2 to Windows Bridge
-# Enhanced with session information (similar to statusline.sh approach)
+# CLAUDE CODE NOTIFICATION HOOK - Cross-Platform
+# Supports: macOS (osascript), Windows/WSL2 (BurntToast), Linux (notify-send)
 #------------------------------------------------------------------------------
 
 # Read hook input from stdin (JSON format)
@@ -110,31 +110,63 @@ else
 fi
 
 #------------------------------------------------------------------------------
-# EXECUTE POWERSHELL NOTIFICATION (Inline BurntToast)
+# EXECUTE PLATFORM-SPECIFIC NOTIFICATION
 #------------------------------------------------------------------------------
 
-# Escape single quotes for PowerShell
-TITLE_ESCAPED="${TITLE//\'/\'\'}"
-MESSAGE_ESCAPED="${MESSAGE//\'/\'\'}"
-DETAILS_ESCAPED="${DETAILS//\'/\'\'}"
+_OS="$(uname -s)"
 
-# Convert icon path to Windows format
-ICON_WSL="/home/jopre/.claude/assets/claude-icon.png"
-ICON_WIN=$(wslpath -w "$ICON_WSL" 2>/dev/null)
-
-# Use BurntToast with inline command and custom icon
-pwsh.exe -NoProfile -Command "
-    Import-Module BurntToast -ErrorAction SilentlyContinue
-    if (Get-Module BurntToast) {
-        \$iconPath = '$ICON_WIN'
-        if (Test-Path \$iconPath) {
-            New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -AppLogo \$iconPath -Sound Default
-        } else {
-            New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -Sound Default
-        }
-    } else {
-        [System.Media.SystemSounds]::Asterisk.Play()
-    }
-" 2>/dev/null
+case "$_OS" in
+    Darwin)
+        # macOS: native osascript (no brew required)
+        osascript -e "display notification \"$MESSAGE — $DETAILS\" with title \"$TITLE\"" 2>/dev/null
+        ;;
+    Linux)
+        if command -v wslpath &>/dev/null || command -v pwsh.exe &>/dev/null; then
+            # WSL2/Windows: BurntToast via PowerShell
+            TITLE_ESCAPED="${TITLE//\'/\'\'}"
+            MESSAGE_ESCAPED="${MESSAGE//\'/\'\'}"
+            DETAILS_ESCAPED="${DETAILS//\'/\'\'}"
+            ICON_WSL="/home/jopre/.claude/assets/claude-icon.png"
+            ICON_WIN=$(wslpath -w "$ICON_WSL" 2>/dev/null)
+            pwsh.exe -NoProfile -Command "
+                Import-Module BurntToast -ErrorAction SilentlyContinue
+                if (Get-Module BurntToast) {
+                    \$iconPath = '$ICON_WIN'
+                    if (Test-Path \$iconPath) {
+                        New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -AppLogo \$iconPath -Sound Default
+                    } else {
+                        New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -Sound Default
+                    }
+                } else {
+                    [System.Media.SystemSounds]::Asterisk.Play()
+                }
+            " 2>/dev/null
+        elif command -v notify-send &>/dev/null; then
+            # Linux Desktop: libnotify
+            notify-send "$TITLE" "$MESSAGE — $DETAILS" 2>/dev/null
+        fi
+        ;;
+    MINGW*|MSYS*)
+        # Git Bash on Windows: BurntToast via PowerShell
+        TITLE_ESCAPED="${TITLE//\'/\'\'}"
+        MESSAGE_ESCAPED="${MESSAGE//\'/\'\'}"
+        DETAILS_ESCAPED="${DETAILS//\'/\'\'}"
+        ICON_UNIX="$HOME/.claude/assets/claude-icon.png"
+        ICON_WIN=$(cygpath -w "$ICON_UNIX" 2>/dev/null)
+        pwsh.exe -NoProfile -Command "
+            Import-Module BurntToast -ErrorAction SilentlyContinue
+            if (Get-Module BurntToast) {
+                \$iconPath = '$ICON_WIN'
+                if (\$iconPath -and (Test-Path \$iconPath)) {
+                    New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -AppLogo \$iconPath -Sound Default
+                } else {
+                    New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -Sound Default
+                }
+            } else {
+                [System.Media.SystemSounds]::Asterisk.Play()
+            }
+        " 2>/dev/null
+        ;;
+esac
 
 exit 0

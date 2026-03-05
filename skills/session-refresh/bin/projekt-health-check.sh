@@ -39,11 +39,13 @@ log_debug() {
 }
 
 # Trim leading/trailing whitespace - pure bash, zero subprocesses
-# Usage: trim VAR_NAME (modifies variable in-place via nameref)
+# Usage: trim VAR_NAME (modifies variable in-place via indirect expansion)
+# Compatible with Bash 3.2+ (no nameref/local -n required)
 trim() {
-    local -n _ref="$1"
-    _ref="${_ref#"${_ref%%[![:space:]]*}"}"
-    _ref="${_ref%"${_ref##*[![:space:]]}"}"
+    local _val="${!1}"
+    _val="${_val#"${_val%%[![:space:]]*}"}"
+    _val="${_val%"${_val##*[![:space:]]}"}"
+    eval "$1=\$_val"
 }
 
 # Normalize status emoji to canonical form
@@ -411,7 +413,7 @@ fi
 echo ""
 
 echo "---"
-printf -v _now '%(%Y-%m-%d %H:%M:%S)T' -1
+_now=$(date '+%Y-%m-%d %H:%M:%S')
 echo "*Generated: $_now*"
 
 # ============================================================================

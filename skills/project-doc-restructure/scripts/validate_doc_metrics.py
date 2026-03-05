@@ -22,7 +22,7 @@ class DocMetricsValidator:
         self.check_executive_summary()
         self.check_immediate_actions()
         self.check_timestamp()
-        self.check_collapsed_sections()
+        self.check_document_size()
         self.calculate_signal_to_noise()
         self.calculate_health_score()
         return self.metrics
@@ -107,24 +107,31 @@ class DocMetricsValidator:
                 'message': message
             }
 
-    def check_collapsed_sections(self):
-        """Check if long documents have migrated completed phases to separate files."""
-        line_count = len(self.lines)
-        migrated_count = self.content.count('docs/phases/') + self.content.count('Ausgelagert:')
+    def check_document_size(self):
+        """Check document size in bytes against target (<12KB)."""
+        size_bytes = len(self.content.encode('utf-8'))
+        size_kb = size_bytes / 1024
 
-        if line_count > 500 and migrated_count < 1:
-            self.metrics['collapsed_sections'] = {
-                'total_lines': line_count,
-                'collapsed_count': migrated_count,
+        if size_kb <= 12:
+            self.metrics['document_size'] = {
+                'size_bytes': size_bytes,
+                'size_kb': round(size_kb, 1),
+                'status': 'OK',
+                'message': f'Document size: {size_kb:.1f} KB (target: <12 KB)'
+            }
+        elif size_kb <= 16:
+            self.metrics['document_size'] = {
+                'size_bytes': size_bytes,
+                'size_kb': round(size_kb, 1),
                 'status': 'WARNING',
-                'message': f'{line_count} lines but no migrated phases found. Consider migrating completed phases to docs/phases/.'
+                'message': f'Document size: {size_kb:.1f} KB — exceeds 12 KB target. Consider migrating completed phases to docs/phases/.'
             }
         else:
-            self.metrics['collapsed_sections'] = {
-                'total_lines': line_count,
-                'collapsed_count': migrated_count,
-                'status': 'OK',
-                'message': f'{migrated_count} migrated phases for {line_count} lines'
+            self.metrics['document_size'] = {
+                'size_bytes': size_bytes,
+                'size_kb': round(size_kb, 1),
+                'status': 'ERROR',
+                'message': f'Document size: {size_kb:.1f} KB — significantly exceeds 12 KB target. Migration to docs/phases/ strongly recommended.'
             }
 
     def calculate_signal_to_noise(self):
@@ -191,9 +198,11 @@ class DocMetricsValidator:
             elif age <= 90:
                 score += 5
 
-        # Collapsed Sections (15 points)
-        if self.metrics['collapsed_sections']['status'] == 'OK':
+        # Document Size (15 points) — replaces old "Collapsed Sections" metric
+        if self.metrics['document_size']['status'] == 'OK':
             score += 15
+        elif self.metrics['document_size']['status'] == 'WARNING':
+            score += 8
 
         # Signal-to-Noise (10 points)
         if self.metrics['signal_to_noise']['status'] == 'EXCELLENT':

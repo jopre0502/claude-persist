@@ -171,6 +171,7 @@ When restructuring PROJEKT.md:
 3. **Wall of Text** – Use tables, bullets, bold terms. Break up prose.
 4. **Overkill Details** – Expand active phases only; collapse everything else.
 5. **Unexplained Acronyms** – Define TASK-001, PROJ-X, etc. on first use.
+6. **HTML `<details>` Blocks** – Don't use `<details>/<summary>` for Progressive Disclosure. It hides content inline (file size stays high). Instead: migrate completed content to separate files (`docs/phases/`) with inline link reference.
 
 ---
 

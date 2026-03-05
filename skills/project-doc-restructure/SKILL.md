@@ -115,6 +115,7 @@ python3 scripts/detect_anti_patterns.py PROJECT.md
 3. **Wall of Text:** Lack of visual hierarchy (long unstructured paragraphs)
 4. **Premature Optimization:** Future planning before current status
 5. **Assumed Context:** Unexplained acronyms, task IDs without context
+6. **HTML Details Blocks:** `<details>` tags hiding content inline instead of migrating to separate files
 
 **Exit codes:**
 - `0`: No anti-patterns
@@ -265,19 +266,22 @@ Apply consistently for visual hierarchy:
 
 **Fully automate (restructure script) when:**
 - Health score < 50 (critical)
-- Multiple high-severity anti-patterns
-- Document > 500 lines without collapsed sections
+- Multiple high-severity anti-patterns (including `<details>` blocks)
+- Document > 16 KB (regardless of health score)
 - User explicitly requests "restructure" or "apply Konzept patterns"
 
 **Semi-automate (guided fixes) when:**
 - Health score 50-75 (needs improvement)
 - 1-2 medium-severity anti-patterns
-- Specific issues (e.g., only missing Executive Summary)
+- Document 12-16 KB (size reduction needed, even if health score > 75)
+- `<details>` blocks detected (migrate to separate files)
 
 **Manual only (provide guidance) when:**
-- Health score > 75 (minor tweaks)
+- Health score > 75 AND document < 12 KB AND no `<details>` blocks
 - User wants to understand patterns first
 - Document has unique structure not fitting standard patterns
+
+**Size Override Rule:** Document size >= 12 KB triggers at minimum semi-automated action, regardless of health score. A document can be structurally sound but too large for efficient session orientation.
 
 ## Validation After Changes
 
