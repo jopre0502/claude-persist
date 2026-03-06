@@ -59,6 +59,12 @@ Orchestriert Task-Ausführung mit klarem Workflow: Main-Session koordiniert, Sub
 
 **SATE-Invariante:** Alle Decisions MUESSEN vor Phase 2 beantwortet sein. Keine Unterbrechungen waehrend Ausfuehrung.
 
+6. Notification Sidecar schreiben (fuer Desktop-Notification Session-Identifikation):
+   ```bash
+   printf '{"task":"TASK-NNN","cwd":"%s","timestamp":"%s"}' "$PWD" "$(date -Iseconds)" > /tmp/claude-active-task.json
+   ```
+   Bei Windows (Git Bash): Pfad `/tmp/` wird auf `$TEMP` gemappt.
+
 **Output:** Task-Kontext verstanden, Dependencies erfüllt, Decisions geklaert, Output-Pfade bekannt.
 
 ---
@@ -345,7 +351,12 @@ Read: output_file path
    - Audit Trail: Datum | Aktion | Ergebnis
    - Metadaten: Updated-Datum
 
-4. Zeige Completion Summary:
+4. Notification Sidecar loeschen:
+   ```bash
+   rm -f /tmp/claude-active-task.json
+   ```
+
+5. Zeige Completion Summary:
    "✅ TASK-XXX abgeschlossen
     - [Deliverable]: [Was produziert wurde]
     - [Dauer]: ~Xh

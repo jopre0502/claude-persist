@@ -8,45 +8,56 @@
 INPUT=$(cat)
 
 #------------------------------------------------------------------------------
-# JSON EXTRACTION (jq-based, like statusline.sh)
+# JSON EXTRACTION (single jq call for all fields)
 #------------------------------------------------------------------------------
 
-# Extract notification type
-NOTIF_TYPE=$(echo "$INPUT" | jq -r '.type // "notification"' 2>/dev/null)
+if command -v jq >/dev/null 2>&1; then
+    PARSED=$(echo "$INPUT" | jq -r '[
+        (.notification_type // .type // "notification"),
+        (.session_id // ""),
+        (.cwd // ""),
+        (.model | if type == "object" then .display_name // "" elif type == "string" then . else "" end),
+        (.context_window.current_usage.input_tokens // 0 | tostring),
+        (.context_window.current_usage.cache_creation_input_tokens // 0 | tostring),
+        (.context_window.current_usage.cache_read_input_tokens // 0 | tostring),
+        (.context_window.context_window_size // 0 | tostring)
+    ] | join("\t")' 2>/dev/null | tr -d '\r')
 
-# Extract session information (if available in hook context)
-SESSION_NAME=$(echo "$INPUT" | jq -r '.session.name // .session_name // empty' 2>/dev/null)
+    IFS=$'\t' read -r NOTIF_TYPE SESSION_ID CWD MODEL TOK_IN TOK_CACHE_CR TOK_CACHE_RD CTX_SIZE <<< "$PARSED"
+fi
 
-# Extract model information
-MODEL=$(echo "$INPUT" | jq -r '.model.display_name // .model // empty' 2>/dev/null)
+# Fallbacks if jq failed or missing
+: "${NOTIF_TYPE:=notification}"
 
-# Extract token usage (similar to statusline.sh)
-get_token_usage() {
-    local input="$1"
+# Session-Hash (first 6 chars of session_id UUID)
+SESSION_HASH=""
+if [ -n "$SESSION_ID" ] && [ "$SESSION_ID" != "null" ]; then
+    SESSION_HASH="${SESSION_ID:0:6}"
+fi
 
-    if command -v jq >/dev/null 2>&1; then
-        local usage=$(echo "$input" | jq '.context_window.current_usage // empty' 2>/dev/null)
+# PWD-Leaf (last path component)
+CWD_LEAF=""
+if [ -n "$CWD" ] && [ "$CWD" != "null" ]; then
+    CWD_LEAF="${CWD##*/}"
+fi
 
-        if [ -n "$usage" ] && [ "$usage" != "null" ]; then
-            local input_tok=$(echo "$usage" | jq '.input_tokens // 0')
-            local cache_cr=$(echo "$usage" | jq '.cache_creation_input_tokens // 0')
-            local cache_rd=$(echo "$usage" | jq '.cache_read_input_tokens // 0')
-            local curr=$((input_tok + cache_cr + cache_rd))
-            local size=$(echo "$input" | jq '.context_window.context_window_size // 0')
+# Token usage (computed from parsed values, no extra jq)
+TOKEN_USAGE=""
+if [ "${CTX_SIZE:-0}" -gt 0 ] 2>/dev/null; then
+    local_curr=$(( ${TOK_IN:-0} + ${TOK_CACHE_CR:-0} + ${TOK_CACHE_RD:-0} ))
+    local_pct=$(( local_curr * 100 / CTX_SIZE ))
+    TOKEN_USAGE="$(( local_curr / 1000 ))K/$(( CTX_SIZE / 1000 ))K (${local_pct}%)"
+fi
 
-            if [ "$size" -gt 0 ] 2>/dev/null; then
-                local pct=$((curr * 100 / size))
-                local curr_k=$((curr / 1000))
-                local size_k=$((size / 1000))
-                echo "${curr_k}K/${size_k}K (${pct}%)"
-                return
-            fi
-        fi
+# Read active TASK from sidecar file (written by task-orchestrator)
+ACTIVE_TASK=""
+SIDECAR_FILE="/tmp/claude-active-task.json"
+if [ -f "$SIDECAR_FILE" ] && command -v jq >/dev/null 2>&1; then
+    SIDECAR_CWD=$(jq -r '.cwd // empty' "$SIDECAR_FILE" 2>/dev/null | tr -d '\r')
+    if [ "$SIDECAR_CWD" = "$CWD" ]; then
+        ACTIVE_TASK=$(jq -r '.task // empty' "$SIDECAR_FILE" 2>/dev/null | tr -d '\r')
     fi
-    echo ""
-}
-
-TOKEN_USAGE=$(get_token_usage "$INPUT")
+fi
 
 #------------------------------------------------------------------------------
 # NOTIFICATION TYPE MAPPING (German messages)
@@ -55,7 +66,7 @@ TOKEN_USAGE=$(get_token_usage "$INPUT")
 case "$NOTIF_TYPE" in
     "permission_prompt")
         TITLE="Claude Code - Berechtigung"
-        MESSAGE="Deine Eingabe wird benötigt"
+        MESSAGE="Deine Eingabe wird benoetig"
         ;;
     "idle_prompt")
         TITLE="Claude Code - Wartet"
@@ -79,93 +90,76 @@ esac
 # BUILD SUBTITLE WITH SESSION INFO
 #------------------------------------------------------------------------------
 
+DETAILS_PARTS=()
+
+if [ -n "$CWD_LEAF" ] && [ -n "$SESSION_HASH" ]; then
+    DETAILS_PARTS+=("$CWD_LEAF #$SESSION_HASH")
+elif [ -n "$CWD_LEAF" ]; then
+    DETAILS_PARTS+=("$CWD_LEAF")
+elif [ -n "$SESSION_HASH" ]; then
+    DETAILS_PARTS+=("#$SESSION_HASH")
+fi
+
+[ -n "$ACTIVE_TASK" ] && [ "$ACTIVE_TASK" != "null" ] && DETAILS_PARTS+=("$ACTIVE_TASK")
+[ -n "$MODEL" ] && [ "$MODEL" != "null" ] && DETAILS_PARTS+=("$MODEL")
+[ -n "$TOKEN_USAGE" ] && DETAILS_PARTS+=("$TOKEN_USAGE")
+
+printf -v TIMESTAMP '%(%H:%M)T' -1
+DETAILS_PARTS+=("$TIMESTAMP")
+
+# Join with pipe separator
 DETAILS=""
-
-if [ -n "$SESSION_NAME" ] && [ "$SESSION_NAME" != "null" ]; then
-    DETAILS="Session: $SESSION_NAME"
-fi
-
-if [ -n "$MODEL" ] && [ "$MODEL" != "null" ]; then
+for part in "${DETAILS_PARTS[@]}"; do
     if [ -n "$DETAILS" ]; then
-        DETAILS="$DETAILS | $MODEL"
+        DETAILS="$DETAILS | $part"
     else
-        DETAILS="$MODEL"
+        DETAILS="$part"
     fi
-fi
-
-if [ -n "$TOKEN_USAGE" ]; then
-    if [ -n "$DETAILS" ]; then
-        DETAILS="$DETAILS | $TOKEN_USAGE"
-    else
-        DETAILS="$TOKEN_USAGE"
-    fi
-fi
-
-# Add timestamp
-TIMESTAMP=$(date +%H:%M:%S)
-if [ -n "$DETAILS" ]; then
-    DETAILS="$DETAILS | $TIMESTAMP"
-else
-    DETAILS="$TIMESTAMP"
-fi
+done
 
 #------------------------------------------------------------------------------
-# EXECUTE PLATFORM-SPECIFIC NOTIFICATION
+# PLATFORM-SPECIFIC NOTIFICATION
 #------------------------------------------------------------------------------
+
+# BurntToast helper (used by WSL2 + Git Bash)
+send_burnttoast() {
+    local icon_path="$1"
+    local title_esc="${TITLE//\'/\'\'}"
+    local msg_esc="${MESSAGE//\'/\'\'}"
+    local details_esc="${DETAILS//\'/\'\'}"
+
+    pwsh.exe -NoProfile -Command "
+        Import-Module BurntToast -ErrorAction SilentlyContinue
+        if (Get-Module BurntToast) {
+            \$iconPath = '$icon_path'
+            if (\$iconPath -and (Test-Path \$iconPath)) {
+                New-BurntToastNotification -Text '$title_esc', '$msg_esc', '$details_esc' -AppLogo \$iconPath -Sound Default
+            } else {
+                New-BurntToastNotification -Text '$title_esc', '$msg_esc', '$details_esc' -Sound Default
+            }
+        } else {
+            [System.Media.SystemSounds]::Asterisk.Play()
+        }
+    " 2>/dev/null
+}
 
 _OS="$(uname -s)"
 
 case "$_OS" in
     Darwin)
-        # macOS: native osascript (no brew required)
         osascript -e "display notification \"$MESSAGE — $DETAILS\" with title \"$TITLE\"" 2>/dev/null
         ;;
     Linux)
         if command -v wslpath &>/dev/null || command -v pwsh.exe &>/dev/null; then
-            # WSL2/Windows: BurntToast via PowerShell
-            TITLE_ESCAPED="${TITLE//\'/\'\'}"
-            MESSAGE_ESCAPED="${MESSAGE//\'/\'\'}"
-            DETAILS_ESCAPED="${DETAILS//\'/\'\'}"
-            ICON_WSL="/home/jopre/.claude/assets/claude-icon.png"
-            ICON_WIN=$(wslpath -w "$ICON_WSL" 2>/dev/null)
-            pwsh.exe -NoProfile -Command "
-                Import-Module BurntToast -ErrorAction SilentlyContinue
-                if (Get-Module BurntToast) {
-                    \$iconPath = '$ICON_WIN'
-                    if (Test-Path \$iconPath) {
-                        New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -AppLogo \$iconPath -Sound Default
-                    } else {
-                        New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -Sound Default
-                    }
-                } else {
-                    [System.Media.SystemSounds]::Asterisk.Play()
-                }
-            " 2>/dev/null
+            ICON_WIN=$(wslpath -w "/home/jopre/.claude/assets/claude-icon.png" 2>/dev/null)
+            send_burnttoast "$ICON_WIN"
         elif command -v notify-send &>/dev/null; then
-            # Linux Desktop: libnotify
             notify-send "$TITLE" "$MESSAGE — $DETAILS" 2>/dev/null
         fi
         ;;
     MINGW*|MSYS*)
-        # Git Bash on Windows: BurntToast via PowerShell
-        TITLE_ESCAPED="${TITLE//\'/\'\'}"
-        MESSAGE_ESCAPED="${MESSAGE//\'/\'\'}"
-        DETAILS_ESCAPED="${DETAILS//\'/\'\'}"
-        ICON_UNIX="$HOME/.claude/assets/claude-icon.png"
-        ICON_WIN=$(cygpath -w "$ICON_UNIX" 2>/dev/null)
-        pwsh.exe -NoProfile -Command "
-            Import-Module BurntToast -ErrorAction SilentlyContinue
-            if (Get-Module BurntToast) {
-                \$iconPath = '$ICON_WIN'
-                if (\$iconPath -and (Test-Path \$iconPath)) {
-                    New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -AppLogo \$iconPath -Sound Default
-                } else {
-                    New-BurntToastNotification -Text '$TITLE_ESCAPED', '$MESSAGE_ESCAPED', '$DETAILS_ESCAPED' -Sound Default
-                }
-            } else {
-                [System.Media.SystemSounds]::Asterisk.Play()
-            }
-        " 2>/dev/null
+        ICON_WIN=$(cygpath -w "$HOME/.claude/assets/claude-icon.png" 2>/dev/null)
+        send_burnttoast "$ICON_WIN"
         ;;
 esac
 
