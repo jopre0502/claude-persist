@@ -161,9 +161,16 @@ Mache einen kurzen **Final-Check**:
 - Typen: feat, fix, docs, refactor, test, chore
 - Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
+### CRITICAL: .gitignore ist UNANTASTBAR
+- **NIEMALS** `git add -f`, `git add --force` oder andere Mechanismen zum Umgehen von `.gitignore` verwenden
+- Wenn `git add` Dateien wegen `.gitignore` ablehnt: **Das ist beabsichtigt.** Diese Dateien gehoeren NICHT ins Repository.
+- Bei `.gitignore`-Fehlern: Nur die nicht-ignorierten Dateien einzeln stagen. NIEMALS die Blockade umgehen.
+- `.gitignore` ist eine **Sicherheitsgrenze** — sie schuetzt vor dem versehentlichen Commit sensibler/privater Daten.
+
 ### Git Safety Protocol
 - NIEMALS --force auf main/master ohne explizite Bestätigung
 - NIEMALS Hooks skippen (--no-verify) ohne explizite Anfrage
+- NIEMALS .gitignore umgehen (kein `-f`, kein `--force` bei `git add`)
 - git status VOR und NACH Operationen zur Verifizierung
 - No destructive operations without explicit confirmation
 

@@ -1,4 +1,4 @@
-# SETUP-REFERENCE — Auto-generated: 2026-03-06 08:57
+# SETUP-REFERENCE — Auto-generated: 2026-03-06 15:22
 
 Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
@@ -36,9 +36,8 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | Agent | Beschreibung |
 |-------|-------------|
 | `my-setup-guide` | Beantwortet Fragen zur persoenlichen Claude Code Installation, Konfiguration, Skills, Workflows und Conventions. Kenn... |
-| `prompt-architect` | Meta-Orchestrator für Prompt-Engineering und Skill-Architektur. Analysiert komplexe Anfragen, empfiehlt proaktiv Skill-Auslagerung, koordiniert prompt-improver Skill und skill-creator. Für Architektur-Entscheidungen und Multi-Skill-Workflows. |
 
-**Gesamt:** 2 Agents
+**Gesamt:** 1 Agents
 
 ---
 
@@ -190,6 +189,10 @@ Rules werden automatisch in den Kontext geladen. Optional mit `paths:` Frontmatt
 - `Bash(git push --force *)`
 - `Bash(git push -f *)`
 - `Bash(git reset --hard *)`
+- `Bash(git add -f *)`
+- `Bash(git add --force *)`
+- `Bash(git add * -f *)`
+- `Bash(git add * --force *)`
 - `TaskCreate`
 - `TaskUpdate`
 - `TaskList`
@@ -400,5 +403,5 @@ source ~/.config/secrets/.env-cache
 
 ---
 
-*Generiert: 2026-03-06 08:57 | Script: generate-reference.sh*
+*Generiert: 2026-03-06 15:22 | Script: generate-reference.sh*
 *Naechste Aktualisierung: /refresh-reference ausfuehren*

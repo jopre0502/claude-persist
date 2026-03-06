@@ -1,24 +1,26 @@
 # ===================================================
-# ~/.claude/ Knowledge Hub - Erweiterte Whitelist
+# ~/.claude/ Knowledge Hub - Granulare Component Whitelist
 # ===================================================
-# Strategy: Ignore EVERYTHING, then whitelist all
-# self-developed elements (skills, agents, commands, hooks)
-# and curated documentation.
+# Strategy: Ignore EVERYTHING, then whitelist EACH
+# component by name. .gitignore = Living Manifest.
+#
+# Neue Components hinzufuegen: 2 Zeilen pro Skill/Plugin,
+# 1 Zeile pro Agent/Command/Hook/Rule/Style.
 # ===================================================
 
 # Ignore everything by default
 *
 
-# ===== WHITELIST: Git Config & Tooling =====
+# ===== GIT CONFIG & TOOLING (pauschal) =====
 !.gitignore
 !.gitattributes
 !.editorconfig
 !.markdownlint.jsonc
 
-# ===== WHITELIST: Global Claude Instructions =====
+# ===== GLOBAL CLAUDE INSTRUCTIONS =====
 !CLAUDE.md
 
-# ===== WHITELIST: Community Standard Files =====
+# ===== COMMUNITY STANDARD FILES =====
 !README.md
 !LICENSE
 !CONTRIBUTING.md
@@ -26,56 +28,103 @@
 !SECURITY.md
 !CHANGELOG.md
 
-# ===== WHITELIST: GitHub Config =====
+# ===== GITHUB CONFIG =====
 !.github/
 !.github/**
 
-# ===== WHITELIST: Agent Definitions =====
-!agents/
-!agents/*.md
-
-# ===== WHITELIST: All Skills =====
+# ===== SKILLS (je 2 Zeilen: Ordner + Inhalt) =====
 !skills/
-!skills/*/
-!skills/**
+# --- Session & Docs ---
+!skills/session-refresh/
+!skills/session-refresh/**
+!skills/project-init/
+!skills/project-init/**
+!skills/project-doc-restructure/
+!skills/project-doc-restructure/**
+!skills/claude-md-restructure/
+!skills/claude-md-restructure/**
+!skills/setup-reference/
+!skills/setup-reference/**
+!skills/generate-pwd-howto/
+!skills/generate-pwd-howto/**
+# --- Task Management ---
+!skills/task-scheduler/
+!skills/task-scheduler/**
+!skills/task-orchestrator/
+!skills/task-orchestrator/**
+!skills/prioritize-tasks/
+!skills/prioritize-tasks/**
+# --- Git & GitHub ---
+!skills/github-push/
+!skills/github-push/**
+!skills/github-init/
+!skills/github-init/**
+!skills/github-ops/
+!skills/github-ops/**
+!skills/github-status/
+!skills/github-status/**
+# --- Vault & Obsidian ---
+!skills/vault-manager/
+!skills/vault-manager/**
+# --- Prompt & Skill Engineering ---
+!skills/prompt-improver/
+!skills/prompt-improver/**
+!skills/skill-creator/
+!skills/skill-creator/**
+# --- Audit & Ops ---
+!skills/permission-audit/
+!skills/permission-audit/**
+# --- ENTFERNT (nicht mehr whitelisten) ---
+# skills/granola-export — leer, geloescht
+# skills/prompt-architect — Agent war redundant (kein Skill, nur Referenz)
 
-# ===== WHITELIST: Commands =====
+# ===== AGENTS (je 1 Zeile) =====
+!agents/
+!agents/my-setup-guide.md
+# ENTFERNT: agents/prompt-architect.md — redundant zu prompt-improver Skill
+
+# ===== COMMANDS (je 1 Zeile) =====
 !commands/
-!commands/*
+!commands/knowledge-hub-sync.md
+!commands/obsidian-sync.md
+!commands/refresh-reference.md
+!commands/run-next-tasks.md
+!commands/statusline.sh
+!commands/vault-export.md
+!commands/vault-work.md
 
-# ===== WHITELIST: Hooks =====
+# ===== HOOKS (je 1 Zeile) =====
 !hooks/
-!hooks/*
+!hooks/auto-approve-readonly.sh
+!hooks/notify.sh
+!hooks/session-env-loader.sh
+!hooks/session-handoff-loader.sh
+!hooks/session-start-scheduler.sh
 
-# ===== WHITELIST: Rules =====
+# ===== RULES (je 1 Zeile) =====
 !rules/
-!rules/*
+!rules/vault-access.md
 
-# ===== WHITELIST: Output Styles =====
+# ===== OUTPUT STYLES (je 1 Zeile) =====
 !output-styles/
-!output-styles/*
+!output-styles/executive.md
 
-# ===== WHITELIST: Analysis & Documentation =====
-!docs/
-!docs/analysis/
-!docs/analysis/*
-
-# ===== WHITELIST: Assets =====
-!assets/
-!assets/*
-
-# ===== WHITELIST: Local Plugins (self-developed) =====
+# ===== PLUGINS (self-developed, einzeln) =====
 !plugins/
 !plugins/cache/
 !plugins/cache/local-plugins/
 !plugins/cache/local-plugins/ai-visualisation/
 !plugins/cache/local-plugins/ai-visualisation/**
 
-# ===== WHITELIST: Secrets Setup (Example Files Only) =====
+# ===== DOCS & ASSETS =====
+!assets/
+!assets/claude-icon.png
+
+# ===== SECRETS SETUP (Example Files Only) =====
 !secrets-setup/
 !secrets-setup/**
 
-# ===== EXPLICIT DENIES (safety net) =====
+# ===== EXPLICIT DENIES (Safety Net) =====
 # Credentials and secrets
 .credentials.json
 settings.json

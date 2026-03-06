@@ -76,10 +76,15 @@ get_sync_message
 
 ### Step 6: Commit erstellen
 
+**NIEMALS `git add -f` oder `git add --force` verwenden. .gitignore ist unantastbar.**
+
 ```bash
+# git add -A respektiert .gitignore. Falls Fehler: nur nicht-ignorierte Dateien einzeln adden.
 git add -A
 git commit -m "COMMIT_MESSAGE"
 ```
+
+Falls `git add` Dateien wegen .gitignore ablehnt: Diese Dateien gehoeren NICHT ins Repo. Nur die nicht-ignorierten Dateien einzeln stagen.
 
 ### Step 7: Push zu Remote
 

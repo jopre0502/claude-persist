@@ -93,7 +93,27 @@ Weise User an: "Token-Budget manuell reduzieren (CLI Built-in)"
 
 **Default: Automatisch committen + pushen. Nur stoppen wenn User explizit "nicht committen" sagt.**
 
-- `git add -A && git commit -m "$COMMIT_MSG" && git push`
+#### KRITISCH: .gitignore ist UNANTASTBAR
+
+- **NIEMALS** `git add -f`, `git add --force` oder sonstige Flags zum Umgehen von .gitignore verwenden
+- Wenn `git add` einen Pfad wegen .gitignore ablehnt: **Das ist korrekt.** Der Pfad gehoert NICHT ins Repository.
+- Stattdessen nur trackbare Dateien einzeln adden oder .gitignore-konforme Patterns nutzen
+- Bei Unsicherheit: User fragen, NIEMALS force-adden
+
+#### Workflow
+
+```bash
+# 1. Pruefen was ueberhaupt stageable ist (respektiert .gitignore)
+git add -A
+
+# 2. Falls git add fehlschlaegt: STOPPEN. Dateien einzeln adden die NICHT in .gitignore sind.
+#    NIEMALS -f oder --force nutzen!
+
+# 3. Commit + Push
+git commit -m "$COMMIT_MSG" && git push
+```
+
+- Falls `git add` Fehler meldet ("ignored by .gitignore"): **NUR die nicht-ignorierten Dateien einzeln adden**
 - Falls kein Remote konfiguriert: nur lokaler Commit
 - Commit-Message: Deutsche Sprache, Format `[Typ]: Kurzbeschreibung`
 
