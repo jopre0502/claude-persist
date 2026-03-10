@@ -1,4 +1,4 @@
-# SETUP-REFERENCE — Auto-generated: 2026-03-06 15:22
+# SETUP-REFERENCE — Auto-generated: 2026-03-10 08:24
 
 Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
@@ -9,6 +9,7 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | Skill | Beschreibung |
 |-------|-------------|
 | `claude-md-restructure` | Optimize CLAUDE.md files for size (<8KB target) while preserving workflow-block.txt injection and Session-Continuous ... |
+| `env-init` | This skill should be used when the user wants to initialize .env and .env.example files with 1Password op:// secret references. Covers setting up secrets, configuring environment variables, adding 1Password integration to a project, or generating op:// reference templates. Relevant for: 'set up .env', 'initialize secrets', 'add 1Password to project', 'configure environment variables', 'create op:// references'. |
 | `generate-pwd-howto` | (keine Beschreibung) |
 | `github-init` | Verknüpft aktuelles Working Directory mit GitHub-Repo und erstellt Pro-Projekt Config (.claude/github.json). Use whe... |
 | `github-ops` | Shared Library für GitHub-Operations Skills. Enthält lib/, assets/, references/. NICHT direkt aufrufen. Nutze statt... |
@@ -27,7 +28,7 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | `task-scheduler` | Automatically orchestrate and execute project tasks from PROJEKT.md. Use this skill when you want to analyze pending ... |
 | `vault-manager` | Use this skill when the user references Vault documents via vault: prefix notation (e.g., "vault:ai-workflows"), requ... |
 
-**Gesamt:** 18 Skills
+**Gesamt:** 19 Skills
 
 ---
 
@@ -74,22 +75,10 @@ Rules werden automatisch in den Kontext geladen. Optional mit `paths:` Frontmatt
 |-------|-------------|---------|
 | PreToolUse | `tool-call-logger.sh` | 5s |
 | PreToolUse | `auto-approve-readonly.sh` | 5s |
-| SessionStart | `session-env-loader.sh` | 10s |
 | SessionStart | `session-handoff-loader.sh` | 15s |
 | Notification | `notify.sh` | defaults |
 
-**Gesamt:** 5 Hooks
-
-### Hook Details: session-env-loader.sh
-
-| Feature | Erkannt |
-|---------|---------|
-| SOPS Decryption | ✅ |
-| age Key-File | ✅ |
-| MINGW/Windows Support | ✅ |
-| .env-cache Fallback (Bug #15840) | ✅ |
-
-**Secrets-Verzeichnis:** `${XDG_CONFIG_HOME:-~/.config}/secrets/env.d`
+**Gesamt:** 4 Hooks
 
 ---
 
@@ -168,12 +157,7 @@ Rules werden automatisch in den Kontext geladen. Optional mit `paths:` Frontmatt
 - `WebFetch(domain:smartscope.blog)`
 - `Bash(git commit:*)`
 - `Bash(cat:*)`
-- `Bash(echo NOT_INSTALLED:*)`
-- `Bash(echo OP_EXE_NOT_FOUND:*)`
-- `Bash(op:*)`
-- `Bash(echo:*)`
-- `Bash(age:*)`
-- `Bash(sops:*)`
+- `Bash(op *)`
 - `Bash(grep:*)`
 - `Bash(head:*)`
 - `Bash(curl:*)`
@@ -256,16 +240,7 @@ Rules werden automatisch in den Kontext geladen. Optional mit `paths:` Frontmatt
 
 ## 9b. Hook Details
 
-### session-env-loader.sh
-
-| Feature | Erkannt |
-|---------|---------|
-| SOPS Decryption | ✅ |
-| age Key-File | ✅ |
-| MINGW/Windows-Kompatibilitaet | ✅ |
-
-**Secrets-Verzeichnis:** `ENV_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/secrets/env.d"`
-**Cache-Datei:** `CACHE_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/secrets/.env-cache"`
+(session-env-loader.sh nicht gefunden)
 
 ---
 
@@ -403,5 +378,5 @@ source ~/.config/secrets/.env-cache
 
 ---
 
-*Generiert: 2026-03-06 15:22 | Script: generate-reference.sh*
+*Generiert: 2026-03-10 08:24 | Script: generate-reference.sh*
 *Naechste Aktualisierung: /refresh-reference ausfuehren*

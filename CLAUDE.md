@@ -194,21 +194,11 @@ Mache einen kurzen **Final-Check**:
 - NOT direct Grep/Glob for exploratory search
 - This minimizes context usage and improves results
 
-### CRITICAL: Environment-Isolation bei Subagents (Task Tool)
+### Environment bei Subagents (Task Tool)
 
-**Problem:** Sub-Agents (Task tool) erben KEINE Environment-Variablen aus dem SessionStart Hook (`CLAUDE_ENV_FILE`). Betrifft: `$N8N_API_KEY` und alle via `~/.config/secrets/env.d/*.env` geladenen Secrets.
+**Vault CLI:** `obsidian.com` nutzt Named Pipe (OS-Level) → funktioniert in Sub-Agents ohne env vars. Voraussetzung: Obsidian App muss laufen.
 
-**Vault Read/Search/Tags/Backlinks — Sub-Agents nutzen CLI direkt:**
-- CLI (`obsidian.com`) nutzt Named Pipe (OS-Level) → funktioniert in Sub-Agents ohne env vars
-- `vault:` Referenzen direkt in Sub-Agents aufloesen (CLI search + read). Kein Main-Session-Preflight noetig.
-- Bash-Scripts: `vault-lib.sh` mit `get_vault_path()` handled Vault-Pfad automatisch (CLI primary, Env fallback)
-- Voraussetzung: Obsidian App muss laufen
-
-**Secrets/API-Keys — weiterhin Main-Session-Pflicht:**
-- API-Calls die Secrets brauchen → Main-Session ausführen, Ergebnis an Subagent
-- Oder: In Bash `source ~/.config/secrets/.env-cache` (wird bei Session-Start vom Hook geschrieben)
-
-**Warum:** SessionStart Hook setzt `CLAUDE_ENV_FILE` → Main-Session lädt env vars. Task-Subagents starten in isoliertem Kontext ohne diese env vars. Vault-CLI ist davon nicht betroffen (Named Pipe, OS-Level).
+**1Password Secrets:** `op run --env-file=.env -- <command>` funktioniert in Main-Session UND Subagents. `op` ist direkt im PATH erreichbar (kein Hook noetig). Voraussetzung: 1Password Desktop App muss laufen + Desktop Integration aktiv.
 
 ---
 
@@ -261,6 +251,16 @@ Jede `.md`-Datei mit YAML-Frontmatter in commands/, skills/, agents/ **MUSS** ei
 - No secrets in committed code (.env, credentials.json, etc.)
 - Warn if user attempts to commit secrets
 - Validate .gitignore before commits
+
+### Secret-Handling: 1Password `op run` (Standard-Pattern)
+
+Projekte mit Secrets nutzen `op run --env-file=.env -- <command>`:
+
+- `.env` mit `op://` Secret References (gitignored, lokal aus `.env.example` kopiert)
+- `.env.example` committed als Template (gleiche `op://` URIs, Doku-Zweck)
+- `.gitignore` MUSS `.env` enthalten, `.env.example` DARF NICHT ignoriert sein
+- Skill `/env-init` automatisiert Setup (liest 1Password Item, generiert beide Dateien)
+- Keine Secrets auf Disk — Aufloesung nur zur Laufzeit im Child-Prozess
 
 ---
 
