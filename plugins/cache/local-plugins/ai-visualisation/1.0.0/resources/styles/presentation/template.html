@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITEL}}</title>
+
+    <!-- ============================================ -->
+    <!-- THEME (CI-Tokens) - wird injiziert          -->
+    <!-- ============================================ -->
+    <link rel="stylesheet" href="{{THEME_PATH}}">
+
+    <!-- ============================================ -->
+    <!-- LAYOUT-STYLE (Komponenten)                  -->
+    <!-- ============================================ -->
+    <link rel="stylesheet" href="{{STYLE_PATH}}">
+
+    <!-- ============================================ -->
+    <!-- PRINT STYLES                                -->
+    <!-- ============================================ -->
+    <style>
+        @media print {
+            @page {
+                size: 297mm 210mm landscape;
+                margin: 10mm;
+            }
+
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+
+            section {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .section-header {
+                display: block;
+                position: running(sectionHeader);
+            }
+
+            @top-right {
+                content: element(sectionHeader);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ============================================ -->
+    <!-- CONTENT STRUCTURE                            -->
+    <!-- ============================================ -->
+    <main>
+        <header>
+            <h1>{{TITEL}}</h1>
+            {{#UNTERTITEL}}
+            <p class="subtitle">{{UNTERTITEL}}</p>
+            {{/UNTERTITEL}}
+        </header>
+
+        <!-- ======================================== -->
+        <!-- CONTENT SECTIONS                         -->
+        <!-- ======================================== -->
+
+        {{#SECTIONS}}
+        <section class="{{SECTION_TYPE}}" id="{{SECTION_ID}}">
+            <div class="section-header">{{SECTION_TITLE}}</div>
+            {{SECTION_CONTENT}}
+        </section>
+        {{/SECTIONS}}
+
+        <!-- ======================================== -->
+        <!-- KROKI DIAGRAMME (Pre-Rendered SVG)       -->
+        <!-- ======================================== -->
+
+        {{#DIAGRAMS}}
+        <section class="diagram" id="{{DIAGRAM_ID}}">
+            <div class="section-header">{{DIAGRAM_HEADING}}</div>
+            {{#DIAGRAM_HEADING}}<h2>{{DIAGRAM_HEADING}}</h2>{{/DIAGRAM_HEADING}}
+            <figure>
+                <img src="./assets/{{DIAGRAM_FILENAME}}"
+                     alt="{{DIAGRAM_ALT}}" />
+                {{#DIAGRAM_CAPTION}}
+                <figcaption>{{DIAGRAM_CAPTION}}</figcaption>
+                {{/DIAGRAM_CAPTION}}
+            </figure>
+        </section>
+        {{/DIAGRAMS}}
+
+        <!-- ======================================== -->
+        <!-- MARKMAP MINDMAPS (Interaktiv)            -->
+        <!-- ======================================== -->
+
+        {{#MINDMAPS}}
+        <section class="mindmap" id="{{MINDMAP_ID}}">
+            <div class="section-header">{{MINDMAP_HEADING}}</div>
+            {{#MINDMAP_HEADING}}<h2>{{MINDMAP_HEADING}}</h2>{{/MINDMAP_HEADING}}
+            <figure>
+                <div id="markmap-{{MINDMAP_ID}}" class="markmap-container"></div>
+                {{#MINDMAP_CAPTION}}
+                <figcaption>{{MINDMAP_CAPTION}}</figcaption>
+                {{/MINDMAP_CAPTION}}
+            </figure>
+        </section>
+        {{/MINDMAPS}}
+
+        <!-- ======================================== -->
+        <!-- VEGA-LITE CHARTS                         -->
+        <!-- ======================================== -->
+
+        {{#CHARTS}}
+        <section class="chart" id="{{CHART_ID}}">
+            <div class="section-header">{{CHART_HEADING}}</div>
+            {{#CHART_HEADING}}<h2>{{CHART_HEADING}}</h2>{{/CHART_HEADING}}
+            <figure>
+                <div id="vega-{{CHART_ID}}"></div>
+                {{#CHART_CAPTION}}
+                <figcaption>{{CHART_CAPTION}}</figcaption>
+                {{/CHART_CAPTION}}
+            </figure>
+        </section>
+        {{/CHARTS}}
+
+        <!-- ======================================== -->
+        <!-- FOOTER                                   -->
+        <!-- ======================================== -->
+
+        <footer>
+            <p>{{TITEL}} | {{AUTHOR}} | {{DATE}} | v{{VERSION}}</p>
+        </footer>
+    </main>
+
+    <!-- ============================================ -->
+    <!-- CDN DEPENDENCIES                             -->
+    <!-- ============================================ -->
+
+    <!-- Vega-Lite für Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Markmap für interaktive Mindmaps -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
+
+    <!-- ============================================ -->
+    <!-- CI-THEME RUNTIME                             -->
+    <!-- ============================================ -->
+    <script>
+        function getCITheme() {
+            var style = getComputedStyle(document.documentElement);
+            return {
+                primary: style.getPropertyValue('--ci-primary').trim() || '#0066cc',
+                secondary: style.getPropertyValue('--ci-secondary').trim() || '#ff6600',
+                success: style.getPropertyValue('--ci-success').trim() || '#28a745',
+                text: style.getPropertyValue('--ci-text').trim() || '#1a1a1a',
+                textMuted: style.getPropertyValue('--ci-text-muted').trim() || '#6c757d',
+                border: style.getPropertyValue('--ci-border').trim() || '#dee2e6',
+                fontHeading: style.getPropertyValue('--ci-font-heading').trim() || 'system-ui, sans-serif',
+                fontBody: style.getPropertyValue('--ci-font-body').trim() || 'system-ui, sans-serif'
+            };
+        }
+
+        var CI = getCITheme();
+    </script>
+
+    <!-- ============================================ -->
+    <!-- INITIALISIERUNG                              -->
+    <!-- ============================================ -->
+    <script>
+        // Lucide Icons
+        lucide.createIcons();
+
+        // Bild-Fallback Handler
+        document.querySelectorAll('img').forEach(function(img) {
+            img.onerror = function() {
+                var placeholder = document.createElement('div');
+                placeholder.className = 'img-placeholder';
+                placeholder.textContent = 'Bild nicht verfügbar: ' + (this.alt || this.src);
+                if (this.parentElement) {
+                    this.parentElement.replaceChild(placeholder, this);
+                }
+            };
+        });
+
+        // Vega-Lite Specs
+        {{#VEGA_SPECS}}
+        (function() {
+            var spec = {{VEGA_JSON}};
+            spec.config = spec.config || {};
+            spec.config.font = CI.fontBody;
+            spec.config.title = { font: CI.fontHeading, color: CI.text };
+            spec.config.axis = { labelFont: CI.fontBody, labelColor: CI.text, gridColor: CI.border };
+            vegaEmbed('#vega-{{CHART_ID}}', spec, {
+                actions: false,
+                renderer: 'svg'
+            });
+        })();
+        {{/VEGA_SPECS}}
+
+        // Markmap Mindmaps
+        {{#MARKMAP_DATA}}
+        (function() {
+            var data = `{{MARKMAP_MARKDOWN}}`;
+            var transformer = new markmap.Transformer();
+            var result = transformer.transform(data);
+            var container = document.getElementById('markmap-{{MINDMAP_ID}}');
+            var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.width = '100%';
+            svg.style.height = '500px';
+            container.appendChild(svg);
+
+            var options = {
+                color: function(node) {
+                    var colors = [CI.primary, CI.success, CI.secondary, CI.textMuted];
+                    return colors[node.state.depth % colors.length];
+                }
+            };
+            markmap.Markmap.create(svg, options, result.root);
+        })();
+        {{/MARKMAP_DATA}}
+    </script>
+
+    <!-- Fallback für deaktiviertes JavaScript -->
+    <noscript>
+        <style>
+            .mindmap .markmap-container,
+            .chart > figure > div { display: none; }
+            .mindmap::after,
+            .chart::after {
+                content: 'Interaktive Visualisierung erfordert JavaScript.';
+                display: block;
+                padding: 20px;
+                background: var(--ci-surface);
+                border-radius: var(--ci-border-radius);
+                text-align: center;
+                color: var(--ci-text-muted);
+            }
+        </style>
+    </noscript>
+</body>
+</html>

@@ -1,0 +1,408 @@
+/* ==========================================================================
+   SmartArt CSS - Token-Layer für Consulting-Style Visuals
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   TOKEN LAYER
+
+   SmartArt-Variablen (--sa-*) mappen auf CI-Theme-Variablen (--ci-*).
+   Dies ermöglicht Theme-Wechsel ohne SmartArt-Code-Änderungen.
+   -------------------------------------------------------------------------- */
+
+:root {
+    /* Farben - mapped auf CI-Theme */
+    --sa-primary: var(--ci-primary, #0066cc);
+    --sa-secondary: var(--ci-secondary, #ff6600);
+    --sa-success: var(--ci-success, #28a745);
+    --sa-warning: var(--ci-warning, #ffc107);
+    --sa-error: var(--ci-error, #dc3545);
+    --sa-surface: var(--ci-surface, #f8f9fa);
+    --sa-background: var(--ci-background, #ffffff);
+    --sa-text: var(--ci-text, #1a1a1a);
+    --sa-text-muted: var(--ci-text-muted, #6c757d);
+    --sa-border: var(--ci-border, #dee2e6);
+
+    /* Typografie */
+    --sa-font-heading: var(--ci-font-heading, system-ui, -apple-system, sans-serif);
+    --sa-font-body: var(--ci-font-body, system-ui, -apple-system, sans-serif);
+
+    /* SmartArt-spezifische Tokens */
+    --sa-box-radius: 8px;
+    --sa-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --sa-line-width: 2px;
+    --sa-accent-width: 4px;
+    --sa-point-radius: 8px;
+
+    /* Quadrant-Farben (matrix_2x2) */
+    --sa-quadrant-tl: #e8f4e8;  /* Top-Left: Grün-Tönung (Quick Wins) */
+    --sa-quadrant-tr: #e8f0f8;  /* Top-Right: Blau-Tönung (Strategisch) */
+    --sa-quadrant-bl: #f8f8e8;  /* Bottom-Left: Gelb-Tönung (Fill-Ins) */
+    --sa-quadrant-br: #f8e8e8;  /* Bottom-Right: Rot-Tönung (Vermeiden) */
+
+    /* Chevron-Farben (chevron_process) */
+    --sa-chevron-1: var(--sa-primary);
+    --sa-chevron-2: #0077dd;
+    --sa-chevron-3: #0088ee;
+    --sa-chevron-4: #0099ff;
+    --sa-chevron-5: #00aaff;
+    --sa-chevron-6: #00bbff;
+    --sa-chevron-7: #00ccff;
+
+    /* Pillar-Farben */
+    --sa-pillar-base: var(--sa-surface);
+    --sa-pillar-accent: var(--sa-primary);
+}
+
+/* --------------------------------------------------------------------------
+   BASE SVG STYLES
+   -------------------------------------------------------------------------- */
+
+.smartart {
+    margin: 2rem 0;
+}
+
+.smartart figure {
+    margin: 0;
+    padding: 0;
+}
+
+.smartart figcaption {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--sa-text-muted);
+    margin-top: 1rem;
+    font-family: var(--sa-font-body);
+}
+
+.sa-viz {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   TEXT STYLES
+   -------------------------------------------------------------------------- */
+
+.sa-text {
+    font-family: var(--sa-font-body);
+    fill: var(--sa-text);
+}
+
+.sa-text-heading {
+    font-family: var(--sa-font-heading);
+    font-weight: 600;
+    font-size: 16px;
+    fill: var(--sa-text);
+}
+
+.sa-text-label {
+    font-size: 14px;
+    fill: var(--sa-text);
+}
+
+.sa-text-muted {
+    font-size: 12px;
+    fill: var(--sa-text-muted);
+}
+
+.sa-text-on-dark {
+    fill: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   BOX & SHAPE STYLES
+   -------------------------------------------------------------------------- */
+
+.sa-box {
+    fill: var(--sa-surface);
+    stroke: var(--sa-border);
+    stroke-width: 1px;
+    rx: var(--sa-box-radius);
+    ry: var(--sa-box-radius);
+}
+
+.sa-box-primary {
+    fill: var(--sa-primary);
+    stroke: none;
+}
+
+.sa-box-accent {
+    fill: var(--sa-secondary);
+    stroke: none;
+}
+
+/* --------------------------------------------------------------------------
+   LINE STYLES
+   -------------------------------------------------------------------------- */
+
+.sa-line {
+    stroke: var(--sa-border);
+    stroke-width: var(--sa-line-width);
+    fill: none;
+}
+
+.sa-line-primary {
+    stroke: var(--sa-primary);
+}
+
+.sa-line-accent {
+    stroke: var(--sa-secondary);
+    stroke-width: var(--sa-accent-width);
+}
+
+.sa-axis {
+    stroke: var(--sa-text-muted);
+    stroke-width: 1px;
+    fill: none;
+}
+
+/* --------------------------------------------------------------------------
+   POINT STYLES
+   -------------------------------------------------------------------------- */
+
+.sa-point {
+    fill: var(--sa-primary);
+    stroke: var(--sa-background);
+    stroke-width: 2px;
+}
+
+.sa-point-label {
+    font-size: 11px;
+    fill: var(--sa-text);
+    text-anchor: middle;
+}
+
+/* --------------------------------------------------------------------------
+   MATRIX 2x2 SPECIFIC
+   -------------------------------------------------------------------------- */
+
+.smartart-matrix_2x2 .sa-quadrant-tl {
+    fill: var(--sa-quadrant-tl);
+}
+
+.smartart-matrix_2x2 .sa-quadrant-tr {
+    fill: var(--sa-quadrant-tr);
+}
+
+.smartart-matrix_2x2 .sa-quadrant-bl {
+    fill: var(--sa-quadrant-bl);
+}
+
+.smartart-matrix_2x2 .sa-quadrant-br {
+    fill: var(--sa-quadrant-br);
+}
+
+.smartart-matrix_2x2 .sa-quadrant-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-anchor: middle;
+    fill: var(--sa-text-muted);
+}
+
+.smartart-matrix_2x2 .sa-axis-label {
+    font-size: 12px;
+    fill: var(--sa-text-muted);
+    text-anchor: middle;
+}
+
+/* --------------------------------------------------------------------------
+   CHEVRON PROCESS SPECIFIC
+   -------------------------------------------------------------------------- */
+
+.smartart-chevron_process .sa-chevron {
+    stroke: none;
+}
+
+.smartart-chevron_process .sa-chevron:nth-child(1) { fill: var(--sa-chevron-1); }
+.smartart-chevron_process .sa-chevron:nth-child(2) { fill: var(--sa-chevron-2); }
+.smartart-chevron_process .sa-chevron:nth-child(3) { fill: var(--sa-chevron-3); }
+.smartart-chevron_process .sa-chevron:nth-child(4) { fill: var(--sa-chevron-4); }
+.smartart-chevron_process .sa-chevron:nth-child(5) { fill: var(--sa-chevron-5); }
+.smartart-chevron_process .sa-chevron:nth-child(6) { fill: var(--sa-chevron-6); }
+.smartart-chevron_process .sa-chevron:nth-child(7) { fill: var(--sa-chevron-7); }
+
+.smartart-chevron_process .sa-chevron-text {
+    fill: #ffffff;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.smartart-chevron_process .sa-chevron-sublabel {
+    fill: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    text-anchor: middle;
+}
+
+/* --------------------------------------------------------------------------
+   PILLARS SPECIFIC
+   -------------------------------------------------------------------------- */
+
+.smartart-pillars .sa-pillar {
+    fill: var(--sa-pillar-base);
+    stroke: var(--sa-border);
+    stroke-width: 1px;
+}
+
+.smartart-pillars .sa-pillar-header {
+    fill: var(--sa-pillar-accent);
+}
+
+.smartart-pillars .sa-pillar-base {
+    fill: var(--sa-surface);
+    stroke: var(--sa-primary);
+    stroke-width: 2px;
+}
+
+.smartart-pillars .sa-pillar-title {
+    fill: #ffffff;
+    font-weight: 600;
+    text-anchor: middle;
+}
+
+.smartart-pillars .sa-pillar-content {
+    fill: var(--sa-text);
+    font-size: 12px;
+    text-anchor: middle;
+}
+
+/* --------------------------------------------------------------------------
+   TIMELINE SPECIFIC
+   -------------------------------------------------------------------------- */
+
+.smartart-timeline .sa-timeline-line {
+    stroke: var(--sa-border);
+    stroke-width: 3px;
+    fill: none;
+}
+
+.smartart-timeline .sa-timeline-point {
+    fill: var(--sa-primary);
+    stroke: var(--sa-background);
+    stroke-width: 3px;
+}
+
+.smartart-timeline .sa-timeline-point-active {
+    fill: var(--sa-success);
+}
+
+.smartart-timeline .sa-timeline-point-future {
+    fill: var(--sa-text-muted);
+}
+
+.smartart-timeline .sa-timeline-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-anchor: middle;
+    fill: var(--sa-text);
+}
+
+.smartart-timeline .sa-timeline-date {
+    font-size: 10px;
+    fill: var(--sa-text-muted);
+    text-anchor: middle;
+}
+
+.smartart-timeline .sa-timeline-content {
+    font-size: 11px;
+    fill: var(--sa-text);
+    text-anchor: middle;
+}
+
+/* --------------------------------------------------------------------------
+   HIERARCHY SPECIFIC
+   -------------------------------------------------------------------------- */
+
+.smartart-hierarchy .sa-node {
+    fill: var(--sa-surface);
+    stroke: var(--sa-border);
+    stroke-width: 1px;
+}
+
+.smartart-hierarchy .sa-node-root {
+    fill: var(--sa-primary);
+    stroke: none;
+}
+
+.smartart-hierarchy .sa-node-level-1 {
+    fill: var(--sa-surface);
+    stroke: var(--sa-primary);
+    stroke-width: 2px;
+}
+
+.smartart-hierarchy .sa-node-level-2 {
+    fill: var(--sa-surface);
+    stroke: var(--sa-border);
+    stroke-width: 1px;
+}
+
+.smartart-hierarchy .sa-connector {
+    stroke: var(--sa-border);
+    stroke-width: 2px;
+    fill: none;
+}
+
+.smartart-hierarchy .sa-node-text {
+    font-size: 12px;
+    text-anchor: middle;
+    dominant-baseline: central;
+    fill: var(--sa-text);
+}
+
+.smartart-hierarchy .sa-node-text-root {
+    fill: #ffffff;
+    font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   PRINT STYLES
+   -------------------------------------------------------------------------- */
+
+@media print {
+    .smartart {
+        page-break-inside: avoid;
+        margin: 1rem 0;
+    }
+
+    .sa-viz {
+        max-height: 350px;
+    }
+
+    /* Schatten entfernen für Print */
+    .sa-box {
+        filter: none !important;
+    }
+
+    /* Farben für Print optimieren */
+    .smartart-matrix_2x2 .sa-quadrant-tl,
+    .smartart-matrix_2x2 .sa-quadrant-tr,
+    .smartart-matrix_2x2 .sa-quadrant-bl,
+    .smartart-matrix_2x2 .sa-quadrant-br {
+        opacity: 0.7;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 600px) {
+    .sa-text-heading {
+        font-size: 14px;
+    }
+
+    .sa-text-label {
+        font-size: 12px;
+    }
+
+    .sa-text-muted {
+        font-size: 10px;
+    }
+
+    .smartart-chevron_process .sa-chevron-sublabel {
+        display: none;
+    }
+}

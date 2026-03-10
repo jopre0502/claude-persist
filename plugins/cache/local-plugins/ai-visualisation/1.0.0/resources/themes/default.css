@@ -1,0 +1,95 @@
+/**
+ * DEFAULT THEME - Clean Light
+ *
+ * Standard-Theme für Präsentationen und Guides.
+ * Heller Hintergrund, klare Kontraste, professioneller Look.
+ */
+
+:root {
+    /* ═══════════════════════════════════════════════════════════════
+       FARBEN
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Primärfarben */
+    --ci-primary: #0066cc;
+    --ci-secondary: #ff6600;
+    --ci-success: #28a745;
+    --ci-warning: #ffc107;
+    --ci-error: #dc3545;
+
+    /* Hintergrund & Oberflächen */
+    --ci-background: #ffffff;
+    --ci-surface: #f8f9fa;
+
+    /* Text */
+    --ci-text: #1a1a1a;
+    --ci-text-muted: #6c757d;
+    --ci-text-inverse: #ffffff;
+
+    /* Borders & Dividers */
+    --ci-border: #dee2e6;
+    --ci-border-strong: #adb5bd;
+
+    /* ═══════════════════════════════════════════════════════════════
+       TYPOGRAFIE
+       ═══════════════════════════════════════════════════════════════ */
+
+    --ci-font-heading: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --ci-font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --ci-font-size-base: 16px;
+    --ci-line-height: 1.6;
+
+    /* ═══════════════════════════════════════════════════════════════
+       SPACING & FORM
+       ═══════════════════════════════════════════════════════════════ */
+
+    --ci-spacing-unit: 8px;
+    --ci-border-radius: 8px;
+    --ci-border-radius-lg: 12px;
+    --ci-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --ci-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+    /* ═══════════════════════════════════════════════════════════════
+       PHASE-FARBEN (für Timeline/Feed-Layouts)
+       ═══════════════════════════════════════════════════════════════ */
+
+    --ci-phase-question: #0066cc;
+    --ci-phase-insight: #28a745;
+    --ci-phase-analysis: #ffc107;
+    --ci-phase-correction: #dc3545;
+    --ci-phase-research: #6f42c1;
+    --ci-phase-decision: #17a2b8;
+    --ci-phase-conclusion: #004085;
+    --ci-phase-takeaway: #1a1a1a;
+
+    /* ═══════════════════════════════════════════════════════════════
+       NAVIGATION CSS VARIABLES
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Page Counter (top-right Badge) */
+    --nav-counter-bg: var(--ci-primary);
+    --nav-counter-color: var(--ci-text-inverse);
+    --nav-counter-font-size: 0.875rem;
+    --nav-counter-padding: var(--ci-spacing-unit) calc(var(--ci-spacing-unit) * 1.5);
+    --nav-counter-border-radius: var(--ci-border-radius);
+    --nav-counter-shadow: var(--ci-shadow);
+    --nav-counter-position-top: 2rem;
+    --nav-counter-position-right: 2rem;
+    --nav-counter-z-index: 100;
+
+    /* Sidebar Navigation */
+    --nav-sidebar-width: 240px;
+    --nav-sidebar-width-mobile: 100%;
+    --nav-sidebar-bg: var(--ci-surface);
+    --nav-sidebar-text-color: var(--ci-text);
+    --nav-sidebar-text-muted: var(--ci-text-muted);
+    --nav-sidebar-active-color: var(--ci-primary);
+    --nav-sidebar-active-bg: rgba(0, 102, 204, 0.08);
+    --nav-sidebar-border-left: 3px solid var(--ci-primary);
+    --nav-sidebar-border-left-inactive: 3px solid transparent;
+    --nav-sidebar-padding: calc(var(--ci-spacing-unit) * 1.5);
+    --nav-sidebar-transition: all 0.2s ease-in-out;
+    --nav-sidebar-position-top: 0;
+    --nav-sidebar-position-left: 0;
+    --nav-sidebar-z-index: 90;
+}

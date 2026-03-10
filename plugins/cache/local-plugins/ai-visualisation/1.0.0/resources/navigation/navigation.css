@@ -1,0 +1,417 @@
+/**
+ * NAVIGATION COMPONENT STYLES
+ *
+ * Semantic CSS für Navigation-Komponenten:
+ * - .page-counter: Fixed Badge für aktuelle Seite
+ * - .sidebar-nav: Fixe Sidebar-Navigation
+ *
+ * Unterstützt Accessibility (ARIA), Keyboard-Navigation, Mobile Responsiveness
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL NAVIGATION STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE COUNTER COMPONENT
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * .page-counter
+ * Fixed badge in top-right corner showing current page / total pages
+ * Example: "5 / 12"
+ */
+.page-counter {
+    position: fixed;
+    top: var(--nav-counter-position-top);
+    right: var(--nav-counter-position-right);
+    z-index: var(--nav-counter-z-index);
+
+    background-color: var(--nav-counter-bg);
+    color: var(--nav-counter-color);
+    font-size: var(--nav-counter-font-size);
+    font-weight: 600;
+    font-family: var(--ci-font-body);
+
+    padding: var(--nav-counter-padding);
+    border-radius: var(--nav-counter-border-radius);
+    box-shadow: var(--nav-counter-shadow);
+
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    white-space: nowrap;
+    user-select: none;
+
+    /* Accessibility */
+    aria-label: "Aktuelle Seite";
+}
+
+.page-counter .current {
+    font-weight: 700;
+}
+
+.page-counter .divider {
+    opacity: 0.7;
+    margin: 0 0.25rem;
+}
+
+.page-counter .total {
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+/* Hover-Effekt für Desktop */
+@media (hover: hover) and (pointer: fine) {
+    .page-counter {
+        transition: var(--nav-sidebar-transition);
+    }
+
+    .page-counter:hover {
+        background-color: var(--ci-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--ci-shadow-lg);
+    }
+}
+
+/* Mobile Anpassung */
+@media (max-width: 768px) {
+    .page-counter {
+        top: 1rem;
+        right: 1rem;
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR NAVIGATION COMPONENT
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * .sidebar-nav
+ * Fixed sidebar navigation with ordered list of sections
+ */
+.sidebar-nav {
+    position: fixed;
+    top: var(--nav-sidebar-position-top);
+    left: var(--nav-sidebar-position-left);
+    width: var(--nav-sidebar-width);
+    height: 100vh;
+    z-index: var(--nav-sidebar-z-index);
+
+    background-color: var(--nav-sidebar-bg);
+    border-right: 1px solid var(--ci-border);
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: calc(var(--nav-sidebar-padding) * 2) 0;
+
+    /* Accessibility */
+    role: navigation;
+    aria-label: "Seiten-Navigation";
+}
+
+/**
+ * Ordered List Styling
+ */
+.sidebar-nav ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: section-counter;
+}
+
+.sidebar-nav ol li {
+    counter-increment: section-counter;
+    margin: 0;
+    padding: 0;
+}
+
+/**
+ * List Item Links
+ */
+.sidebar-nav ol li a {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--ci-spacing-unit) * 0.75);
+
+    padding: var(--nav-sidebar-padding);
+    color: var(--nav-sidebar-text-color);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-family: var(--ci-font-body);
+    line-height: 1.5;
+
+    border-left: var(--nav-sidebar-border-left-inactive);
+    transition: var(--nav-sidebar-transition);
+
+    word-break: break-word;
+    white-space: normal;
+
+    /* Accessibility */
+    aria-current: page;
+}
+
+/**
+ * Counter Badge vor dem Link-Text
+ */
+.sidebar-nav ol li a::before {
+    content: counter(section-counter);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 0.25rem;
+
+    background-color: var(--ci-primary);
+    color: var(--ci-text-inverse);
+    border-radius: calc(var(--ci-border-radius) / 2);
+
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+
+    transition: var(--nav-sidebar-transition);
+}
+
+/**
+ * Hover-State (Desktop)
+ */
+@media (hover: hover) and (pointer: fine) {
+    .sidebar-nav ol li a {
+        cursor: pointer;
+    }
+
+    .sidebar-nav ol li a:hover {
+        background-color: rgba(0, 102, 204, 0.04);
+        padding-left: calc(var(--nav-sidebar-padding) + 0.5rem);
+    }
+
+    .sidebar-nav ol li a:hover::before {
+        transform: scale(1.1);
+        box-shadow: var(--ci-shadow);
+    }
+}
+
+/**
+ * Active/Current State
+ * .active Klasse oder [aria-current="page"]
+ */
+.sidebar-nav ol li a.active,
+.sidebar-nav ol li a[aria-current="page"] {
+    color: var(--nav-sidebar-active-color);
+    background-color: var(--nav-sidebar-active-bg);
+    border-left: var(--nav-sidebar-border-left);
+    font-weight: 600;
+}
+
+.sidebar-nav ol li a.active::before,
+.sidebar-nav ol li a[aria-current="page"]::before {
+    background-color: var(--nav-sidebar-active-color);
+    box-shadow: var(--ci-shadow);
+    transform: scale(1.15);
+}
+
+/* Focus-State (Keyboard Navigation) */
+.sidebar-nav ol li a:focus-visible {
+    outline: 2px solid var(--nav-sidebar-active-color);
+    outline-offset: -2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN CONTENT ADJUSTMENTS
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * Wenn Sidebar vorhanden: Hauptinhalt nach rechts verschieben
+ */
+body.has-sidebar {
+    margin-left: var(--nav-sidebar-width);
+}
+
+/**
+ * Page Content Container
+ */
+.page-content {
+    padding: calc(var(--ci-spacing-unit) * 3);
+    min-height: 100vh;
+    background-color: var(--ci-background);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION ANCHORS (für Scroll-Navigation)
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * Sections sollten ID haben für Linking:
+ * <section id="section-1">
+ *   <h2>Abschnitt 1</h2>
+ * </section>
+ */
+section[id] {
+    scroll-margin-top: 2rem;
+}
+
+/* Sichtbar machen, wenn aktuelle Section angesteuert wird */
+section[id]:target {
+    background-color: rgba(0, 102, 204, 0.02);
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * Tablets und kleinere Geräte:
+ * Sidebar wird verborgen, kann aber mit Toggle angezeigt werden
+ */
+@media (max-width: 1024px) {
+    .sidebar-nav {
+        width: 200px;
+    }
+
+    body.has-sidebar {
+        margin-left: 200px;
+    }
+}
+
+/**
+ * Mobile Geräte:
+ * Sidebar wird komplett verborgen (kann per JS togglebar sein)
+ */
+@media (max-width: 768px) {
+    .sidebar-nav {
+        display: none;
+        width: 100%;
+        height: auto;
+        position: fixed;
+        top: 0;
+        left: -100%;
+        z-index: 1000;
+
+        border-right: none;
+        border-bottom: 1px solid var(--ci-border);
+        max-height: 70vh;
+        overflow-y: auto;
+
+        /* Animation für Mobile-Toggle */
+        transition: left 0.3s ease-in-out;
+    }
+
+    /* Wenn "is-open" Klasse vorhanden */
+    .sidebar-nav.is-open {
+        display: block;
+        left: 0;
+    }
+
+    body.has-sidebar {
+        margin-left: 0;
+    }
+
+    .page-content {
+        padding: calc(var(--ci-spacing-unit) * 2);
+    }
+
+    .sidebar-nav ol li a {
+        padding: calc(var(--nav-sidebar-padding) * 1.5) var(--nav-sidebar-padding);
+    }
+
+    .sidebar-nav ol li a:hover {
+        padding-left: calc(var(--nav-sidebar-padding) * 1.5);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLL-INDICATOR (Optional: für visuelle Fortschrittsanzeige)
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * Optionales Element zur Anzeige der Scroll-Position
+ * Nutzen: <div class="scroll-indicator"></div>
+ */
+.scroll-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(
+        to right,
+        var(--ci-primary) 0%,
+        var(--ci-secondary) 100%
+    );
+    transform: scaleX(0);
+    transform-origin: left;
+    z-index: 110;
+    transition: transform 0.1s linear;
+
+    /* Updated via JavaScript: style="transform: scaleX(var(--scroll-percent))" */
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PRINT STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+@media print {
+    .page-counter,
+    .sidebar-nav {
+        display: none !important;
+    }
+
+    body.has-sidebar {
+        margin-left: 0;
+    }
+
+    .page-content {
+        padding: 0;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACCESSIBILITY UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * Skip-Link (für Keyboard-Navigation zu Hauptinhalt)
+ * Nutzen: <a href="#main-content" class="skip-link">Zum Hauptinhalt</a>
+ */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--nav-sidebar-active-color);
+    color: var(--ci-text-inverse);
+    padding: 0.5rem;
+    text-decoration: none;
+    border-radius: var(--ci-border-radius);
+    z-index: 150;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/**
+ * Screen-Reader only content
+ * Nutzen: <span class="sr-only">Versteckter Text für Reader</span>
+ */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}

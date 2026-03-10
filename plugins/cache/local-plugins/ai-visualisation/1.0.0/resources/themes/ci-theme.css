@@ -1,0 +1,253 @@
+/**
+ * CI-THEME TEMPLATE
+ * =================
+ *
+ * Dieses Template definiert die Corporate-Identity-Variablen
+ * für alle Visualisierungen. Anpassung durch Überschreiben
+ * der CSS-Custom-Properties in :root.
+ *
+ * VERWENDUNG:
+ * 1. Kopiere diese Datei
+ * 2. Passe die Werte an das Corporate Design an
+ * 3. Der Assembly-Agent injiziert die Variablen in das HTML
+ */
+
+:root {
+    /* ========================================== */
+    /* FARBEN - PRIMÄR                            */
+    /* ========================================== */
+
+    /**
+     * Hauptfarbe der Marke
+     * Verwendung: Buttons, Links, Akzente, Diagramm-Highlights
+     */
+    --ci-primary: #0066cc;
+
+    /**
+     * Sekundärfarbe
+     * Verwendung: Sekundäre Buttons, Hover-States, Alternativ-Akzente
+     */
+    --ci-secondary: #ff6600;
+
+    /* ========================================== */
+    /* FARBEN - SEMANTISCH                        */
+    /* ========================================== */
+
+    /**
+     * Erfolg/Positiv
+     * Verwendung: Bestätigungen, positive Werte, Fortschritt
+     */
+    --ci-success: #28a745;
+
+    /**
+     * Warnung
+     * Verwendung: Warnhinweise, ausstehende Aktionen
+     */
+    --ci-warning: #ffc107;
+
+    /**
+     * Fehler/Negativ
+     * Verwendung: Fehlermeldungen, kritische Werte, Fallbacks
+     */
+    --ci-error: #dc3545;
+
+    /**
+     * Information
+     * Verwendung: Hinweise, neutrale Informationen
+     */
+    --ci-info: #17a2b8;
+
+    /* ========================================== */
+    /* FARBEN - OBERFLÄCHEN                       */
+    /* ========================================== */
+
+    /**
+     * Hintergrund (Seite)
+     */
+    --ci-background: #ffffff;
+
+    /**
+     * Oberfläche (Karten, Panels)
+     */
+    --ci-surface: #f8f9fa;
+
+    /**
+     * Rahmen und Trennlinien
+     */
+    --ci-border: #dee2e6;
+
+    /* ========================================== */
+    /* FARBEN - TEXT                              */
+    /* ========================================== */
+
+    /**
+     * Primärer Text
+     */
+    --ci-text: #1a1a1a;
+
+    /**
+     * Sekundärer/gedämpfter Text
+     */
+    --ci-text-muted: #6c757d;
+
+    /**
+     * Text auf dunklem Hintergrund
+     */
+    --ci-text-inverse: #ffffff;
+
+    /* ========================================== */
+    /* TYPOGRAFIE                                 */
+    /* ========================================== */
+
+    /**
+     * Schriftart für Überschriften
+     * Fallback auf System-Fonts für optimale Performance
+     */
+    --ci-font-heading: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /**
+     * Schriftart für Fließtext
+     */
+    --ci-font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /**
+     * Schriftart für Code/Monospace
+     */
+    --ci-font-mono: 'SF Mono', 'Fira Code', Consolas, 'Liberation Mono', monospace;
+
+    /**
+     * Basis-Schriftgröße
+     */
+    --ci-font-size-base: 16px;
+
+    /**
+     * Schriftgrößen-Skala
+     */
+    --ci-font-size-sm: 0.875rem;   /* 14px */
+    --ci-font-size-lg: 1.125rem;   /* 18px */
+    --ci-font-size-xl: 1.25rem;    /* 20px */
+    --ci-font-size-2xl: 1.5rem;    /* 24px */
+    --ci-font-size-3xl: 2rem;      /* 32px */
+    --ci-font-size-4xl: 2.5rem;    /* 40px */
+
+    /**
+     * Zeilenhöhe
+     */
+    --ci-line-height: 1.6;
+    --ci-line-height-tight: 1.25;
+    --ci-line-height-loose: 1.8;
+
+    /* ========================================== */
+    /* SPACING                                    */
+    /* ========================================== */
+
+    /**
+     * Basis-Einheit für Abstände (8px-Grid)
+     * Verwendung: margin/padding als Vielfaches
+     * Beispiel: padding: calc(var(--ci-spacing-unit) * 2) = 16px
+     */
+    --ci-spacing-unit: 8px;
+
+    /**
+     * Vordefinierte Spacing-Stufen
+     */
+    --ci-spacing-xs: 4px;
+    --ci-spacing-sm: 8px;
+    --ci-spacing-md: 16px;
+    --ci-spacing-lg: 24px;
+    --ci-spacing-xl: 32px;
+    --ci-spacing-2xl: 48px;
+    --ci-spacing-3xl: 64px;
+
+    /* ========================================== */
+    /* FORM & EFFEKTE                             */
+    /* ========================================== */
+
+    /**
+     * Eckenradius
+     */
+    --ci-border-radius: 8px;
+    --ci-border-radius-sm: 4px;
+    --ci-border-radius-lg: 12px;
+    --ci-border-radius-full: 9999px;
+
+    /**
+     * Schatten
+     */
+    --ci-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --ci-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --ci-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+    /**
+     * Übergänge
+     */
+    --ci-transition-fast: 150ms ease;
+    --ci-transition: 250ms ease;
+    --ci-transition-slow: 400ms ease;
+
+    /* ========================================== */
+    /* LAYOUT                                     */
+    /* ========================================== */
+
+    /**
+     * Maximale Inhaltsbreite
+     */
+    --ci-max-width: 1200px;
+    --ci-max-width-narrow: 800px;
+    --ci-max-width-wide: 1400px;
+
+    /* ========================================== */
+    /* DIAGRAMM-SPEZIFISCH                        */
+    /* ========================================== */
+
+    /**
+     * Mermaid-Diagramm-Farben
+     * Diese werden vom Template in die Mermaid-Konfiguration übernommen
+     */
+    --ci-diagram-node-bg: var(--ci-primary);
+    --ci-diagram-node-text: var(--ci-text-inverse);
+    --ci-diagram-node-border: var(--ci-primary);
+    --ci-diagram-line: var(--ci-text);
+    --ci-diagram-label: var(--ci-text);
+
+    /**
+     * Vega-Lite Chart-Farben (Farbpalette für Datenserien)
+     */
+    --ci-chart-color-1: var(--ci-primary);
+    --ci-chart-color-2: var(--ci-secondary);
+    --ci-chart-color-3: var(--ci-success);
+    --ci-chart-color-4: var(--ci-warning);
+    --ci-chart-color-5: var(--ci-info);
+    --ci-chart-color-6: #6f42c1;  /* Violett */
+    --ci-chart-color-7: #fd7e14;  /* Orange */
+    --ci-chart-color-8: #20c997;  /* Türkis */
+}
+
+/* ============================================== */
+/* DARK MODE (Optional)                           */
+/* ============================================== */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Uncomment und anpassen für Dark Mode Support */
+        /*
+        --ci-background: #1a1a1a;
+        --ci-surface: #2d2d2d;
+        --ci-border: #404040;
+        --ci-text: #f0f0f0;
+        --ci-text-muted: #a0a0a0;
+        */
+    }
+}
+
+/* ============================================== */
+/* PRINT STYLES (Optional)                        */
+/* ============================================== */
+
+@media print {
+    :root {
+        --ci-shadow: none;
+        --ci-shadow-sm: none;
+        --ci-shadow-lg: none;
+    }
+}

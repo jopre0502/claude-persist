@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITEL}}</title>
+
+    <!-- ============================================ -->
+    <!-- THEME (CI-Tokens)                           -->
+    <!-- ============================================ -->
+    <link rel="stylesheet" href="{{THEME_PATH}}">
+
+    <!-- ============================================ -->
+    <!-- LAYOUT-STYLE (Feed-Timeline Components)     -->
+    <!-- ============================================ -->
+    <link rel="stylesheet" href="{{STYLE_PATH}}">
+</head>
+<body>
+    <div class="container">
+        <!-- ======================================== -->
+        <!-- HEADER                                   -->
+        <!-- ======================================== -->
+        <header>
+            <h1>{{TITEL}}</h1>
+            {{#UNTERTITEL}}
+            <p class="subtitle">{{UNTERTITEL}}</p>
+            {{/UNTERTITEL}}
+        </header>
+
+        <!-- ======================================== -->
+        <!-- TIMELINE                                 -->
+        <!-- ======================================== -->
+        <div class="timeline">
+            <div class="timeline-line"></div>
+
+            {{#PHASES}}
+            <div class="phase">
+                <div class="phase-icon {{PHASE_TYPE}}" {{#PHASE_STYLE}}style="{{PHASE_STYLE}}"{{/PHASE_STYLE}}>
+                    {{PHASE_ICON}}
+                </div>
+                <div class="card {{PHASE_TYPE}}">
+                    <h2>{{PHASE_HEADING}}</h2>
+
+                    {{#PHASE_BULLETS}}
+                    <ul>
+                        {{#BULLETS}}
+                        <li>{{.}}</li>
+                        {{/BULLETS}}
+                    </ul>
+                    {{/PHASE_BULLETS}}
+
+                    {{#PHASE_QUESTION}}
+                    <div class="question-box">{{PHASE_QUESTION}}</div>
+                    {{/PHASE_QUESTION}}
+
+                    {{#PHASE_INSIGHT}}
+                    <div class="insight-box">{{PHASE_INSIGHT}}</div>
+                    {{/PHASE_INSIGHT}}
+
+                    {{#PHASE_PROBLEM}}
+                    <div class="problem-box">{{PHASE_PROBLEM}}</div>
+                    {{/PHASE_PROBLEM}}
+
+                    {{#PHASE_TAGS}}
+                    <div class="tags">
+                        {{#TAGS}}
+                        <span class="tag">{{.}}</span>
+                        {{/TAGS}}
+                    </div>
+                    {{/PHASE_TAGS}}
+
+                    {{#PHASE_DECISIONS}}
+                    {{#DECISIONS}}
+                    <div class="decision-item {{DECISION_TYPE}}">
+                        <span class="decision-icon">{{DECISION_ICON}}</span>
+                        <div>
+                            <div class="decision-label">{{DECISION_LABEL}}</div>
+                            <div class="decision-reason">{{DECISION_REASON}}</div>
+                        </div>
+                    </div>
+                    {{/DECISIONS}}
+                    {{/PHASE_DECISIONS}}
+
+                    {{#PHASE_CONCLUSION}}
+                    <div class="conclusion-box">{{PHASE_CONCLUSION}}</div>
+                    {{/PHASE_CONCLUSION}}
+
+                    {{#PHASE_PATHS}}
+                    <div class="paths">
+                        {{#PATHS}}
+                        <div class="path">
+                            <div class="path-name">{{PATH_NAME}}</div>
+                            <div class="path-details">
+                                {{#PATH_DETAILS}}
+                                <div>{{.}}</div>
+                                {{/PATH_DETAILS}}
+                            </div>
+                        </div>
+                        {{/PATHS}}
+                    </div>
+                    {{/PHASE_PATHS}}
+
+                    {{#PHASE_COMPARISON}}
+                    {{#COMPARISONS}}
+                    <div class="comparison-item">
+                        <div class="tool-name">{{TOOL_NAME}}</div>
+                        <div class="tool-pro">{{TOOL_PRO}}</div>
+                        <div class="tool-con">{{TOOL_CON}}</div>
+                    </div>
+                    {{/COMPARISONS}}
+                    {{#LIBS}}
+                    <div class="libs">
+                        <span class="libs-label">{{LIBS_LABEL}}</span>
+                        {{#LIB_ITEMS}}
+                        <span class="lib-tag">{{.}}</span>
+                        {{/LIB_ITEMS}}
+                    </div>
+                    {{/LIBS}}
+                    {{/PHASE_COMPARISON}}
+
+                    {{#PHASE_ARCHITECTURE}}
+                    <div class="arch-skill-primary">{{ARCH_PRIMARY}}</div>
+                    <div class="arch-router">{{ARCH_ROUTER}}</div>
+                    <div class="arch-grid">
+                        {{#ARCH_SKILLS}}
+                        <div class="arch-skill">
+                            <div class="arch-skill-name">{{SKILL_NAME}}</div>
+                            <div class="arch-skill-use">{{SKILL_USE}}</div>
+                        </div>
+                        {{/ARCH_SKILLS}}
+                    </div>
+                    {{/PHASE_ARCHITECTURE}}
+
+                    {{#PHASE_TAKEAWAYS}}
+                    {{#TAKEAWAYS}}
+                    <div class="takeaway">
+                        <span class="takeaway-num">{{TAKEAWAY_NUM}}</span>
+                        <span class="takeaway-text">{{TAKEAWAY_TEXT}}</span>
+                    </div>
+                    {{/TAKEAWAYS}}
+                    {{/PHASE_TAKEAWAYS}}
+
+                </div>
+            </div>
+            {{/PHASES}}
+
+        </div>
+
+        <!-- ======================================== -->
+        <!-- FOOTER                                   -->
+        <!-- ======================================== -->
+        <footer>
+            {{TITEL}} | {{AUTHOR}} | {{DATE}} | v{{VERSION}}
+        </footer>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- CDN DEPENDENCIES (optional, für Erweiterungen)
+    <!-- ============================================ -->
+
+    <!-- Lucide Icons (falls benötigt) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- ============================================ -->
+    <!-- INITIALISIERUNG                              -->
+    <!-- ============================================ -->
+    <script>
+        // Lucide Icons (optional)
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

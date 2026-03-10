@@ -1,0 +1,291 @@
+/**
+ * PRESENTATION STYLE - Components
+ *
+ * Standard-Layout für Guides, Reports und Präsentationen.
+ * Klare Sections, Icon-Grids, Vergleichstabellen.
+ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   BASE RESET
+   ═══════════════════════════════════════════════════════════════════ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--ci-font-body);
+    font-size: var(--ci-font-size-base, 16px);
+    line-height: var(--ci-line-height, 1.6);
+    color: var(--ci-text);
+    background: var(--ci-background);
+    padding: calc(var(--ci-spacing-unit) * 4);
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════════ */
+
+h1, h2, h3 {
+    font-family: var(--ci-font-heading);
+    font-weight: 600;
+    margin-bottom: calc(var(--ci-spacing-unit) * 2);
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: var(--ci-primary);
+}
+
+h2 {
+    font-size: 1.75rem;
+    border-bottom: 2px solid var(--ci-primary);
+    padding-bottom: 8px;
+}
+
+h3 {
+    font-size: 1.25rem;
+}
+
+p {
+    margin-bottom: calc(var(--ci-spacing-unit) * 2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════════ */
+
+header {
+    margin-bottom: calc(var(--ci-spacing-unit) * 6);
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    color: var(--ci-text-muted);
+    margin-top: calc(var(--ci-spacing-unit) * 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SECTIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+section {
+    margin-bottom: calc(var(--ci-spacing-unit) * 6);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ICON GRID
+   ═══════════════════════════════════════════════════════════════════ */
+
+.icon-grid-container {
+    display: grid;
+    grid-template-columns: repeat(var(--columns, 3), 1fr);
+    gap: calc(var(--ci-spacing-unit) * 3);
+    margin-top: calc(var(--ci-spacing-unit) * 3);
+}
+
+.icon-item {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(var(--ci-spacing-unit) * 2);
+    padding: calc(var(--ci-spacing-unit) * 2);
+    background: var(--ci-surface);
+    border-radius: var(--ci-border-radius);
+}
+
+.icon-item svg {
+    flex-shrink: 0;
+    color: var(--ci-primary);
+    width: 32px;
+    height: 32px;
+}
+
+.icon-item h3 {
+    margin-bottom: 4px;
+}
+
+.icon-item p {
+    margin: 0;
+    color: var(--ci-text-muted);
+    font-size: 0.9rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DIAGRAM
+   ═══════════════════════════════════════════════════════════════════ */
+
+.diagram figure {
+    margin: 0;
+    text-align: center;
+}
+
+.diagram img {
+    max-width: 100%;
+    height: auto;
+}
+
+.diagram figcaption {
+    font-size: 0.875rem;
+    color: var(--ci-text-muted);
+    margin-top: calc(var(--ci-spacing-unit) * 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CHART (Vega-Lite)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.chart figure {
+    margin: 0;
+    text-align: center;
+}
+
+.chart figure > div {
+    width: 100%;
+    min-height: 350px;
+}
+
+.chart figcaption {
+    font-size: 0.875rem;
+    color: var(--ci-text-muted);
+    margin-top: calc(var(--ci-spacing-unit) * 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MINDMAP (Markmap)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.mindmap figure {
+    margin: 0;
+}
+
+.mindmap figcaption {
+    font-size: 0.875rem;
+    color: var(--ci-text-muted);
+    margin-top: calc(var(--ci-spacing-unit) * 1);
+    text-align: center;
+}
+
+.markmap-container {
+    width: 100%;
+    min-height: 400px;
+    background: var(--ci-surface);
+    border-radius: var(--ci-border-radius);
+    overflow: hidden;
+    margin-top: calc(var(--ci-spacing-unit) * 2);
+}
+
+.markmap-container text {
+    font-family: var(--ci-font-body) !important;
+    fill: var(--ci-text) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMPARISON TABLE
+   ═══════════════════════════════════════════════════════════════════ */
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: calc(var(--ci-spacing-unit) * 3);
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: calc(var(--ci-spacing-unit) * 2);
+    text-align: left;
+    border-bottom: 1px solid var(--ci-border);
+}
+
+.comparison-table th {
+    background: var(--ci-surface);
+    font-weight: 600;
+}
+
+.comparison-table tr:hover {
+    background: var(--ci-surface);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MULTI-ELEMENT SECTIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.multi-element .section-elements {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--ci-spacing-unit) * 3);
+}
+
+.section-elements-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.element-full { width: 100%; }
+.element-half { width: calc(50% - var(--ci-spacing-unit) * 1.5); }
+.element-third { width: calc(33.33% - var(--ci-spacing-unit) * 2); }
+
+.element ul {
+    margin: 0;
+    padding-left: calc(var(--ci-spacing-unit) * 3);
+}
+
+.element ul li {
+    margin-bottom: calc(var(--ci-spacing-unit) * 1);
+    line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FALLBACK
+   ═══════════════════════════════════════════════════════════════════ */
+
+.img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ci-surface);
+    border: 2px dashed var(--ci-error);
+    border-radius: var(--ci-border-radius);
+    color: var(--ci-error);
+    padding: calc(var(--ci-spacing-unit) * 3);
+    min-height: 100px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════════ */
+
+footer {
+    margin-top: calc(var(--ci-spacing-unit) * 8);
+    padding-top: calc(var(--ci-spacing-unit) * 4);
+    border-top: 1px solid var(--ci-border);
+    text-align: center;
+    color: var(--ci-text-muted);
+    font-size: 0.875rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PRINT HEADER (Section-basiert)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.section-header {
+    display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    .icon-grid-container {
+        grid-template-columns: 1fr;
+    }
+    h1 { font-size: 2rem; }
+}

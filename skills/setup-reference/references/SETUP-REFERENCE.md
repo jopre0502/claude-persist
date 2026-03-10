@@ -1,4 +1,4 @@
-# SETUP-REFERENCE — Auto-generated: 2026-03-10 08:24
+# SETUP-REFERENCE — Auto-generated: 2026-03-10 17:26
 
 Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 
@@ -9,6 +9,7 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | Skill | Beschreibung |
 |-------|-------------|
 | `claude-md-restructure` | Optimize CLAUDE.md files for size (<8KB target) while preserving workflow-block.txt injection and Session-Continuous ... |
+| `end-of-day` | (keine Beschreibung) |
 | `env-init` | This skill should be used when the user wants to initialize .env and .env.example files with 1Password op:// secret references. Covers setting up secrets, configuring environment variables, adding 1Password integration to a project, or generating op:// reference templates. Relevant for: 'set up .env', 'initialize secrets', 'add 1Password to project', 'configure environment variables', 'create op:// references'. |
 | `generate-pwd-howto` | (keine Beschreibung) |
 | `github-init` | Verknüpft aktuelles Working Directory mit GitHub-Repo und erstellt Pro-Projekt Config (.claude/github.json). Use whe... |
@@ -28,7 +29,7 @@ Generiert aus Live-System (`~/.claude/`). Nicht manuell bearbeiten.
 | `task-scheduler` | Automatically orchestrate and execute project tasks from PROJEKT.md. Use this skill when you want to analyze pending ... |
 | `vault-manager` | Use this skill when the user references Vault documents via vault: prefix notation (e.g., "vault:ai-workflows"), requ... |
 
-**Gesamt:** 19 Skills
+**Gesamt:** 20 Skills
 
 ---
 
@@ -201,9 +202,10 @@ Rules werden automatisch in den Kontext geladen. Optional mit `paths:` Frontmatt
 | `pr-review-toolkit` | claude-plugins-official |
 | `ralph-wiggum` | claude-plugins-official |
 | `security-guidance` | claude-plugins-official |
+| `auto-task` | local-plugins |
 | `ai-visualisation` | local-plugins |
 
-**Gesamt:** 13 Plugins
+**Gesamt:** 14 Plugins
 
 ---
 
@@ -378,5 +380,5 @@ source ~/.config/secrets/.env-cache
 
 ---
 
-*Generiert: 2026-03-10 08:24 | Script: generate-reference.sh*
+*Generiert: 2026-03-10 17:26 | Script: generate-reference.sh*
 *Naechste Aktualisierung: /refresh-reference ausfuehren*

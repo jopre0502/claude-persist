@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITEL}}</title>
+
+    <!-- ============================================ -->
+    <!-- CI-THEME                                     -->
+    <!-- Hier werden die CSS-Variablen injiziert     -->
+    <!-- ============================================ -->
+    <style>
+        :root {
+            /* Farben - werden vom CI-Theme überschrieben */
+            --ci-primary: #0066cc;
+            --ci-secondary: #ff6600;
+            --ci-success: #28a745;
+            --ci-warning: #ffc107;
+            --ci-error: #dc3545;
+            --ci-background: #ffffff;
+            --ci-surface: #f8f9fa;
+            --ci-text: #1a1a1a;
+            --ci-text-muted: #6c757d;
+            --ci-border: #dee2e6;
+
+            /* Typografie */
+            --ci-font-heading: system-ui, -apple-system, sans-serif;
+            --ci-font-body: system-ui, -apple-system, sans-serif;
+            --ci-font-mono: 'SF Mono', Consolas, monospace;
+            --ci-font-size-base: 16px;
+            --ci-line-height: 1.6;
+
+            /* Spacing & Form */
+            --ci-spacing-unit: 8px;
+            --ci-border-radius: 8px;
+            --ci-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* ========================================== */
+        /* BASIS-LAYOUT                               */
+        /* ========================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--ci-font-body);
+            font-size: var(--ci-font-size-base);
+            line-height: var(--ci-line-height);
+            color: var(--ci-text);
+            background: var(--ci-background);
+            padding: calc(var(--ci-spacing-unit) * 4);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ========================================== */
+        /* TYPOGRAFIE                                 */
+        /* ========================================== */
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--ci-font-heading);
+            font-weight: 600;
+            margin-bottom: calc(var(--ci-spacing-unit) * 2);
+        }
+
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; }
+        h3 { font-size: 1.5rem; }
+
+        p {
+            margin-bottom: calc(var(--ci-spacing-unit) * 2);
+        }
+
+        /* ========================================== */
+        /* SECTIONS                                   */
+        /* ========================================== */
+
+        section {
+            margin-bottom: calc(var(--ci-spacing-unit) * 6);
+        }
+
+        .card {
+            background: var(--ci-surface);
+            border-radius: var(--ci-border-radius);
+            padding: calc(var(--ci-spacing-unit) * 3);
+            box-shadow: var(--ci-shadow);
+        }
+
+        /* ========================================== */
+        /* DIAGRAMME (Kroki → SVG)                    */
+        /* ========================================== */
+
+        .diagram {
+            margin: calc(var(--ci-spacing-unit) * 4) 0;
+        }
+
+        .diagram figure {
+            margin: 0;
+            text-align: center;
+        }
+
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .diagram figcaption {
+            font-size: 0.875rem;
+            color: var(--ci-text-muted);
+            margin-top: calc(var(--ci-spacing-unit) * 1);
+        }
+
+        /* ========================================== */
+        /* MINDMAPS (Markmap)                         */
+        /* ========================================== */
+
+        .mindmap {
+            margin: calc(var(--ci-spacing-unit) * 4) 0;
+        }
+
+        .markmap-container {
+            width: 100%;
+            min-height: 400px;
+            background: var(--ci-surface);
+            border-radius: var(--ci-border-radius);
+            overflow: hidden;
+        }
+
+        .markmap-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ========================================== */
+        /* CHARTS (Vega-Lite)                         */
+        /* ========================================== */
+
+        .chart {
+            margin: calc(var(--ci-spacing-unit) * 4) 0;
+        }
+
+        .vega-embed {
+            width: 100%;
+        }
+
+        /* ========================================== */
+        /* ICONS (Lucide)                             */
+        /* ========================================== */
+
+        .icon-grid-container {
+            display: grid;
+            grid-template-columns: repeat(var(--columns, 3), 1fr);
+            gap: calc(var(--ci-spacing-unit) * 3);
+        }
+
+        .icon-item {
+            display: flex;
+            align-items: flex-start;
+            gap: calc(var(--ci-spacing-unit) * 2);
+        }
+
+        .icon-item svg {
+            flex-shrink: 0;
+            color: var(--ci-primary);
+            width: 24px;
+            height: 24px;
+        }
+
+        /* ========================================== */
+        /* BILDER MIT FALLBACK                        */
+        /* ========================================== */
+
+        .img-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--ci-surface);
+            border: 2px dashed var(--ci-error);
+            border-radius: var(--ci-border-radius);
+            color: var(--ci-error);
+            padding: calc(var(--ci-spacing-unit) * 3);
+            min-height: 100px;
+            font-size: 0.875rem;
+        }
+
+        /* ========================================== */
+        /* VERGLEICHSTABELLEN                         */
+        /* ========================================== */
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: calc(var(--ci-spacing-unit) * 3) 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: calc(var(--ci-spacing-unit) * 2);
+            text-align: left;
+            border-bottom: 1px solid var(--ci-border);
+        }
+
+        .comparison-table th {
+            background: var(--ci-surface);
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: var(--ci-surface);
+        }
+
+        /* ========================================== */
+        /* ZITATE                                     */
+        /* ========================================== */
+
+        blockquote {
+            border-left: 4px solid var(--ci-primary);
+            padding-left: calc(var(--ci-spacing-unit) * 3);
+            margin: calc(var(--ci-spacing-unit) * 3) 0;
+            font-style: italic;
+        }
+
+        blockquote footer {
+            font-style: normal;
+            margin-top: calc(var(--ci-spacing-unit) * 1);
+            color: var(--ci-text-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- ============================================ -->
+    <!-- CONTENT STRUCTURE                            -->
+    <!-- Wird vom Layout-Agent befüllt               -->
+    <!-- ============================================ -->
+    <main>
+        <header>
+            <h1>{{TITEL}}</h1>
+            {{#UNTERTITEL}}
+            <p class="subtitle">{{UNTERTITEL}}</p>
+            {{/UNTERTITEL}}
+        </header>
+
+        <!-- ======================================== -->
+        <!-- CONTENT SECTIONS                         -->
+        <!-- Platzhalter für verschiedene Sektionen  -->
+        <!-- ======================================== -->
+
+        {{#SECTIONS}}
+        <section class="{{SECTION_TYPE}}" id="{{SECTION_ID}}">
+            {{SECTION_CONTENT}}
+        </section>
+        {{/SECTIONS}}
+
+        <!-- ======================================== -->
+        <!-- KROKI DIAGRAMME (Pre-Rendered SVG)       -->
+        <!-- Alle Diagramm-Typen: Mermaid, D2, etc.  -->
+        <!-- ======================================== -->
+
+        {{#DIAGRAMS}}
+        <section class="diagram" id="{{DIAGRAM_ID}}">
+            {{#DIAGRAM_HEADING}}<h2>{{DIAGRAM_HEADING}}</h2>{{/DIAGRAM_HEADING}}
+            <figure>
+                <img src="./assets/{{DIAGRAM_FILENAME}}"
+                     alt="{{DIAGRAM_ALT}}" />
+                {{#DIAGRAM_CAPTION}}
+                <figcaption>{{DIAGRAM_CAPTION}}</figcaption>
+                {{/DIAGRAM_CAPTION}}
+            </figure>
+        </section>
+        {{/DIAGRAMS}}
+
+        <!-- ======================================== -->
+        <!-- MARKMAP MINDMAPS (Interaktiv)            -->
+        <!-- ======================================== -->
+
+        {{#MINDMAPS}}
+        <section class="mindmap" id="{{MINDMAP_ID}}">
+            {{#MINDMAP_HEADING}}<h2>{{MINDMAP_HEADING}}</h2>{{/MINDMAP_HEADING}}
+            <div id="markmap-{{MINDMAP_ID}}" class="markmap-container"></div>
+        </section>
+        {{/MINDMAPS}}
+
+        <!-- ======================================== -->
+        <!-- VEGA-LITE CHARTS                         -->
+        <!-- ======================================== -->
+
+        {{#CHARTS}}
+        <section class="chart" id="{{CHART_ID}}">
+            {{#CHART_HEADING}}<h2>{{CHART_HEADING}}</h2>{{/CHART_HEADING}}
+            <div id="vega-{{CHART_ID}}"></div>
+        </section>
+        {{/CHARTS}}
+    </main>
+
+    <!-- ============================================ -->
+    <!-- CDN DEPENDENCIES                             -->
+    <!-- Hinweis: Mermaid nicht nötig (Kroki → SVG) -->
+    <!-- ============================================ -->
+
+    <!-- Vega-Lite für Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Markmap für interaktive Mindmaps -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
+
+    <!-- ============================================ -->
+    <!-- INITIALISIERUNG                              -->
+    <!-- ============================================ -->
+    <script>
+        // Lucide Icons Initialisierung
+        lucide.createIcons();
+
+        // Bild-Fallback Handler (sichere DOM-Manipulation)
+        document.querySelectorAll('img').forEach(function(img) {
+            img.onerror = function() {
+                var placeholder = document.createElement('div');
+                placeholder.className = 'img-placeholder';
+                placeholder.textContent = 'Bild nicht verfügbar: ' + (this.alt || this.src);
+                if (this.parentElement) {
+                    this.parentElement.replaceChild(placeholder, this);
+                }
+            };
+        });
+
+        // Vega-Lite Specs (werden vom Chart-Agent injiziert)
+        {{#VEGA_SPECS}}
+        (function() {
+            var spec = {{VEGA_JSON}};
+            vegaEmbed('#vega-{{CHART_ID}}', spec, {
+                actions: false,
+                renderer: 'svg'
+            });
+        })();
+        {{/VEGA_SPECS}}
+
+        // Markmap Mindmaps (werden vom Mindmap-Skill generiert)
+        {{#MARKMAP_DATA}}
+        (function() {
+            var data = `{{MARKMAP_MARKDOWN}}`;
+            var transformer = new markmap.Transformer();
+            var result = transformer.transform(data);
+            var container = document.getElementById('markmap-{{MINDMAP_ID}}');
+            var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.width = '100%';
+            svg.style.height = '500px';
+            container.appendChild(svg);
+            markmap.Markmap.create(svg, null, result.root);
+        })();
+        {{/MARKMAP_DATA}}
+    </script>
+
+    <!-- Fallback für deaktiviertes JavaScript -->
+    <noscript>
+        <style>
+            .mindmap .markmap-container {
+                display: none;
+            }
+            .mindmap::after {
+                content: 'Interaktive Mindmap erfordert JavaScript.';
+                display: block;
+                padding: 20px;
+                background: var(--ci-surface);
+                border-radius: var(--ci-border-radius);
+                text-align: center;
+                color: var(--ci-text-muted);
+            }
+        </style>
+    </noscript>
+</body>
+</html>

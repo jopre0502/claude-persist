@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}{% if subtitle %} - {{ subtitle }}{% endif %}</title>
+
+    <!-- CI-Theme: {{ visualProfile.theme }} -->
+    <style>
+        /* === CI-Flexibel (Style 2): Hover, Transitions, Landing-Page-Spacing === */
+
+        :root {
+            /* CI-Farben */
+            --ci-primary: #1976d2;
+            --ci-primary-light: #e3f2fd;
+            --ci-secondary: #f57c00;
+            --ci-secondary-light: #fff3e0;
+            --ci-accent: #388e3c;
+            --ci-accent-light: #e8f5e9;
+            --ci-text: #212121;
+            --ci-text-secondary: #757575;
+            --ci-bg: #ffffff;
+            --ci-border: #e0e0e0;
+
+            /* Spacing - Großzügiger für Landing-Page-Look */
+            --spacing-xs: 0.75rem;
+            --spacing-sm: 1.25rem;
+            --spacing-md: 2rem;
+            --spacing-lg: 3rem;
+            --spacing-xl: 4.5rem;
+
+            /* Typography */
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-base: 16px;
+            --line-height: 1.7;
+
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+            --transition-base: 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height);
+            color: var(--ci-text);
+            background: var(--ci-bg);
+            padding: var(--spacing-lg);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+            border-bottom: 3px solid var(--ci-primary);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        h1 {
+            color: var(--ci-primary);
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .subtitle {
+            color: var(--ci-text-secondary);
+            font-size: 1.35rem;
+            font-weight: 400;
+        }
+
+        /* Sections mit Hover-Effekt */
+        section {
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background: var(--ci-bg);
+            border: 1px solid var(--ci-border);
+            border-radius: 8px;
+            transition: transform var(--transition-base), box-shadow var(--transition-base);
+        }
+
+        section:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(25, 118, 210, 0.15);
+        }
+
+        h2 {
+            color: var(--ci-primary);
+            font-size: 1.85rem;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--ci-primary-light);
+        }
+
+        /* Text Section */
+        .text-section p {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .text-section strong {
+            color: var(--ci-primary);
+        }
+
+        .text-section em {
+            color: var(--ci-secondary);
+        }
+
+        /* Diagram Section */
+        .diagram-section img {
+            width: 100%;
+            height: auto;
+            border: 1px solid var(--ci-border);
+            border-radius: 8px;
+            transition: transform var(--transition-base);
+        }
+
+        .diagram-section img:hover {
+            transform: scale(1.02);
+        }
+
+        .caption {
+            text-align: center;
+            color: var(--ci-text-secondary);
+            font-size: 0.95rem;
+            margin-top: var(--spacing-sm);
+            font-style: italic;
+        }
+
+        /* Comparison Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--spacing-md) 0;
+        }
+
+        th {
+            background: var(--ci-primary);
+            color: white;
+            padding: var(--spacing-sm);
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: var(--spacing-sm);
+            border: 1px solid var(--ci-border);
+            transition: background var(--transition-fast);
+        }
+
+        tr:hover td {
+            background: var(--ci-primary-light);
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* Icon Grid */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+        }
+
+        .icon-card {
+            padding: var(--spacing-md);
+            border: 1px solid var(--ci-border);
+            border-radius: 8px;
+            text-align: center;
+            transition: transform var(--transition-base), box-shadow var(--transition-base);
+        }
+
+        .icon-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.2);
+        }
+
+        .icon-card svg {
+            width: 56px;
+            height: 56px;
+            margin-bottom: var(--spacing-sm);
+            color: var(--ci-primary);
+            transition: transform var(--transition-fast);
+        }
+
+        .icon-card:hover svg {
+            transform: scale(1.1);
+        }
+
+        .icon-card h3 {
+            color: var(--ci-primary);
+            font-size: 1.15rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .icon-card p {
+            color: var(--ci-text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* SmartArt */
+        .smartart-container {
+            margin: var(--spacing-md) 0;
+            transition: transform var(--transition-base);
+        }
+
+        .smartart-container:hover {
+            transform: scale(1.01);
+        }
+
+        .smartart-container svg {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Mindmap */
+        .mindmap-container {
+            min-height: 650px;
+            border: 1px solid var(--ci-border);
+            border-radius: 8px;
+            margin: var(--spacing-md) 0;
+            transition: box-shadow var(--transition-base);
+        }
+
+        .mindmap-container:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .mindmap-container .markmap {
+            width: 100%;
+            height: 600px;
+        }
+
+        .mindmap-container .markmap svg {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--ci-border);
+            text-align: center;
+            color: var(--ci-text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Page Counter */
+        .page-counter {
+            position: sticky;
+            top: var(--spacing-md);
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            font-size: 0.95rem;
+            color: var(--ci-text-secondary);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: var(--ci-primary-light);
+            border-radius: 8px;
+            z-index: 100;
+            transition: box-shadow var(--transition-base);
+        }
+
+        .page-counter:hover {
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+        }
+
+        .page-counter .current {
+            font-weight: 600;
+            color: var(--ci-primary);
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, var(--ci-primary-light) 0%, rgba(227, 242, 253, 0.5) 100%);
+            border-right: 1px solid var(--ci-border);
+            z-index: 50;
+            transition: box-shadow var(--transition-base);
+        }
+
+        .sidebar-nav:hover {
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-nav ol {
+            list-style: decimal;
+            margin-left: var(--spacing-lg);
+        }
+
+        .sidebar-nav li {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .sidebar-nav a {
+            color: var(--ci-primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color var(--transition-fast);
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--ci-secondary);
+            text-decoration: underline;
+        }
+
+        /* Layout mit Sidebar */
+        body.has-sidebar {
+            margin-left: 280px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                padding: 0;
+                max-width: none;
+                margin-left: 0;
+            }
+
+            section {
+                page-break-inside: avoid;
+                border: none;
+                box-shadow: none;
+            }
+
+            section:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .mindmap-container {
+                display: none;
+            }
+
+            .page-counter {
+                display: none;
+            }
+
+            .sidebar-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body{% if navigation_config and navigation_config.sidebarNav.enabled %} class="has-sidebar"{% endif %}>
+    {% if navigation_config and navigation_config.sidebarNav.enabled %}
+    <aside class="sidebar-nav" aria-label="Inhaltsverzeichnis">
+        <ol>
+            {% for section in sections %}
+            <li><a href="#{{ section.id or loop.index0 }}">{{ "%02d"|format(loop.index) }} {{ section.heading }}</a></li>
+            {% endfor %}
+        </ol>
+    </aside>
+    {% endif %}
+
+    <header>
+        <h1>{{ title }}</h1>
+        {% if subtitle %}<p class="subtitle">{{ subtitle }}</p>{% endif %}
+    </header>
+
+    {% if navigation_config and navigation_config.pageCounter.enabled %}
+    <nav class="page-counter" aria-label="Seitenfortschritt">
+        <span class="current">1</span> / <span class="total">{{ sections|length }}</span>
+    </nav>
+    {% endif %}
+
+    <main>
+        {% for section in sections %}
+        <section class="{{ section.type }}-section" id="{{ section.id or loop.index0 }}">
+            <h2>{{ section.heading }}</h2>
+
+            {% if section.type == 'text' %}
+                {{ render_text(section.content) }}
+            {% elif section.type == 'diagram' %}
+                <img src="./assets/{{ section.content.filename }}" alt="{{ section.content.caption }}">
+                <p class="caption">{{ section.content.caption }}</p>
+            {% elif section.type == 'comparison' %}
+                {{ render_comparison_table(section.content) }}
+            {% elif section.type == 'icon-grid' %}
+                {{ render_icon_grid(section.content) }}
+            {% elif section.type == 'smartart' %}
+                <div class="smartart-container">
+                    {{ render_smartart(section.content) }}
+                </div>
+                <p class="caption">{{ section.content.caption }}</p>
+            {% elif section.type == 'mindmap' %}
+                <div class="mindmap-container">
+                    <svg class="markmap"></svg>
+                </div>
+                <p class="caption">{{ section.content.caption }}</p>
+                <script type="module">
+                    import { Transformer } from 'https://cdn.jsdelivr.net/npm/markmap-lib@0.17.4/+esm';
+                    import { Markmap, loadJS, loadCSS } from 'https://cdn.jsdelivr.net/npm/markmap-view@0.17.4/+esm';
+
+                    const markdown = `{{ section.content.markdown | safe }}`;
+                    const transformer = new Transformer();
+                    const { root, features } = transformer.transform(markdown);
+                    await loadCSS(features.styles);
+                    await loadJS(features.scripts);
+
+                    const svg = document.querySelector('.mindmap-container .markmap');
+                    Markmap.create(svg, {}, root);
+                </script>
+            {% endif %}
+        </section>
+        {% endfor %}
+    </main>
+
+    <footer>
+        {% if metadata %}
+        <p>{{ metadata.author }} | Version {{ metadata.version }} | {{ metadata.date }}</p>
+        {% endif %}
+        <p>Generiert mit AI-Visualisation Pipeline | Kreativitätsstufe {{ visualProfile.creativityLevel }}</p>
+    </footer>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

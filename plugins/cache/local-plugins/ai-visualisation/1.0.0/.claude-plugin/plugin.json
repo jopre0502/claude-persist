@@ -1,0 +1,8 @@
+{
+  "name": "ai-visualisation",
+  "version": "1.0.0",
+  "description": "Modulare Visualisierungs-Pipeline: User-Prompt zu standalone HTML-Infografiken mit Diagrammen, Charts, Mindmaps und SmartArt.",
+  "author": {
+    "name": "J. Prechtel"
+  }
+}

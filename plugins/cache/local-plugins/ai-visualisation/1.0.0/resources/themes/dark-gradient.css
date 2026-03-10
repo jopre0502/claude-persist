@@ -1,0 +1,93 @@
+/**
+ * DARK GRADIENT THEME - Feed Timeline
+ *
+ * Dunkler Gradient-Hintergrund mit weißen Cards.
+ * Ideal für Timeline/Feed-Darstellungen und Narratives.
+ * Abgeleitet von conversation-feed_1.html
+ */
+
+:root {
+    /* ═══════════════════════════════════════════════════════════════
+       FARBEN
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Primärfarben */
+    --ci-primary: #0066cc;
+    --ci-secondary: #6f42c1;
+    --ci-success: #28a745;
+    --ci-warning: #ffc107;
+    --ci-error: #dc3545;
+
+    /* Hintergrund & Oberflächen */
+    --ci-background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    --ci-background-solid: #1a1a2e;
+    --ci-surface: #ffffff;
+
+    /* Text */
+    --ci-text: #1a1a1a;
+    --ci-text-muted: #6c757d;
+    --ci-text-inverse: #ffffff;
+
+    /* Text auf dunklem Hintergrund */
+    --ci-text-on-dark: #ffffff;
+    --ci-text-muted-on-dark: rgba(255, 255, 255, 0.6);
+
+    /* Borders & Dividers */
+    --ci-border: #dee2e6;
+    --ci-border-strong: #adb5bd;
+    --ci-border-on-dark: rgba(255, 255, 255, 0.2);
+
+    /* ═══════════════════════════════════════════════════════════════
+       TYPOGRAFIE
+       ═══════════════════════════════════════════════════════════════ */
+
+    --ci-font-heading: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --ci-font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --ci-font-size-base: 16px;
+    --ci-line-height: 1.6;
+
+    /* ═══════════════════════════════════════════════════════════════
+       SPACING & FORM
+       ═══════════════════════════════════════════════════════════════ */
+
+    --ci-spacing-unit: 8px;
+    --ci-border-radius: 16px;
+    --ci-border-radius-lg: 20px;
+    --ci-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    --ci-shadow-lg: 0 15px 50px rgba(0, 0, 0, 0.3);
+
+    /* ═══════════════════════════════════════════════════════════════
+       PHASE-FARBEN (für Timeline/Feed-Layouts)
+       ═══════════════════════════════════════════════════════════════ */
+
+    --ci-phase-question: #0066cc;
+    --ci-phase-question-bg: #e8f4f8;
+
+    --ci-phase-insight: #28a745;
+    --ci-phase-insight-bg: #d4edda;
+
+    --ci-phase-analysis: #ffc107;
+    --ci-phase-analysis-bg: #fff3cd;
+
+    --ci-phase-correction: #dc3545;
+    --ci-phase-correction-bg: #f8d7da;
+
+    --ci-phase-research: #6f42c1;
+    --ci-phase-research-bg: #e2d9f3;
+
+    --ci-phase-decision: #17a2b8;
+    --ci-phase-decision-bg: #d1ecf1;
+
+    --ci-phase-conclusion: #004085;
+    --ci-phase-conclusion-bg: #cce5ff;
+
+    --ci-phase-takeaway: #1a1a1a;
+    --ci-phase-takeaway-bg: #f8f9fa;
+
+    /* ═══════════════════════════════════════════════════════════════
+       DECISION-FARBEN
+       ═══════════════════════════════════════════════════════════════ */
+
+    --ci-decision-yes-bg: #d4edda;
+    --ci-decision-no-bg: #f8d7da;
+}
