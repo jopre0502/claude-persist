@@ -18,9 +18,9 @@ If you discover a security vulnerability, please report it responsibly.
 Instead, please use one of these methods:
 
 1. **GitHub Security Advisories** (preferred):
-   [Report a vulnerability](https://github.com/jopre0502/my-claude-knowledge-hub/security/advisories/new)
+   [Report a vulnerability](https://github.com/jopre0502/claude-persist/security/advisories/new)
 
-2. **Email**: Open a [private security advisory](https://github.com/jopre0502/my-claude-knowledge-hub/security/advisories/new)
+2. **Email**: Open a [private security advisory](https://github.com/jopre0502/claude-persist/security/advisories/new)
    on GitHub if email is not available.
 
 ### What to Include
