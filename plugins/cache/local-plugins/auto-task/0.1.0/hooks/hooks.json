@@ -1,0 +1,16 @@
+{
+  "description": "Auto-task plugin stop hook for autonomous task execution loop",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/auto-task-loop-hook.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  }
+}

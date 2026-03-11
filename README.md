@@ -44,7 +44,7 @@ Proactive monitoring prevents context collapse. Automatic documentation refresh 
 | Component | Count | Highlights |
 |-----------|------:|------------|
 | **Skills** | 20+ | session-refresh, task-orchestrator, vault-manager, prompt-improver, project-init |
-| **Commands** | 6 | `/run-next-tasks`, `/obsidian-sync`, `/vault-export`, `/knowledge-hub-sync` |
+| **Commands** | 6 | `/run-next-tasks`, `/obsidian-sync`, `/vault-export`, `/sync-claude-persist` |
 | **Hooks** | 4 | Session handoff loader, notification system, tool-call logger |
 | **Agents** | 1 | Setup guide agent for self-documentation |
 | **Output Styles** | 1 | Executive communication mode (German/English) |

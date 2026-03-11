@@ -89,7 +89,7 @@ LIVE-SESSION (mit Trainer, ~90 Min)
 |-----|-----|
 | Anthropic Console | https://console.anthropic.com/ |
 | Claude Code Docs | https://docs.anthropic.com/en/docs/claude-code |
-| Knowledge Hub Repo | https://github.com/jopre0502/my-claude-knowledge-hub |
+| Knowledge Hub Repo | https://github.com/jopre0502/claude-persist |
 | VS Code Download | https://code.visualstudio.com/ |
 | PowerShell Releases | https://github.com/PowerShell/PowerShell/releases |
 | Node.js Download | https://nodejs.org/ |

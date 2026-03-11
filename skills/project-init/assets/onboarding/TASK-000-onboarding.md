@@ -131,7 +131,7 @@ Dieses Tutorial fuehrt Sie durch die komplette Einrichtung von Claude Code und d
    ```
 3. Klonen:
    ```powershell
-   git clone https://github.com/jopre0502/my-claude-knowledge-hub.git ~/.claude/
+   git clone https://github.com/jopre0502/claude-persist.git ~/.claude/
    ```
 4. Pruefen:
    ```powershell

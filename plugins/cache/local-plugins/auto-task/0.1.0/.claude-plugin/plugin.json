@@ -1,0 +1,8 @@
+{
+  "name": "auto-task",
+  "version": "0.1.0",
+  "description": "Autonomous task execution via hook-based in-session loop (Ralph-Pattern). Executes structured tasks with defined actions sequentially, using Stop-Hook re-injection to keep the session alive between actions.",
+  "author": {
+    "name": "Jonas Prechtel"
+  }
+}

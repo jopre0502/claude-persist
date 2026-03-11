@@ -43,10 +43,6 @@
 !skills/project-doc-restructure/**
 !skills/claude-md-restructure/
 !skills/claude-md-restructure/**
-!skills/setup-reference/
-!skills/setup-reference/**
-!skills/generate-pwd-howto/
-!skills/generate-pwd-howto/**
 # --- Task Management ---
 !skills/task-scheduler/
 !skills/task-scheduler/**
@@ -63,9 +59,6 @@
 !skills/github-ops/**
 !skills/github-status/
 !skills/github-status/**
-# --- Vault & Obsidian ---
-!skills/vault-manager/
-!skills/vault-manager/**
 # --- Prompt & Skill Engineering ---
 !skills/prompt-improver/
 !skills/prompt-improver/**
@@ -85,29 +78,21 @@
 
 # ===== COMMANDS (je 1 Zeile) =====
 !commands/
-!commands/knowledge-hub-sync.md
-!commands/obsidian-sync.md
-!commands/refresh-reference.md
 !commands/run-next-tasks.md
 !commands/statusline.sh
-!commands/vault-export.md
-!commands/vault-work.md
 
 # ===== HOOKS (je 1 Zeile) =====
 !hooks/
 !hooks/auto-approve-readonly.sh
 !hooks/notify.sh
-!hooks/session-env-loader.sh
 !hooks/session-handoff-loader.sh
 !hooks/session-start-scheduler.sh
 
 # ===== RULES (je 1 Zeile) =====
 !rules/
-!rules/vault-access.md
 
 # ===== OUTPUT STYLES (je 1 Zeile) =====
 !output-styles/
-!output-styles/executive.md
 
 # ===== PLUGINS (self-developed, einzeln) =====
 !plugins/
@@ -115,6 +100,8 @@
 !plugins/cache/local-plugins/
 !plugins/cache/local-plugins/ai-visualisation/
 !plugins/cache/local-plugins/ai-visualisation/**
+!plugins/cache/local-plugins/auto-task/
+!plugins/cache/local-plugins/auto-task/**
 
 # ===== DOCS & ASSETS =====
 !assets/
