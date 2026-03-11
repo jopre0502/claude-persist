@@ -1,146 +1,181 @@
-# my-claude-knowledge-hub
+# claude-persist
 
-> Claude Code configuration hub: Skills, Agents, Commands, Hooks and Output Styles for session-continuous AI-assisted development.
+> **Make Claude Code remember.** Sessions that persist, tasks that finish, context that never dies.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
-## What is this?
+## The Problem
 
-A curated collection of **Claude Code** extensions that turn the CLI into a full session-continuous development environment. Everything lives in `~/.claude/` and is version-controlled here.
+Claude Code is powerful — but **stateless**. Every session starts from zero.
 
-### At a glance
+- Yesterday's progress? Gone. No memory of what was discussed, decided, or built.
+- Task tracking across sessions? Manual copy-paste into prompts.
+- Repetitive workflows? Type the same instructions every time.
+- Token budget? Runs out silently. Context collapses without warning.
 
-| Component | Count | Examples |
-|-----------|-------|----------|
-| **Skills** | 20 | session-refresh, vault-manager, task-orchestrator, prompt-improver |
-| **Agents** | 1 | my-setup-guide |
-| **Commands** | 6 | obsidian-sync, vault-export, run-next-tasks |
-| **Hooks** | 4 | notify, session-handoff-loader |
-| **Output Styles** | 1 | Executive communication mode |
-| **Plugins** | 14 | code-review, commit-commands, hookify, pr-review-toolkit |
+**Claude Code out of the box is a brilliant engineer with amnesia.**
 
----
+## The Solution
 
-## Features
+**claude-persist** makes Claude Code sessions continuous. Install once, benefit in every project.
 
-- **Session-Continuous Workflow** — Automatic handoffs, token budget awareness, and documentation refresh between sessions
-- **Task Orchestration** — UUID-based task tracking with dependency resolution, sub-agent delegation, and checkpoint commits
-- **Vault Integration** — Bidirectional Obsidian Vault access (read, search, export) via CLI
-- **Prompt Engineering** — Prompt analysis and improvement following Anthropic best practices
-- **Project Initialization** — One-command project scaffolding with CLAUDE.md, PROJEKT.md, and task infrastructure
-- **Multi-Platform** — Windows (Git Bash) and macOS compatible with OS-detection patterns
+### Persistent Memory
 
----
+Sessions write structured handoffs. The next session picks up exactly where you left off — decisions, progress, blockers, learnings. No re-explaining.
 
-## Prerequisites
+### Task Orchestration
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (latest version)
-- Bash >= 4.0 (macOS: `brew install bash`)
-- Git >= 2.30
-- Optional: [Obsidian](https://obsidian.md/) (for vault-manager and vault-export)
-- Optional: [1Password CLI](https://developer.1password.com/docs/cli/) (for SSH key management)
+UUID-based task tracking with dependency resolution, sub-agent delegation, and automatic checkpoint commits. A project manager that lives inside your terminal.
+
+### 20+ Automation Skills
+
+From project scaffolding to prompt optimization, from documentation restructuring to Obsidian vault integration. Each skill replaces 10-15 minutes of manual prompting.
+
+### Token Budget Awareness
+
+Proactive monitoring prevents context collapse. Automatic documentation refresh before you hit the limit.
 
 ---
 
-## Installation
+## What's Inside
+
+| Component | Count | Highlights |
+|-----------|------:|------------|
+| **Skills** | 20+ | session-refresh, task-orchestrator, vault-manager, prompt-improver, project-init |
+| **Commands** | 6 | `/run-next-tasks`, `/obsidian-sync`, `/vault-export`, `/knowledge-hub-sync` |
+| **Hooks** | 4 | Session handoff loader, notification system, tool-call logger |
+| **Agents** | 1 | Setup guide agent for self-documentation |
+| **Output Styles** | 1 | Executive communication mode (German/English) |
+| **Plugins** | 14 | code-review, commit-commands, hookify, pr-review-toolkit, feature-dev |
+
+---
+
+## Key Workflows
+
+### Session Start (2 minutes)
+
+```text
+1. Claude reads CLAUDE.md + PROJEKT.md (automatic)
+2. /run-next-tasks → identifies ready tasks
+3. Start working — full context from previous session loaded
+```
+
+### Session End (automatic)
+
+```text
+1. Final commit with descriptive message
+2. Session handoff written (progress, blockers, recommendations)
+3. Documentation refresh if token budget > 65%
+```
+
+### Task Lifecycle
+
+```text
+Create → Schedule → Execute (with sub-agents) → Checkpoint → Complete
+         ↑                                                      |
+         └──────────────────────────────────────────────────────┘
+                         Dependencies resolve automatically
+```
+
+---
+
+## Quick Start
 
 ```bash
 # Clone into ~/.claude/
-git clone https://github.com/jopre0502/my-claude-knowledge-hub.git ~/.claude/
+git clone https://github.com/jopre0502/claude-persist.git ~/.claude/
 
-# Claude Code automatically discovers skills, commands, agents, and hooks
-# from ~/.claude/ — no additional configuration needed.
+# That's it. Claude Code auto-discovers everything from ~/.claude/
 ```
 
-> **Note:** If you already have a `~/.claude/` directory, back it up first. This repo replaces the entire directory.
+> **Already have `~/.claude/`?** Back it up first — this repo replaces the entire directory.
+
+### Prerequisites
+
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) (latest)
+- Bash >= 4.0 (macOS: `brew install bash`)
+- Git >= 2.30
+- Optional: [Obsidian](https://obsidian.md/) for vault integration
+- Optional: [1Password CLI](https://developer.1password.com/docs/cli/) for secrets management
 
 ---
 
-## Directory Structure
+## Core Skills
+
+| Skill | What it does |
+|-------|-------------|
+| `session-refresh` | Updates project docs, triggers restructuring, manages token budget |
+| `task-orchestrator` | Executes tasks with sub-agent delegation and checkpoint commits |
+| `task-scheduler` | Resolves dependencies, identifies which tasks are ready |
+| `vault-manager` | Read-only Obsidian Vault access via `vault:` prefix notation |
+| `project-init` | One-command project scaffolding with full session-continuous infrastructure |
+| `prompt-improver` | Analyzes and improves prompts following Anthropic best practices |
+| `skill-creator` | Guided skill creation with validation and best-practice enforcement |
+| `prioritize-tasks` | Scores tasks by dependencies, effort, and blockers |
+
+[View all skills and commands →](docs/COMPONENT-REFERENCE.md)
+
+---
+
+## How It Works
+
+### Session-Continuous Architecture
 
 ```text
 ~/.claude/
-├── CLAUDE.md              # Global instructions for Claude Code
-├── skills/                # 18 skills (session-refresh, task-orchestrator, ...)
-│   └── <skill-name>/
-│       └── SKILL.md       # Skill definition + supporting files
-├── agents/                # 2 autonomous agents
-│   └── <agent-name>.md
-├── commands/              # 6 slash commands
-│   └── <command-name>.md
-├── hooks/                 # 5 event-driven hooks
-│   └── <hook-name>.sh
-├── output-styles/         # 1 output style (executive)
-│   └── executive.md
-├── projects/              # Per-project memory and configuration
-├── plugins/               # 10 installed plugins (managed by Claude Code)
+├── CLAUDE.md              # Global instructions (loaded every session)
+├── skills/                # 20+ automation skills
+├── agents/                # Autonomous agents
+├── commands/              # Slash commands (/run-next-tasks, etc.)
+├── hooks/                 # Event-driven automation
+├── output-styles/         # Communication modes
+├── projects/              # Per-project memory (handoffs, decisions)
+├── plugins/               # Installed plugins
 └── settings.json          # Permissions and auto-approval rules
+```
+
+### Per-Project Infrastructure
+
+Each project gets its own session-continuous setup via `/project-init`:
+
+```text
+your-project/
+├── CLAUDE.md              # Project-specific instructions
+├── PROJEKT.md             # Task tracking (7-column schema)
+└── docs/
+    ├── tasks/             # Individual task files with audit trail
+    ├── handoffs/          # Session handoff history
+    └── DECISION-LOG.md    # Architectural decisions
 ```
 
 ---
 
-## Key Skills
+## Design Principles
 
-| Skill | Description |
-|-------|-------------|
-| `session-refresh` | Updates CLAUDE.md + PROJEKT.md, triggers restructuring when needed |
-| `task-orchestrator` | Orchestrates task execution with sub-agent delegation and checkpoints |
-| `task-scheduler` | Resolves task dependencies, identifies ready tasks |
-| `vault-manager` | Read-only Obsidian Vault access via `vault:` prefix notation |
-| `project-init` | Scaffolds session-continuous project infrastructure |
-| `prompt-improver` | Analyzes and improves prompts for Claude 4.x models |
-| `skill-creator` | Guided skill creation with validation |
-| `prioritize-tasks` | Scores and ranks tasks by dependencies, effort, and blockers |
-
----
-
-## Key Commands
-
-| Command | Description |
-|---------|-------------|
-| `/run-next-tasks` | Identify and start ready tasks from PROJEKT.md |
-| `/obsidian-sync` | Push Obsidian Vault to GitHub |
-| `/knowledge-hub-sync` | Commit and push this repo to GitHub |
-| `/vault-export` | Export content to Obsidian Vault with templates |
-| `/vault-work` | Load, edit, and save Vault documents |
-| `/refresh-reference` | Generate system inventory from live `~/.claude/` |
-
----
-
-## Configuration
-
-Claude Code uses `~/.claude/settings.json` for permissions and auto-approval rules. Key settings:
-
-- **Allow rules** — Pre-approved tool patterns (e.g., read-only file access)
-- **Deny rules** — Blocked operations (e.g., `TaskCreate`, `TodoWrite`)
-- **Model selection** — Default model for sessions
-
-Refer to `CLAUDE.md` for global instructions that Claude Code follows in every session.
+1. **Persist over Reset** — Every session builds on the last
+2. **Convention over Configuration** — Works out of the box, customizable when needed
+3. **Automation over Repetition** — If you do it twice, make it a skill
+4. **Transparency over Magic** — Every decision logged, every action traceable
+5. **Cross-Platform** — Windows (Git Bash) and macOS, OS-detection built in
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
-
-- Branch strategy and commit conventions
-- How to add new skills, commands, or hooks
-- Pull request process
-
----
+See [CONTRIBUTING.md](CONTRIBUTING.md) for branch strategy, commit conventions, and how to add new skills, commands, or hooks.
 
 ## Security
 
-See [SECURITY.md](SECURITY.md) for:
-
-- Supported versions
-- How to report vulnerabilities
-- Security considerations for secrets handling
-
----
+See [SECURITY.md](SECURITY.md) for vulnerability reporting and security best practices.
 
 ## License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  <i>Built with Claude Code. Powered by persistence.</i>
+</p>
