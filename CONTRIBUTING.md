@@ -1,11 +1,11 @@
-# Contributing to my-claude-knowledge-hub
+# Contributing to claude-persist
 
 Thank you for your interest in contributing! This guide covers the conventions and workflow for this repository.
 
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/<your-user>/my-claude-knowledge-hub.git ~/.claude/`
+2. Clone your fork: `git clone https://github.com/<your-user>/claude-persist.git ~/.claude/`
 3. Create a feature branch: `git checkout -b feat/your-feature`
 4. Make your changes
 5. Commit and push
@@ -89,7 +89,7 @@ Co-Authored-By: Your Name <email>
 
 ## Reporting Issues
 
-Use [GitHub Issues](https://github.com/jopre0502/my-claude-knowledge-hub/issues) with the provided templates for bug reports and feature requests.
+Use [GitHub Issues](https://github.com/jopre0502/claude-persist/issues) with the provided templates for bug reports and feature requests.
 
 ## Code of Conduct
 
