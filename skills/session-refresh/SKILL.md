@@ -29,10 +29,9 @@ When this skill is triggered:
 **BEFORE reading any files, check conversation context:**
 - IF CLAUDE.md was already read in this session AND no structural changes expected → **Skip CLAUDE.md read**
 - IF PROJEKT.md was already read in this session → **Skip PROJEKT.md read**
-- IF no new decisions to log → **Skip DECISION-LOG.md read**
 - ALWAYS run Health-Check (Bash, token-efficient)
 
-This eliminates ~3.000-4.500 Token redundanter Reads.
+This eliminates ~3.000-10.000 Token redundanter Reads.
 
 ### 1. Read Current State (nur wenn noetig)
 
@@ -43,7 +42,7 @@ This eliminates ~3.000-4.500 Token redundanter Reads.
 ### 1.5. Run PROJEKT Health-Check
 
 ```bash
-~/.claude/skills/session-refresh/bin/projekt-health-check.sh ./docs/PROJEKT.md
+${CLAUDE_PLUGIN_ROOT}/skills/session-refresh/bin/projekt-health-check.sh ./docs/PROJEKT.md
 ```
 
 - Parses Task-Table (7-Column Schema)
@@ -64,13 +63,13 @@ This eliminates ~3.000-4.500 Token redundanter Reads.
 
 - Use Edit tool for specific sections
 - Keep changes minimal, preserve structure
-- Update: Task status, Decision Log, timestamps, Executive Summary
+- Update: Task status, timestamps, Executive Summary
 
 ### 4. Show Compact Summary to User
 
 Present changes concisely (max 5 Zeilen):
 ```
-Session-Refresh: X Tasks aktualisiert, Y Decisions geloggt.
+Session-Refresh: X Tasks aktualisiert.
 CLAUDE.md: [sections changed]. PROJEKT.md: [tasks changed].
 Restructure: [triggered/skipped (reason)].
 → Naechste Session: TASK-XXX ready.
@@ -121,15 +120,57 @@ git commit -m "$COMMIT_MSG" && git push
 
 **Default: Automatisch erstellen. Nur ueberspringen wenn User explizit "kein Handoff" sagt.**
 
-- Erstelle `docs/handoffs/SESSION-HANDOFF-YYYY-MM-DD.md` (oder Projekt-Root falls kein docs/)
-  - Template: `assets/session-handoff-template.md`
-  - Inhalt: Erreichte Tasks, Blocker, Learnings, Empfehlungen, Token-Trend
+- Erstelle akkumulierende Handoff-Datei: `docs/handoffs/SESSION-HANDOFF-YYYY-MM-DD-SNNN.md`
+  - **Dateiname-Pattern:** `SESSION-HANDOFF-{Datum}-S{Session-Nr}.md` (z.B. `SESSION-HANDOFF-2026-03-18-S192.md`)
+  - Template: `assets/session-handoff-template.md` (mit YAML-Frontmatter)
+  - Inhalt: YAML-Properties (fileClass, tasks, tags, outcome) + Erreichte Tasks, Naechste Session, Learnings
+  - **WICHTIG:** Jede Session erstellt eine NEUE Datei (kein Ueberschreiben). Handoffs akkumulieren.
+  - **PARALLELITAET:** NUR die Main-Session schreibt Handoff-Dateien. Subagents und parallele Tasks schreiben NICHT.
+
+### 7b. Vault-Write (wenn Obsidian CLI verfuegbar)
+
+**Feature-Detection:** Fuehre `obsidian.com version` aus. Wenn erfolgreich → Vault-Write ausfuehren. Wenn nicht → diesen Schritt ueberspringen (kein Fehler).
+
+```bash
+# Feature-Detection (einmal pro Session)
+obsidian.com version 2>/dev/null
+```
+
+**Wenn verfuegbar, NACH dem File-Write (Step 7):**
+
+1. **Handoff im Vault erstellen** (Dual-Write — File + Vault):
+
+```bash
+obsidian.com create name="SESSION-HANDOFF-YYYY-MM-DD-SNNN" path="_claude-pm" content="<YAML-Frontmatter + Body>"
+```
+
+- Gleicher Inhalt wie die .md-Datei aus Step 7
+- `path="_claude-pm"` legt die Datei im PM-Ordner ab
+- Frontmatter muss `fileClass: claude-session` enthalten (Template aus `assets/`)
+
+2. **Task-Status im Vault aktualisieren** (fuer jeden geaenderten Task):
+
+```bash
+obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name"
+```
+
+3. **Projekt-Status aktualisieren** (wenn Phase/Status sich geaendert hat):
+
+```bash
+obsidian.com property:set name="phase" value="Phase X: ..." type=text file="PROJECT-xxx"
+```
+
+**WICHTIG:**
+- File-Write (Step 7) hat Vorrang — Vault-Write ist Bonus, kein Ersatz
+- Bei Vault-Fehlern: Warnung loggen, nicht abbrechen
+- `file=` Parameter nutzt Wikilink-Aufloesung (Dateiname ohne Pfad/Extension)
+- CWD muss im Claude Vault liegen (oder cd dahin) — `vault=` wird von CLI ignoriert
 
 ### 8. Final Report (Compact)
 
 3-5 Zeilen Zusammenfassung:
 ```
-Session-Refresh abgeschlossen. X Tasks, Y Decisions.
+Session-Refresh abgeschlossen. X Tasks aktualisiert.
 Restructure: [status]. Token-Budget: manuell reduzieren.
 → Naechster Task: TASK-XXX | Tipp: /prioritize-tasks (bei >=3 pending)
 ```

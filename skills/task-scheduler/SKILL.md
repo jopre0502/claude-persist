@@ -52,6 +52,19 @@ Automatisches Task-Management für dieses Projekt mit Dependency-Auflösung und 
 - Suggest `/project-doc-restructure` bei >70%
 - Recommend `/exit` bei >85%
 
+### 3b. Vault-Enhanced Discovery (wenn Obsidian CLI verfuegbar)
+
+**Feature-Detection:** `obsidian.com version 2>/dev/null` — wenn erfolgreich:
+
+```bash
+# Cross-Project Task-Uebersicht (alle Projekte, nicht nur aktuelles PWD)
+obsidian.com base:query path="_dashboards/BASE_Claude_Tasks.base" format=json
+```
+
+**Nutzen:** Findet Tasks aus ALLEN Projekten im Claude Vault — nicht nur aus dem aktuellen PROJEKT.md. Ermoeglicht Cross-PWD Dependency-Checks.
+
+**Fallback:** Ohne Obsidian CLI → nur PROJEKT.md-basierte Discovery (bisheriges Verhalten).
+
 ### 4. Automated PROJEKT.md Updates
 
 **Nach Task-Completion:**
@@ -59,6 +72,17 @@ Automatisches Task-Management für dieses Projekt mit Dependency-Auflösung und 
 - Notiere Completion-Timestamp
 - Trigger nächste Ready-Tasks automatisch
 - Aktualisiere Phase-Status
+
+### 4b. Vault Status-Sync (wenn Obsidian CLI verfuegbar)
+
+**Nach jedem PROJEKT.md-Update zusaetzlich:**
+
+```bash
+# Task-Status im Vault aktualisieren
+obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name"
+```
+
+**Wichtig:** PROJEKT.md bleibt SSOT. Vault-Updates sind Sync, nicht Ersatz. Bei Konflikten gilt PROJEKT.md.
 
 ## Komponenten
 
@@ -122,12 +146,12 @@ scheduler.sh [PROJEKT_PATH] [DRY_RUN=false]
 
 ### Automatisch bei Session-Start (Optional)
 
-**Via Hook** (`~/.claude/hooks/session-start-scheduler.sh`):
+**Via Hook** (Plugin hooks.json registriert `session-start-scheduler.sh`):
 ```bash
 #!/bin/bash
 INPUT=$(cat)
 if [ "$(echo "$INPUT" | jq -r '.event')" = "SessionStart" ]; then
-    ~/.claude/skills/task-scheduler/scripts/scheduler.sh
+    ${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/scheduler.sh
 fi
 ```
 
@@ -374,34 +398,19 @@ Dies ist die **kanonische Referenz** für alle Task-Status-Werte im gesamten Eco
 
 ## Deployment
 
-### Installation
+### Installation (Plugin)
 
 ```bash
-# 1. Create skill directory
-mkdir -p ~/.claude/skills/task-scheduler/{scripts,references}
-
-# 2. Copy SKILL.md + scripts
-cp SKILL.md ~/.claude/skills/task-scheduler/
-cp scheduler.sh ~/.claude/skills/task-scheduler/scripts/
-cp task-completion-hook.sh ~/.claude/skills/task-scheduler/scripts/
-cp token-watcher.sh ~/.claude/skills/task-scheduler/scripts/
-
-# 3. Make scripts executable
-chmod +x ~/.claude/skills/task-scheduler/scripts/*.sh
-
-# 4. Copy documentation
-cp SETUP.md ~/.claude/skills/task-scheduler/references/
-cp SCHEDULER-ARCHITECTURE.md ~/.claude/skills/task-scheduler/references/
-
-# 5. Create command (optional auto-trigger)
-cp run-next-tasks.md ~/.claude/commands/
-cp session-start-scheduler.sh ~/.claude/hooks/ (optional)
+# Via Claude Code Plugin Marketplace:
+claude plugin marketplace add <marketplace-url>
+claude plugin install persist@<marketplace>
+# Session neustarten — Plugin wird automatisch geladen
 ```
 
 ### Troubleshooting
 
 **Scheduler not triggering:**
-- Check: Skill is in correct directory (`~/.claude/skills/task-scheduler/`)
+- Check: Plugin ist installiert (`claude plugin list`)
 - Check: Auto-Discovery keywords in description
 
 **Tasks not progressing:**

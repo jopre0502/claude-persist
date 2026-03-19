@@ -27,7 +27,7 @@ Creates a production-grade project setup in 15-20 minutes:
 5. **Onboarding Tutorial (optional)** - Asks user if TASK-000 tutorial should be included (10-step guided setup)
 6. **Integration** - Hooks into global `/session-refresh` + `/run-next-tasks` skills
 
-**Task Template (SSOT):** `~/.claude/skills/project-init/assets/task-md-template.txt` - NOT copied to projects
+**Task Template (SSOT):** `${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/task-md-template.txt` - NOT copied to projects
 
 **Result:** Complete workflow automatically activated. New developers get embedded workflow documentation in CLAUDE.md. Next session: Read CLAUDE.md + PROJEKT.md (includes workflow instructions) → `/run-next-tasks` → start working. Run `/session-refresh` at session END (or when token >65%).
 
@@ -92,9 +92,14 @@ The skill creates:
 - ✓ PROJEKT.md (customize: phase 1 tasks)
 - ✓ 90_DOCS/tasks/TASK-001-setup.md (first task)
 
-**Task Template:** Use `~/.claude/skills/project-init/assets/task-md-template.txt` for new tasks
+**Task Template:** Use `${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/task-md-template.txt` for new tasks
 
 **Action:** Edit CLAUDE.md + PROJEKT.md to add your project-specific details
+
+**Vault-Integration (optional):** Wenn `obsidian.com version 2>/dev/null` erfolgreich:
+- Erstelle `claude-project` Dokument im Vault: `obsidian.com create name="PROJECT-{pwd}" path="_claude-pm" content="<Frontmatter + Body>"`
+- Erstelle `claude-task` fuer TASK-001: `obsidian.com create name="TASK-001-setup" path="_claude-pm" content="<Frontmatter>"`
+- Fallback: Ohne Obsidian CLI werden nur lokale Dateien erstellt (bisheriges Verhalten)
 
 ### Step 4: Verify Setup
 
@@ -136,7 +141,6 @@ your-project/
 │   └── Exports/                # Generated artifacts
 ├── 90_DOCS/                     # Project management (default --docs-path)
 │   ├── PROJEKT.md              # Active phase + tasks (SSOT)
-│   ├── DECISION-LOG.md         # Architecture decisions
 │   ├── tasks/
 │   │   ├── TASK-001-setup.md        # Task documentation (DIRECT in tasks/)
 │   │   ├── TASK-001/                # Task outputs directory
@@ -144,7 +148,7 @@ your-project/
 │   │   │   └── artifacts/           # Generated outputs
 │   │   └── TASK-NNN/                # Output directories per task
 │   ├── handoffs/                # Session handoff files
-│   │   └── SESSION-HANDOFF-*.md
+│   │   └── LATEST-HANDOFF.md
 │   └── phases/                  # Archived completed phases
 ├── 99_ARCHIV/                   # Completed and outdated materials
 │   ├── alte-versionen/          # Superseded documents
@@ -157,7 +161,7 @@ your-project/
 
 **Legacy support:** Use `--docs-path docs` for projects using the old `docs/` structure.
 
-**Task Template (SSOT):** `~/.claude/skills/project-init/assets/task-md-template.txt`
+**Task Template (SSOT):** `${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/task-md-template.txt`
 
 **Key constraints:**
 - CLAUDE.md + PROJEKT.md each <8,000 chars (automatically enforced)
@@ -250,7 +254,7 @@ The skill:
 After creating the base structure, check if the onboarding tutorial assets exist:
 
 ```
-~/.claude/skills/project-init/assets/onboarding/TASK-000-onboarding.md
+${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/onboarding/TASK-000-onboarding.md
 ```
 
 **If the file exists**, ask the user via AskUserQuestion:
@@ -279,8 +283,8 @@ After creating the base structure, check if the onboarding tutorial assets exist
 
 The skill checks:
 - `~/.claude/CLAUDE.md` has "Session-Continuous Projects" section ✅
-- `~/.claude/skills/session-refresh/` exists ✅
-- `~/.claude/skills/task-scheduler/` exists ✅
+- `${CLAUDE_PLUGIN_ROOT}/skills/session-refresh/` exists ✅
+- `${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/` exists ✅
 
 **Result:** Global infrastructure ready to support your project
 
@@ -559,7 +563,7 @@ Session 2+ (after TASK-001 complete):
    - `claude-md-template.txt` - CLAUDE.md starter
    - `projekt-md-template.txt` - PROJEKT.md starter
    - `task-md-template.txt` - Task file starter
-   - `session-handoff-template.txt` - Handoff template
+   - Session-Handoff Template: siehe `${CLAUDE_PLUGIN_ROOT}/skills/session-refresh/assets/session-handoff-template.md` (SSOT)
    - `phase-template.txt` - Archived phase template (for completed phases)
    - `workflow-block.txt` - Session-Continuous workflow section (auto-injected)
    - `onboarding/TASK-000-onboarding.md` - Onboarding tutorial (optional, copied on user consent)

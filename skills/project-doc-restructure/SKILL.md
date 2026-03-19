@@ -347,6 +347,7 @@ python3 scripts/migrate_completed_phases.py PROJECT.md
 2. **Migration:** Creates `docs/phases/Phase-NN-Name.md` for each completed phase
 3. **Link Update:** Replaces inline content with a link reference in PROJEKT.md
 4. **Backup:** Creates `.pre-migration.backup` before modifying PROJEKT.md
+5. **Vault-Sync** (wenn `obsidian.com version` erfolgreich): `obsidian.com property:set name="phase" value="..." type=text file="PROJECT-xxx"` — aktualisiert Phase/Status im Vault-Projekt-Dokument. Fallback: Nur PROJEKT.md (bisheriges Verhalten).
 
 ### Detection Patterns
 

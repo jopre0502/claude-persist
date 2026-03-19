@@ -255,7 +255,7 @@ Nach Abschluss einer Action → automatischer Checkpoint:
 
 ```
 1. Rufe scripts/checkpoint.sh auf:
-   Bash: ~/.claude/skills/task-orchestrator/scripts/checkpoint.sh \
+   Bash: ${CLAUDE_PLUGIN_ROOT}/skills/task-orchestrator/scripts/checkpoint.sh \
          TASK-XXX <ACTION_NR> <ACTION_TOTAL> "<ACTION_NAME>" <PROJECT_ROOT>
 
    → Commit-Format: feat: TASK-XXX Action N/M - Action-Name
@@ -350,6 +350,17 @@ Read: output_file path
 3. Update Task-File (docs/tasks/TASK-XXX-*.md)
    - Audit Trail: Datum | Aktion | Ergebnis
    - Metadaten: Updated-Datum
+
+3b. Vault Status-Sync (wenn Obsidian CLI verfuegbar):
+   Feature-Detection: `obsidian.com version 2>/dev/null`
+   Wenn erfolgreich:
+   ```bash
+   # Task-Status im Vault aktualisieren
+   obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name"
+   # Projekt-Status aktualisieren (wenn Phase sich aendert)
+   obsidian.com property:set name="phase" value="Phase X: ..." type=text file="PROJECT-xxx"
+   ```
+   Bei Fehler: Warnung loggen, nicht abbrechen. PROJEKT.md bleibt SSOT.
 
 4. Notification Sidecar loeschen:
    ```bash
