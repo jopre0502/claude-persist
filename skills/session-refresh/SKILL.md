@@ -128,45 +128,55 @@ git commit -m "$COMMIT_MSG" && git push
 
 ### 7b. Vault-Write (NUR fuer Projekte im Claude Vault)
 
-**Voraussetzungen (ALLE muessen erfuellt sein):**
-1. `obsidian.com version` erfolgreich (CLI verfuegbar)
-2. **PWD liegt unter dem Claude Vault Root** (ermitteln via `obsidian.com vault vault=Claude` → `path` Feld)
+**Architektur (TASK-110, persist v1.3.0):**
+
+- SSOT fuer Handoffs: `<vault-root>/_claude-pm/SESSION-HANDOFF-YYYY-MM-DD-SNNN.md`
+- Lokal-Files (Step 7) sind Audit-Trail in Git, Vault-Files sind SSOT fuer Konsultation
+- Drift-Prevention: Vault-Write nutzt `cp` aus lokalem File (nicht `obsidian.com create` mit content)
+- Detection via Helper-Skript (robust, gecached): `${CLAUDE_PLUGIN_ROOT}/scripts/detect-claude-vault.sh`
 
 **Scope-Check (PFLICHT vor jedem Vault-Write):**
 
 ```bash
-# 1. Feature-Detection
-obsidian.com version 2>/dev/null || exit  # kein Fehler wenn CLI nicht da
+# 1. Vault-Detection (Cache-First, ~1ms warm, ~2s cold)
+VAULT_ROOT=$("${CLAUDE_PLUGIN_ROOT}/scripts/detect-claude-vault.sh")
+# Returns vault root iff PWD inside Claude-Vault, sonst empty.
 
-# 2. Claude Vault Root ermitteln + Pfad normalisieren
-# WICHTIG: obsidian.com gibt Windows-Pfade (C:\...), PWD ist Unix (/c/...)
-CLAUDE_VAULT_RAW=$(obsidian.com vault vault=Claude 2>/dev/null | grep '^path' | cut -f2 | tr -d '\r')
-# Normalisieren: C:\Dev\... → /c/Dev/... (Git Bash Format)
-CLAUDE_VAULT_PATH=$(cygpath -u "$CLAUDE_VAULT_RAW" 2>/dev/null || echo "$CLAUDE_VAULT_RAW" | sed 's|\\|/|g; s|^\([A-Z]\):|/\L\1|')
+if [[ -z "$VAULT_ROOT" ]]; then
+  # PWD nicht im Claude-Vault — Step 7b komplett ueberspringen (Graceful Degradation)
+  echo "PWD ausserhalb Claude-Vault, Step 7b skip"
+  return 0
+fi
 
-# 3. Pruefen ob PWD unter Claude Vault liegt
-# case "$PWD" in "$CLAUDE_VAULT_PATH"*) → Match ;; *) → Skip esac
+CLAUDE_PM_DIR="$VAULT_ROOT/_claude-pm"
+if [[ ! -d "$CLAUDE_PM_DIR" ]]; then
+  echo "_claude-pm/ fehlt im Vault, Step 7b skip" >&2
+  return 0
+fi
 ```
 
 **Wenn PWD NICHT im Claude Vault:** Step 7b komplett ueberspringen.
-Session-Handoffs gehoeren ins lokale Projekt (Step 7). Der Vault-Write ist
-NUR fuer Projekte relevant, die Teil des Claude Vaults sind.
+Session-Handoffs leben nur im lokalen Projekt (Step 7).
 
 **GUARDRAIL:** NIEMALS Session-Handoffs in einen anderen Vault als `vault=Claude`
-schreiben. Kein Fallback auf PKM oder andere Vaults. Bei Unsicherheit welcher
-Vault zustaendig ist → Step 7b ueberspringen (Graceful Degradation).
+schreiben. Kein Fallback auf PKM oder andere Vaults. Detection-Skript ist 1Source-of-Truth
+fuer "ist PWD im Claude-Vault?".
 
-**Wenn PWD im Claude Vault UND CLI verfuegbar:**
+**Wenn PWD im Claude Vault:**
 
-1. **Handoff im Vault erstellen** (Dual-Write — File + Vault):
+1. **Handoff in `_claude-pm/` ablegen** (Drift-Frei via `cp`):
 
 ```bash
-obsidian.com create name="SESSION-HANDOFF-YYYY-MM-DD-SNNN" vault=Claude path="_claude-pm" content="<YAML-Frontmatter + Body>"
+LOCAL_HANDOFF="$PWD/docs/handoffs/SESSION-HANDOFF-YYYY-MM-DD-SNNN.md"
+VAULT_HANDOFF="$CLAUDE_PM_DIR/SESSION-HANDOFF-YYYY-MM-DD-SNNN.md"
+
+# Idempotent: ueberschreibe nur, wenn lokales File jetzt geschrieben wurde
+cp "$LOCAL_HANDOFF" "$VAULT_HANDOFF"
 ```
 
-- Gleicher Inhalt wie die .md-Datei aus Step 7
-- `path="_claude-pm"` legt die Datei direkt im PM-Ordner ab
 - Frontmatter muss `fileClass: claude-session` enthalten (Template aus `assets/`)
+- `cp` garantiert: Vault-Inhalt == lokaler Inhalt (kein LLM-Drift bei Re-Render)
+- Alternative: `${CLAUDE_PLUGIN_ROOT}/scripts/vault-handoff-backfill.sh` (bulk-safe, idempotent)
 
 2. **Task-Status im Vault aktualisieren** (fuer jeden geaenderten Task):
 
@@ -188,12 +198,28 @@ obsidian.com read file="PROJECT-xxx" vault=Claude
 # 3. Write Tool auf Pfad — Frontmatter erhalten, Body aktualisieren
 ```
 
+4. **PROJECT-Doku Staleness-Check** (TASK-110):
+
+```bash
+# Optional: Warnung wenn PROJECT-xxx Property `updated` > 30 Tage alt
+PROJECT_FILE="PROJECT-$(basename "$PWD")"
+UPDATED=$(obsidian.com property:read name="updated" file="$PROJECT_FILE" vault=Claude 2>/dev/null | tr -d '\r')
+if [[ -n "$UPDATED" ]]; then
+  AGE_DAYS=$(( ( $(date +%s) - $(date -d "$UPDATED" +%s 2>/dev/null || echo 0) ) / 86400 ))
+  if [[ $AGE_DAYS -gt 30 ]]; then
+    echo "WARN: $PROJECT_FILE ist $AGE_DAYS Tage alt — bitte Body + 'updated'-Property aktualisieren"
+  fi
+fi
+```
+
 **WICHTIG:**
 - Step 7b ist NUR fuer Claude-Vault-Projekte — externe Projekte nutzen nur Step 7
 - Bei Vault-Fehlern: Warnung loggen, nicht abbrechen (Graceful Degradation)
 - `vault=Claude` bei ALLEN Commands verwenden — NIEMALS anderen Vault, NICHT cd zum Vault
+- Vault-Switch erfordert CWD-Wechsel (per CLI-Convention) — wir wechseln nie, sondern bleiben im Claude-Vault-Scope
 - `file=` Parameter nutzt Wikilink-Aufloesung (Dateiname ohne Pfad/Extension)
-- Claude Vault hat KEINEN Automover — `path=` bei create ist zwingend
+- Claude Vault hat KEINEN Automover — `path=` bei create ist zwingend (falls `cp` nicht moeglich)
+- **Konsultation aelterer Handoffs:** Im Claude-Vault unter `_claude-pm/` via `vault-manager` Skill
 
 ### 8. Final Report (Compact)
 

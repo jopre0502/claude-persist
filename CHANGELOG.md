@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-05-19
+
+### Added
+
+- **`scripts/detect-claude-vault.sh`** — Cache-First Vault-Detection mit 4 Modi (default/--global/--in-vault/--refresh). TTL-24h Cache in `~/.cache/claude-persist/vault-claude-root.txt`, ~3ms warm
+- **`scripts/vault-handoff-backfill.sh`** — Idempotenter Backfill lokaler Session-Handoffs ins zentrale Vault-Verzeichnis (`_claude-pm/`). Collision-safe via size-diff Detection. Flags: `--dry-run`, `--all-projects`, `--force-newer`, `--quiet`
+- **`commands/vault-backfill.md`** — Slash-Command `/persist:vault-backfill` fuer Notfall-Recovery oder Drift-Reconciliation
+- **PROJECT-Doku Staleness-Check** in `session-refresh` Step 7b — Warnung bei `updated > 30 Tage` (kein Hard-Stop)
+
+### Changed
+
+- **`session-handoff-loader.sh`** — Vault-First-Read mit Local-Fallback. Liest Handoff-Content aus `<vault-root>/_claude-pm/<basename>` wenn PWD im Claude-Vault, sonst aus lokalem `docs/handoffs/`. Source-Hint `[Vault-SSOT: _claude-pm/]` im Output bei Vault-Hit
+- **`session-refresh/SKILL.md` Step 7b** — Robust gegen Multi-Vault-Setups via Detection-Skript-Call. Vault-Write nutzt `cp` statt `obsidian.com create content=` (eliminiert LLM-Re-Render-Drift mechanisch). Hinweis zu CWD-Switch fuer Cross-Vault-Operationen ergaenzt
+- **SSOT-Convention:** `_claude-pm/` ist SSOT fuer Handoffs (zentrale Konsultation), lokale `docs/handoffs/` bleiben Git-Audit-Trail
+
+### Notes
+
+- **Performance:** Detection ~3ms warm / ~560ms cold (Bash-Startup dominiert). Loader-Overhead durch Vault-Check: ~500ms
+- **Backward-Compatibility:** Non-Vault-Projekte funktionieren unveraendert (Loader faellt zurueck auf lokale Files)
+- **Empirie aus Hub-Reverse-Engineering:** Walk-up-Detection (`.obsidian/` + Pfad-Suffix `*/Claude`) schlaegt CLI-Check um ~500× (3ms vs 1.7s)
+
+---
+
 ## [1.2.0] - 2026-05-19
 
 ### Changed

@@ -2,9 +2,14 @@
 # session-handoff-loader.sh — Injects latest session handoff as additionalContext
 # Part of TASK-036: Session-Start Handoff-Injection
 # Updated TASK-086: Akkumulierende Handoffs (SESSION-HANDOFF-YYYY-MM-DD-SNNN.md)
+# Updated TASK-110: Vault-First Read (Claude-Vault _claude-pm/ als SSOT)
 #
-# Finds newest SESSION-HANDOFF-*.md file in handoffs directory.
-# Optionally runs projekt-health-check.sh for a compact status line.
+# Resolution order:
+#   1. Vault-SSOT: <vault-root>/_claude-pm/<basename>   (if PWD in Claude-Vault)
+#   2. Local cache: $PWD/<docs-path>/handoffs/<basename>
+#
+# Filename-Detection nutzt lokale Files (deterministisch, project-bound).
+# Content-Read nutzt Vault wenn verfuegbar (SSOT). Sonst Local-Fallback.
 #
 # Hook type: SessionStart
 # Output: JSON with hookSpecificOutput.additionalContext
@@ -27,6 +32,7 @@ fi
 HANDOFF_DIR="$PWD/$DOCS_PATH/handoffs"
 PROJEKT_FILE="$PWD/$DOCS_PATH/PROJEKT.md"
 HEALTH_CHECK="${CLAUDE_PLUGIN_ROOT}/skills/session-refresh/bin/projekt-health-check.sh"
+DETECT_SCRIPT="${CLAUDE_PLUGIN_ROOT}/scripts/detect-claude-vault.sh"
 MAX_CHARS=2000
 
 # ============================================================================
@@ -39,17 +45,30 @@ if [[ ! -d "$HANDOFF_DIR" ]]; then
 fi
 
 # ============================================================================
-# Find newest SESSION-HANDOFF-*.md (akkumulierendes Pattern)
+# Vault-Detection (TASK-110): determine SSOT location for handoff content
 # ============================================================================
 
-# Use ls -t to find newest file matching the pattern (no subprocesses in loop)
+VAULT_ROOT=""
+CLAUDE_PM_DIR=""
+HANDOFF_SOURCE="local"
+
+if [[ -x "$DETECT_SCRIPT" ]]; then
+  # Default mode returns root iff PWD inside vault — exactly what we need
+  VAULT_ROOT=$("$DETECT_SCRIPT" 2>/dev/null || true)
+  if [[ -n "$VAULT_ROOT" && -d "$VAULT_ROOT/_claude-pm" ]]; then
+    CLAUDE_PM_DIR="$VAULT_ROOT/_claude-pm"
+  fi
+fi
+
+# ============================================================================
+# Find newest SESSION-HANDOFF-*.md (filename-detection via local handoffs/)
+# ============================================================================
+
 LATEST_HANDOFF=""
 HANDOFF_BASENAME=""
 
-# Try akkumulating pattern first, fall back to LATEST-HANDOFF.md for migration
 for f in "$HANDOFF_DIR"/SESSION-HANDOFF-*.md; do
   if [[ -f "$f" ]]; then
-    # At least one match exists — use ls -t to find newest
     LATEST_HANDOFF=$(ls -t "$HANDOFF_DIR"/SESSION-HANDOFF-*.md 2>/dev/null | head -1)
     HANDOFF_BASENAME="${LATEST_HANDOFF##*/}"
     break
@@ -60,6 +79,18 @@ done
 if [[ -z "$LATEST_HANDOFF" && -f "$HANDOFF_DIR/LATEST-HANDOFF.md" ]]; then
   LATEST_HANDOFF="$HANDOFF_DIR/LATEST-HANDOFF.md"
   HANDOFF_BASENAME="LATEST-HANDOFF.md"
+fi
+
+# ============================================================================
+# Vault-Override: prefer Vault content (SSOT) if available
+# ============================================================================
+
+if [[ -n "$HANDOFF_BASENAME" && -n "$CLAUDE_PM_DIR" ]]; then
+  VAULT_HANDOFF="$CLAUDE_PM_DIR/$HANDOFF_BASENAME"
+  if [[ -f "$VAULT_HANDOFF" ]]; then
+    LATEST_HANDOFF="$VAULT_HANDOFF"
+    HANDOFF_SOURCE="vault"
+  fi
 fi
 
 if [[ -z "$LATEST_HANDOFF" ]]; then
@@ -161,11 +192,17 @@ fi
 # Build additionalContext
 # ============================================================================
 
-CONTEXT="Session-Handoff geladen (${HANDOFF_BASENAME}):
+SOURCE_HINT=""
+if [[ "$HANDOFF_SOURCE" == "vault" ]]; then
+  SOURCE_HINT=" [Vault-SSOT: _claude-pm/]"
+fi
+
+CONTEXT="Session-Handoff geladen (${HANDOFF_BASENAME})${SOURCE_HINT}:
 ---
 ${HANDOFF_CONTENT}${HEALTH_LINE}${STALENESS_LINE}${HOWTO_STALENESS}
 ---
-Hinweis: CLAUDE.md + PROJEKT.md nur bei Bedarf lesen (Handoff enthaelt Kontext der letzten Session)."
+Hinweis: CLAUDE.md + PROJEKT.md nur bei Bedarf lesen (Handoff enthaelt Kontext der letzten Session).
+Tip: Aeltere Handoffs sind im Claude-Vault unter _claude-pm/ konsultierbar (vault-manager Skill)."
 
 # ============================================================================
 # Output JSON (use jq for safe escaping)
