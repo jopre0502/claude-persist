@@ -7,7 +7,6 @@ description: |
 
   Implements: UUID-based task tracking (TASK-001, etc.), session-refresh automation, token budget awareness, phase-based workflow.
 
-model: sonnet
 tools: Read, Edit, Bash, Write
 ---
 
@@ -310,29 +309,28 @@ Next: Customize CLAUDE.md, then /session-refresh
 ## File Details & Constraints
 
 ### CLAUDE.md (Project)
-- **Size:** Will be ~9,500 chars after Workflow-Block injection
+- **Size:** ~5-6KB after Compact Block injection (well under 8KB limit)
   - Base template: ~1,500 chars (guidelines, conventions)
-  - Workflow-Block: ~8,000 chars (critical operational docs)
-  - Acceptable trade-off: Exceeds 8K limit, but contains essential workflow info every developer must read
-  - Note: Size is manageable; after Phase 1, compress by moving history to PROJEKT-ARCHIVE.md
-- **Content:** Architecture, conventions, development guidelines, **+ Session-Continuous Workflow**
-- **Auto-Injected Workflow-Block covers:**
-  - What to do at session start (read docs, `/run-next-tasks`)
-  - How to find ready tasks (`/run-next-tasks`)
-  - Task tracking in PROJEKT.md
-  - Token budget monitoring + restructuring
-  - Session-end handoff pattern
-  - Key tools & commands
-  - Example workflow flow
+  - Vault-First Compact Block: ~4KB (Feature Detection + Dual-Path Workflow)
+- **Content:** Architecture, conventions, development guidelines, **+ Session-Continuous Workflow (Compact)**
+- **Auto-Injected Compact Block covers:**
+  - Feature Detection (`obsidian.com version` → Vault-First or Local Fallback)
+  - Session lifecycle (start, during, end)
+  - Task structure + creation steps
+  - Token budget thresholds
+  - Commands reference (`/run-next-tasks`, `/session-refresh`)
+  - Detail-Reference: `session-workflow` Skill (on-demand)
 - **Update:** When architecture changes; edit Workflow section as developers learn patterns
 - **How to customize:** Replace placeholders: `[Project Name]`, `[Description]`, etc.
 
-### PROJEKT.md (Active Phase)
+### PROJEKT.md (Executive Summary + Active Phase)
 - **Size:** <8,000 chars (hard limit)
-- **Content:** Current phase, tasks, immediate actions
-- **Sections:** Executive Summary, Current Phase, Tasks (UUID table), Session Model
-- **Update:** After each task completion
-- **How to customize:** Add your first 2-3 tasks to the table (TASK-002, TASK-003, etc.)
+- **Role depends on mode:**
+  - **Vault-First:** Executive Summary + Known Issues + Phase Overview. Task-Status kommt aus Vault Base.
+  - **Local Fallback:** Executive Summary + 7-Column Task Table als SSOT fuer task-scheduler.
+- **Sections:** Executive Summary, Immediate Actions, Current Phase, Known Issues
+- **Update:** After each task completion (or phase change)
+- **How to customize:** Add project-specific goals, phase definitions, known issues
 
 ### Task Files (docs/tasks/TASK-NNN-name.md)
 - **Format:** UUID: TASK-001, TASK-002, etc. (zero-padded)
@@ -347,62 +345,41 @@ Next: Customize CLAUDE.md, then /session-refresh
 
 ---
 
-## Auto-Injected Workflow-Block (Key Feature)
+## Auto-Injected Vault-First Compact Block (Key Feature)
 
 ### Why It's Important
 
 Every new project gets a **"Session-Continuous Workflow"** section auto-injected into CLAUDE.md. This section:
 
-✅ **Explains everything a developer needs to know** about the operational workflow
-✅ **Embedded in CLAUDE.md** (doesn't require finding external docs)
-✅ **Mandatory reading** (part of project onboarding)
-✅ **Reduces context-switching** (all workflow info in one place)
+✅ **Feature Detection** — Vault-First or Local Fallback, determined at runtime
+✅ **Dual-Path Workflow** — Works with and without Obsidian CLI
+✅ **Compact (~4KB)** — Well under 8KB limit, leaves room for project-specific content
+✅ **Detail-Reference** — `session-workflow` Skill for advanced operations (on-demand)
 
 ### What's Included
 
-The workflow-block covers:
+The Compact Block covers:
 
 ```
-├─ At Session Start: Read docs, /run-next-tasks
-├─ During Work: /run-next-tasks + task tracking
-├─ Token Budget Monitoring: When to restructure
-├─ Session-End Pattern: Documentation updates
-├─ Tools & Commands: All CLI tools explained
-├─ Example Flow: Full session lifecycle
-└─ Links: To detailed references (WORKFLOW.md)
+├─ Feature Detection: obsidian.com version → mode selection
+├─ At Session Start: Read docs, feature detect, /run-next-tasks
+├─ During Work: Dual-path status updates (Vault / Local)
+├─ At Session End: /session-refresh, auto-commit + handoff
+├─ Task Structure: File layout + creation steps
+├─ Token Budget: Thresholds + actions
+└─ Commands: /run-next-tasks, /session-refresh
 ```
 
-### Size Trade-off Justification
+### Size Impact
 
-**Traditional 8K limit:**
-- Assumes most projects have minimal operational overhead
-- Designed for architecture-only docs
+| Component | Size | Notes |
+|-----------|------|-------|
+| Base CLAUDE.md template | ~1.5KB | Architecture, guidelines |
+| Vault-First Compact Block | ~4KB | Workflow (injected from workflow-block.txt) |
+| **Total** | **~5.5KB** | **Well under 8KB limit** |
 
-**This project: 9.5K after injection**
-- First 1.5K: Architecture + conventions (standard)
-- Added 8K: Session-Continuous Workflow (NEW, but **critical**)
-
-**Why acceptable:**
-- Operational workflow is essential for every developer
-- Alternative: Separate reference file (requires navigation, slower onboarding)
-- Trade-off: +1.5K extra chars for guaranteed TTO <5 min on new developer
-- Compression: After Phase 1, move history → PROJEKT-ARCHIVE.md (brings down to ~6K)
-
-### Optional: Skip Workflow-Block Injection
-
-If you prefer NOT to auto-inject the workflow-block:
-
-```bash
-# Edit init-project.sh, comment out this line:
-# echo "$WORKFLOW_BLOCK" >> "$PROJECT_DIR/CLAUDE.md"
-
-# Then:
-# - CLAUDE.md will be ~1.5K (under 8K)
-# - Developer must manually reference ~/project-init/references/WORKFLOW.md
-# - Higher friction, but meets 8K constraint
-```
-
-**Recommendation:** Keep auto-injection enabled. The 1.5K overage is worth the onboarding speed.
+**Verglichen mit frueher:** Old Full Injection war ~10KB → CLAUDE.md ueberschritt 8KB Limit.
+Compact Block + session-workflow Skill = gleiche Information, ~60% weniger Token-Verbrauch.
 
 ---
 

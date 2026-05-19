@@ -13,7 +13,6 @@ description: |
 
   Triggered via /prioritize-tasks command.
 
-model: sonnet
 ---
 
 # Task-Priorisierung Skill
@@ -145,7 +144,7 @@ Sortiert Task-Tabelle in PROJEKT.md nach Priority-Score um.
 
 ### prioritize.sh
 
-**Hauptscript:** `~/.claude/skills/prioritize-tasks/scripts/prioritize.sh`
+**Hauptscript:** `${CLAUDE_PLUGIN_ROOT}/skills/prioritize-tasks/scripts/prioritize.sh`
 
 ```bash
 prioritize.sh [PROJEKT_PATH] [--reorder]
@@ -228,7 +227,7 @@ Wenn dieser Skill getriggert wird (`/prioritize-tasks`), führe folgende Schritt
 ### Schritt 1: Script ausführen
 
 ```bash
-~/.claude/skills/prioritize-tasks/scripts/prioritize.sh [PROJEKT_PATH]
+${CLAUDE_PLUGIN_ROOT}/skills/prioritize-tasks/scripts/prioritize.sh [PROJEKT_PATH]
 ```
 
 Das Script gibt einen vollständigen Report aus mit:
@@ -275,9 +274,14 @@ Soll ich die Task-Tabelle in PROJEKT.md entsprechend dieser Reihenfolge umsortie
 **Sortier-Reihenfolge innerhalb der Tabelle:**
 ```
 1. Pending/In-Progress (nach Score absteigend)
+   Tie-Break: in_progress vor pending (Kontinuitaet der Arbeit)
 2. Blocked (nach Score absteigend)
 3. Completed/Cancelled (chronologisch oder alphabetisch)
 ```
+
+> Hinweis: Das Script realisiert den Tie-Break ueber einen Mini-Bonus
+> (+0.01) auf den Score von in_progress-Tasks, sodass sie bei sonst
+> identischen Bedingungen vor pending einsortiert werden.
 
 ### Schritt 5: Zusammenfassung
 

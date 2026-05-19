@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-05-19
+
+### Changed
+
+- **Repo-Aera:** Plugin-only Distribution (kein Knowledge-Hub mehr) — persoenliche Infrastruktur entfernt
+- **Plugin-Layout:** Anthropic-Standard via `.claude-plugin/plugin.json` (statt Root-`plugin.json`)
+- **Release-Workflow:** Kuratierter Snapshot-Release via `/pt:release-persist-public` Skill — kein Auto-Sync mehr
+- **Tag-Konvention:** `persist-v<X.Y.Z>` mit Plugin-Prefix (zukunftssicher fuer Multi-Plugin-Repos)
+- **`.gitignore`:** Whitelist-Strategie auf Plugin-Aera angepasst (pauschal `!skills/**` statt granular per Skill)
+
+### Added
+
+- **`skills/auto-task`** — Autonomous task execution via hook-based in-session loop mit Git-Checkpoints
+- **`skills/session-workflow`** — Detailed session-continuous workflow reference (task management, phase completion, token budget)
+- **`hooks/auto-task-loop-hook.sh`** — Hook fuer Auto-Task-Continuation
+- **`scripts/`** — parse-next-action.sh, session-handoff-loader.sh, session-start-scheduler.sh (vorher in hooks/)
+- **`commands/cancel-auto-task.md`** — Slash-Command zum Auto-Task-Stop
+
+### Removed
+
+- **Skills (gehoeren in andere Plugins):** github-init, github-ops, github-push, github-status, permission-audit, prompt-improver (alle ins `pt`-Plugin migriert)
+- **Skills (deprecated):** skill-creator (ersetzt durch `plugin-dev:skill-development`)
+- **Agents:** my-setup-guide (ins `pt`-Plugin migriert)
+- **Hooks:** auto-approve-readonly, notify (ins `pt`-Plugin migriert), statusline.sh (gehoert nicht zu persist)
+- **Top-Level:** `agents/`, `assets/`, `docs/`, `secrets-setup/`, `plugins/cache/**`, alte `CLAUDE.md`
+- **Cache-Pollution:** `plugins/cache/local-plugins/**` (85+ Files Hub-Plugin-Cache-Reste)
+
+### Fixed
+
+- **Hooks → Scripts:** session-handoff-loader und session-start-scheduler waren faelschlicherweise in `hooks/` — jetzt in `scripts/` (referenziert via `${CLAUDE_PLUGIN_ROOT}/scripts/...` aus Plugin-Manifest)
+
 ## [1.1.0] - 2026-03-11
 
 ### Changed
@@ -37,5 +68,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Issue Templates (bug report, feature request)
 - Secret scanning and push protection enabled
 
+[1.2.0]: https://github.com/jopre0502/claude-persist/releases/tag/persist-v1.2.0
 [1.1.0]: https://github.com/jopre0502/claude-persist/releases/tag/v1.1.0
 [1.0.0]: https://github.com/jopre0502/claude-persist/releases/tag/v1.0.0

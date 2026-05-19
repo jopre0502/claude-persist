@@ -89,8 +89,9 @@ fi
 
 # Check 6: Skill task-template accessible (SSOT, not copied to project)
 echo -n "6. Skill task-template accessible... "
-if [ -f "$HOME/.claude/skills/project-init/assets/task-md-template.txt" ]; then
-    echo -e "${GREEN}✓${NC} (SSOT: ~/.claude/skills/project-init/assets/task-md-template.txt)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/../assets/task-md-template.txt" ]; then
+    echo -e "${GREEN}✓${NC} (SSOT: ${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/task-md-template.txt)"
     ((PASSED++))
 else
     echo -e "${YELLOW}⚠${NC} MISSING in skill (check skill installation)"
@@ -129,7 +130,7 @@ fi
 
 # Check 10: Global skills installed
 echo -n "10. Global session-refresh skill... "
-if [ -d "$HOME/.claude/skills/session-refresh" ]; then
+if [ -d "$SCRIPT_DIR/../../session-refresh" ]; then
     echo -e "${GREEN}✓${NC}"
     ((PASSED++))
 else

@@ -2,11 +2,10 @@
 name: claude-md-restructure
 description: >
   Optimize CLAUDE.md files for size (<8KB target) while preserving workflow-block.txt
-  injection and Session-Continuous patterns. Use when CLAUDE.md exceeds 8KB, when
-  Decision Log has >10 entries, or when users mention "CLAUDE.md too large",
-  "optimize CLAUDE.md", "reduce CLAUDE.md size", or "Decision Log auslagern".
-  Migrates Decision Log to docs/DECISION-LOG.md, applies Modular Disclosure
-  (outsourcing to separate files), and maintains injection markers for project-init compatibility.
+  injection and Session-Continuous patterns. Use when CLAUDE.md exceeds 8KB or when
+  users mention "CLAUDE.md too large", "optimize CLAUDE.md", "reduce CLAUDE.md size".
+  Applies Modular Disclosure (outsourcing to separate files) and maintains injection
+  markers for project-init compatibility.
 context: fork
 agent: general-purpose
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
@@ -77,7 +76,7 @@ Optimize CLAUDE.md files for session-continuous projects. Target: <8KB while pre
 **Nachher (Reference, ~1.5KB):**
 ```markdown
 ## Session-Continuous Workflow
-**Detaillierte Workflow-Dokumentation:** `~/.claude/skills/project-init/references/WORKFLOW.md`
+**Detaillierte Workflow-Dokumentation:** `${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/WORKFLOW.md`
 [Quick-Reference Tabellen]
 ```
 
@@ -89,38 +88,11 @@ python3 scripts/externalize_workflow.py CLAUDE.md
 
 **Why:** Claude liest die externe Datei nur bei Bedarf (via Read-Tool), nicht bei jedem Session-Start.
 
-### 2. Decision Log Externalization
-
-Decision Logs grow with project maturity. When >10 entries (~2KB), externalize to `docs/DECISION-LOG.md`.
-
-**Before:**
-```markdown
-## Decision Log
-
-| Decision | Rationale | Impact | Status |
-|----------|-----------|--------|--------|
-... 20 rows ...
-```
-
-**After:**
-```markdown
-## Decision Log
-
-> Vollstaendiger Decision Log: [docs/DECISION-LOG.md](docs/DECISION-LOG.md)
-
-**Letzte Entscheidungen:**
-- ✅ Last decision summary...
-- ✅ Second last...
-- ✅ Third last...
-
-*20 Eintraege insgesamt.*
-```
-
-### 3. No HTML `<details>` Blocks
+### 2. No HTML `<details>` Blocks
 
 **Anti-Pattern:** `<details>` tags hide content inline instead of migrating it to separate files. This keeps file size high while giving the illusion of "Progressive Disclosure". Use Modular Disclosure (file migration with links) instead.
 
-### 4. Modular Disclosure
+### 3. Modular Disclosure
 
 Outsource historical/resolved content to separate files:
 
@@ -236,17 +208,38 @@ See `assets/claude-md-template.txt` for the optimized CLAUDE.md structure with:
 **Workflow:**
 1. Check for injection markers in CLAUDE.md
 2. If missing: Re-run `/project-init` or manually inject
-3. Source: `~/.claude/skills/project-init/assets/workflow-block.txt`
+3. Source: `${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/workflow-block.txt`
+
+### Scenario 5: Old Workflow Block → Vault-First Compact Block
+
+**User says:** "Migrate my project to Vault-First" or detected automatically
+
+**Detects three patterns:**
+1. **Full Inline Injection** (~10KB, `<!-- BEGIN:WORKFLOW-INJECTION -->` markers)
+2. **Old Reference-Only Block** (~1.5KB, references WORKFLOW.md but no Vault-First)
+3. **Old Reference Block without Feature Detection** (no `obsidian.com version`)
+
+**Workflow:**
+```bash
+python3 scripts/externalize_workflow.py CLAUDE.md --dry-run
+python3 scripts/externalize_workflow.py CLAUDE.md
+```
+
+**Result:** Replaces any old pattern with Vault-First Compact Block (~4KB) that includes:
+- Feature Detection (`obsidian.com version`)
+- Dual-path: Vault-First + Local Fallback
+- `session-workflow` skill reference for details
+- Compact enough to stay inline in CLAUDE.md
 
 ## Guardrails
 
 | Rule | Reason |
 |------|--------|
-| Never delete workflow-block content | project-init dependency |
-| Keep "Session-Continuous Workflow" string | Marker for project-init |
-| Maintain injection markers | Safe re-injection on updates |
+| Keep "Session-Continuous Workflow" heading | Marker for project-init detection |
+| Keep `obsidian.com version` Feature Detection | Vault-First requires runtime detection |
 | Backup before modifications | Recovery option |
 | Test /run-next-tasks after changes | Verify task-scheduler compatibility |
+| Old injection markers can be removed | Replaced by Vault-First Compact Block |
 
 ## Integration
 
@@ -269,16 +262,16 @@ See `assets/claude-md-template.txt` for the optimized CLAUDE.md structure with:
 
 | Component | Target | Notes |
 |-----------|--------|-------|
-| **Total CLAUDE.md** | <8KB | Jetzt erreichbar mit External Reference |
-| Workflow Reference | ~1.5KB | Compact (statt ~10KB inline) |
-| Project-specific | <4KB | Mehr Budget verfügbar |
+| **Total CLAUDE.md** | <8KB | Erreichbar mit Vault-First Compact Block |
+| Vault-First Compact Block | ~4KB | Feature Detection + Dual-Path (statt ~10KB inline) |
+| Project-specific | ~3KB | Architecture, guidelines, conventions |
 | Decision Log inline | <500B | Link + 3 summaries |
 | Other sections | Minimal | Use Modular Disclosure (outsource) |
 
-**Mit External Reference:** Das 8KB-Ziel ist jetzt realistisch erreichbar:
-- Workflow Reference: ~1.5KB (statt ~10KB inline)
-- Decision Log externalized: ~500B
-- Project-specific: ~4-5KB Budget verfügbar
+**Mit Vault-First Compact Block:** Das 8KB-Ziel ist realistisch:
+- Compact Block: ~4KB (statt ~10KB Full Injection oder ~1.5KB old reference)
+- Compact Block enthaelt: Feature Detection, Vault-First/Local Fallback, Session Lifecycle
+- Detail-Referenz: `session-workflow` Skill (on-demand, nicht inline)
 
 ## Troubleshooting
 

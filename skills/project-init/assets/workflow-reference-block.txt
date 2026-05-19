@@ -4,7 +4,7 @@
 
 This project uses an automated session workflow for context optimization and task tracking.
 
-**Detaillierte Workflow-Dokumentation:** `~/.claude/skills/project-init/references/WORKFLOW.md`
+**Detaillierte Workflow-Dokumentation:** `${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/WORKFLOW.md`
 
 ### Quick Reference
 
@@ -55,10 +55,10 @@ This project uses an automated session workflow for context optimization and tas
 ### Neue Task erstellen
 
 1. **UUID:** Nächste freie TASK-NNN Nummer
-2. **Task-Dokument:** `{{DOCS_PATH}}/tasks/TASK-NNN-name.md` (Template: `~/.claude/skills/project-init/assets/task-md-template.txt`)
+2. **Task-Dokument:** `{{DOCS_PATH}}/tasks/TASK-NNN-name.md` (Template: `${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/task-md-template.txt`)
 3. **Output-Ordner:** `mkdir -p {{DOCS_PATH}}/tasks/TASK-NNN/{execution-logs,artifacts}`
 4. **PROJEKT.md:** Neue Zeile im 7-Column Schema
 
 ---
 
-**Vollständige Workflow-Dokumentation:** For complex usage, see `~/.claude/skills/project-init/references/WORKFLOW.md`
+**Vollständige Workflow-Dokumentation:** For complex usage, see `${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/WORKFLOW.md`

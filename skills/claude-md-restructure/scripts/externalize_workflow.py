@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Externalize inline workflow-block to external reference.
+Externalize inline workflow-block to Vault-First Compact Block.
 
-Replaces large inline workflow documentation (~10KB) with compact reference
-pointing to ~/.claude/skills/project-init/references/WORKFLOW.md.
+Replaces large inline workflow documentation (~10KB) or old reference-only block
+with the Vault-First Compact Block (~4KB) that includes Feature Detection,
+Vault-First/Local Fallback dual-path, and session-workflow skill reference.
 
 Usage:
     python3 externalize_workflow.py <path-to-claude-md> [--dry-run]
@@ -14,7 +15,7 @@ Example:
 
 Output:
     - Backup: CLAUDE.md.pre-workflow-externalization.backup
-    - Updated CLAUDE.md with compact reference (~1.5KB instead of ~10KB)
+    - Updated CLAUDE.md with Vault-First Compact Block (~4KB instead of ~10KB)
 """
 
 import sys
@@ -23,72 +24,94 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
-# Compact reference block to replace inline workflow
-COMPACT_REFERENCE = '''---
+# Vault-First Compact Block to replace inline workflow
+# Source of truth: project-init/assets/workflow-block.txt
+# This block is loaded at runtime from the file to stay in sync.
+COMPACT_REFERENCE_FALLBACK = '''---
 
 ## Session-Continuous Workflow
 
-This project uses an automated session workflow for context optimization and task tracking.
+This project uses session-continuous task tracking. Detailed workflow instructions load automatically via the `session-workflow` skill when needed.
 
-**Detaillierte Workflow-Dokumentation:** `~/.claude/skills/project-init/references/WORKFLOW.md`
+### Feature Detection (Once per Session)
 
-### Quick Reference
+```bash
+obsidian.com version  # If available → Vault-First, otherwise → Local Fallback
+```
 
-| Wann | Aktion | Command |
-|------|--------|---------|
-| Session-Start | Ready-Tasks prüfen | `/run-next-tasks` |
-| Während Arbeit | Task-Status updaten | PROJEKT.md + Task-File |
-| Token >65% | Docs optimieren | `/session-refresh` |
-| Session-Ende | Commit + Optimieren | `/session-refresh` |
+### At Session Start
 
-### Task-Struktur (⚠️ KRITISCH)
+1. **Read CLAUDE.md** (this file) + **docs/PROJEKT.md**
+2. **Feature Detection:** `obsidian.com version` → Vault-First or Local mode
+3. **Run `/run-next-tasks`** — Shows unblocked tasks (queries Vault Base or PROJEKT.md)
+
+> No `/session-refresh` needed at start if previous session ended with it.
+
+### During Work
+
+- **Start task:** Update status to in_progress (Vault: `property:set` / Local: edit task file + PROJEKT.md)
+- **Log progress** in `docs/tasks/TASK-NNN-name.md` (Audit Trail section)
+- **Complete task:** Mark completed (same dual-path as above)
+- **Next task:** `/run-next-tasks` again
+- **Watch token budget** — If >65%: trigger `/session-refresh`
+
+### At Session End (or Token >65%)
+
+1. Update task status (Vault properties and/or PROJEKT.md)
+2. **`/session-refresh`** — Consolidates learnings, optimizes docs
+3. **Commit + Handoff automatisch** (ohne Rueckfrage)
+   - Handoff: `SESSION-HANDOFF-YYYY-MM-DD-SNNN.md` (akkumulierend)
+   - **NUR Main-Session** schreibt Handoffs (nicht Subagents)
+
+### Task Structure
 
 ```
 docs/tasks/
-├── TASK-001-setup.md       ← Task-Dokument DIREKT hier (nicht in Unterordner!)
-├── TASK-001/               ← Output-Ordner (NUR für Logs/Artifacts)
-│   ├── execution-logs/
-│   └── artifacts/
-├── TASK-002-feature.md     ← Nächstes Task-Dokument (direkt)
-└── TASK-002/               ← Dessen Output-Ordner
+├── TASK-001-setup.md       ← Task-Dokument DIREKT hier
+├── TASK-001/               ← Output-Ordner (Logs/Artifacts)
+└── ...
 ```
 
-### Token Budget Schwellwerte
+- **Vault-First:** Vault Base ist SSOT fuer Task-Status. Lokale Files = Audit Trail.
+- **Local Fallback:** PROJEKT.md Task-Tabelle ist SSOT. Status: 📋|⏳|📘|✅|🚫|❌
+- **PROJEKT.md:** Executive Summary (Vault-First) oder Task-Tabelle (Local Fallback)
 
-| Budget | Status | Action |
-|--------|--------|--------|
-| <50% | ✅ Healthy | Continue working |
-| 50-65% | ⏳ Monitor | Watch for next trigger |
-| **65-70%** | **⚠️ TRIGGER** | **Run `/session-refresh`** |
-| 70%+ | 🔴 Alert | Plan session end |
+### Token Budget
 
-### Core Commands
+| Budget | Action |
+|--------|--------|
+| <65% | Continue working |
+| **65-70%** | **Run `/session-refresh`** |
+| 85%+ | Finish task, commit, end session |
 
-| Command | Zweck | Wann |
-|---------|-------|------|
-| `/run-next-tasks` | Ready-Tasks anzeigen | Session-Start |
-| `/session-refresh` | Docs + Context optimieren | Token >65%, Session-Ende |
-| `/project-doc-restructure` | PROJEKT.md optimieren | Auto via session-refresh |
+### Commands
 
-### Task-Tabellen-Format (7-Column Schema)
+| Command | When |
+|---------|------|
+| `/run-next-tasks` | Before starting work |
+| `/session-refresh` | Session END or token >65% |
 
-| UUID | Task | Status | Dependencies | Effort | Deliverable | Task-File |
-|------|------|--------|--------------|--------|-------------|-----------|
-| **TASK-001** | Setup | ✅ completed | None | 1h | docs | [Details](tasks/TASK-001-setup.md) |
+### New Task erstellen
 
-**Status-Werte:** `✅ completed` | `📋 pending` | `⏳ in_progress` | `🚫 blocked`
-
-### Neue Task erstellen
-
-1. **UUID:** Nächste freie TASK-NNN Nummer
-2. **Task-Dokument:** `docs/tasks/TASK-NNN-name.md` (Template: `~/.claude/skills/project-init/assets/task-md-template.txt`)
-3. **Output-Ordner:** `mkdir -p docs/tasks/TASK-NNN/{execution-logs,artifacts}`
-4. **PROJEKT.md:** Neue Zeile im 7-Column Schema
+1. Naechste UUID: Check Vault Base oder PROJEKT.md
+2. Task-File: `docs/tasks/TASK-NNN-name.md` (Template: `${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/task-md-template.txt`)
+3. Vault-First: Vault-Dokument mit Fileclass `claude-task` erstellen
+4. Output-Ordner: `mkdir -p docs/tasks/TASK-NNN/{execution-logs,artifacts}`
+5. PROJEKT.md: Erwaehnen (Vault-First) oder Tabellen-Eintrag (Local Fallback)
 
 ---
-
-**Vollständige Workflow-Dokumentation:** For complex usage, see `~/.claude/skills/project-init/references/WORKFLOW.md`
 '''
+
+
+def load_compact_reference() -> str:
+    """Load Compact Block from workflow-block.txt (SSOT) with fallback."""
+    import os
+    # Try to find workflow-block.txt relative to this script
+    script_dir = Path(__file__).parent.parent.parent  # Up to skills/
+    workflow_block = script_dir / 'project-init' / 'assets' / 'workflow-block.txt'
+    if workflow_block.exists():
+        return workflow_block.read_text(encoding='utf-8')
+    return COMPACT_REFERENCE_FALLBACK
 
 
 def find_workflow_section(content: str) -> tuple[int, int, int]:
@@ -142,13 +165,18 @@ def find_workflow_section(content: str) -> tuple[int, int, int]:
 
     section_size = end - start
 
-    # Only consider it "inline" if it's large (>5KB)
-    # Small sections might already be externalized
+    section_content = content[start:end]
+
+    # Already using Vault-First Compact Block? (has Feature Detection marker)
+    if 'obsidian.com version' in section_content and 'Vault-First' in section_content:
+        return -1, -1, 0  # Already migrated to Vault-First
+
+    # Small sections (<5KB) that reference WORKFLOW.md but lack Vault-First
+    # → These are OLD reference-only blocks that need migration to Vault-First
     if section_size < 5000:
-        # Check if it contains external reference indicator
-        section_content = content[start:end]
         if 'references/WORKFLOW.md' in section_content or '@~/.claude/skills' in section_content:
-            return -1, -1, 0  # Already externalized
+            # Old reference-only block — migrate to Vault-First Compact Block
+            return start, end, section_size
 
     return start, end, section_size
 
@@ -183,17 +211,9 @@ def externalize_workflow(file_path: str, dry_run: bool = False) -> dict:
             'message': "No inline workflow section found (may already be externalized)"
         }
 
-    if section_size < 5000:
-        return {
-            'success': False,
-            'original_size': original_size,
-            'new_size': original_size,
-            'saved_bytes': 0,
-            'message': f"Workflow section is only {section_size:,} bytes - likely already compact"
-        }
-
-    # Build new content
-    new_content = content[:start] + COMPACT_REFERENCE + content[end:]
+    # Build new content using Vault-First Compact Block
+    compact_block = load_compact_reference()
+    new_content = content[:start] + compact_block + content[end:]
     new_size = len(new_content.encode('utf-8'))
     saved_bytes = original_size - new_size
 
@@ -266,9 +286,9 @@ def main():
         print("\nExamples:")
         print("  python3 externalize_workflow.py CLAUDE.md --dry-run")
         print("  python3 externalize_workflow.py /path/to/project/CLAUDE.md")
-        print("\nThis script replaces large inline workflow documentation (~10KB)")
-        print("with a compact reference to the external WORKFLOW.md file (~1.5KB).")
-        print("\nExpected savings: 70-85% of workflow section size")
+        print("\nThis script replaces old workflow blocks (inline ~10KB or old reference ~1.5KB)")
+        print("with the Vault-First Compact Block (~4KB) from workflow-block.txt.")
+        print("\nHandles: Full inline injection, old reference-only block, injection markers.")
         sys.exit(1)
 
     file_path = sys.argv[1]

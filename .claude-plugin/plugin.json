@@ -1,0 +1,22 @@
+{
+  "name": "persist",
+  "description": "Session-Continuity Framework: Task scheduling, session refresh, project initialization, and documentation management for Claude Code.",
+  "version": "1.2.0",
+  "author": {
+    "name": "Jonas Prechtel"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session-handoff-loader.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

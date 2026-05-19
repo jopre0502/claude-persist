@@ -12,7 +12,6 @@ description: |
 
   NOT needed at session start if previous session ended with /session-refresh.
 
-model: opus
 allowed-tools: Read, Edit, Bash
 ---
 
@@ -127,44 +126,74 @@ git commit -m "$COMMIT_MSG" && git push
   - **WICHTIG:** Jede Session erstellt eine NEUE Datei (kein Ueberschreiben). Handoffs akkumulieren.
   - **PARALLELITAET:** NUR die Main-Session schreibt Handoff-Dateien. Subagents und parallele Tasks schreiben NICHT.
 
-### 7b. Vault-Write (wenn Obsidian CLI verfuegbar)
+### 7b. Vault-Write (NUR fuer Projekte im Claude Vault)
 
-**Feature-Detection:** Fuehre `obsidian.com version` aus. Wenn erfolgreich → Vault-Write ausfuehren. Wenn nicht → diesen Schritt ueberspringen (kein Fehler).
+**Voraussetzungen (ALLE muessen erfuellt sein):**
+1. `obsidian.com version` erfolgreich (CLI verfuegbar)
+2. **PWD liegt unter dem Claude Vault Root** (ermitteln via `obsidian.com vault vault=Claude` → `path` Feld)
+
+**Scope-Check (PFLICHT vor jedem Vault-Write):**
 
 ```bash
-# Feature-Detection (einmal pro Session)
-obsidian.com version 2>/dev/null
+# 1. Feature-Detection
+obsidian.com version 2>/dev/null || exit  # kein Fehler wenn CLI nicht da
+
+# 2. Claude Vault Root ermitteln + Pfad normalisieren
+# WICHTIG: obsidian.com gibt Windows-Pfade (C:\...), PWD ist Unix (/c/...)
+CLAUDE_VAULT_RAW=$(obsidian.com vault vault=Claude 2>/dev/null | grep '^path' | cut -f2 | tr -d '\r')
+# Normalisieren: C:\Dev\... → /c/Dev/... (Git Bash Format)
+CLAUDE_VAULT_PATH=$(cygpath -u "$CLAUDE_VAULT_RAW" 2>/dev/null || echo "$CLAUDE_VAULT_RAW" | sed 's|\\|/|g; s|^\([A-Z]\):|/\L\1|')
+
+# 3. Pruefen ob PWD unter Claude Vault liegt
+# case "$PWD" in "$CLAUDE_VAULT_PATH"*) → Match ;; *) → Skip esac
 ```
 
-**Wenn verfuegbar, NACH dem File-Write (Step 7):**
+**Wenn PWD NICHT im Claude Vault:** Step 7b komplett ueberspringen.
+Session-Handoffs gehoeren ins lokale Projekt (Step 7). Der Vault-Write ist
+NUR fuer Projekte relevant, die Teil des Claude Vaults sind.
+
+**GUARDRAIL:** NIEMALS Session-Handoffs in einen anderen Vault als `vault=Claude`
+schreiben. Kein Fallback auf PKM oder andere Vaults. Bei Unsicherheit welcher
+Vault zustaendig ist → Step 7b ueberspringen (Graceful Degradation).
+
+**Wenn PWD im Claude Vault UND CLI verfuegbar:**
 
 1. **Handoff im Vault erstellen** (Dual-Write — File + Vault):
 
 ```bash
-obsidian.com create name="SESSION-HANDOFF-YYYY-MM-DD-SNNN" path="_claude-pm" content="<YAML-Frontmatter + Body>"
+obsidian.com create name="SESSION-HANDOFF-YYYY-MM-DD-SNNN" vault=Claude path="_claude-pm" content="<YAML-Frontmatter + Body>"
 ```
 
 - Gleicher Inhalt wie die .md-Datei aus Step 7
-- `path="_claude-pm"` legt die Datei im PM-Ordner ab
+- `path="_claude-pm"` legt die Datei direkt im PM-Ordner ab
 - Frontmatter muss `fileClass: claude-session` enthalten (Template aus `assets/`)
 
 2. **Task-Status im Vault aktualisieren** (fuer jeden geaenderten Task):
 
 ```bash
-obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name"
+obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name" vault=Claude
 ```
 
-3. **Projekt-Status aktualisieren** (wenn Phase/Status sich geaendert hat):
+3. **Projekt-Dokument aktualisieren** (Immediate Actions + Properties):
 
 ```bash
-obsidian.com property:set name="phase" value="Phase X: ..." type=text file="PROJECT-xxx"
+# Properties aktualisieren (Phase, Status)
+obsidian.com property:set name="phase" value="Phase X: ..." type=text file="PROJECT-xxx" vault=Claude
+
+# Body aktualisieren (Immediate Actions, zuletzt abgeschlossen):
+# 1. Dateipfad holen
+obsidian.com file file="PROJECT-xxx" vault=Claude
+# 2. Inhalt lesen
+obsidian.com read file="PROJECT-xxx" vault=Claude
+# 3. Write Tool auf Pfad — Frontmatter erhalten, Body aktualisieren
 ```
 
 **WICHTIG:**
-- File-Write (Step 7) hat Vorrang — Vault-Write ist Bonus, kein Ersatz
-- Bei Vault-Fehlern: Warnung loggen, nicht abbrechen
+- Step 7b ist NUR fuer Claude-Vault-Projekte — externe Projekte nutzen nur Step 7
+- Bei Vault-Fehlern: Warnung loggen, nicht abbrechen (Graceful Degradation)
+- `vault=Claude` bei ALLEN Commands verwenden — NIEMALS anderen Vault, NICHT cd zum Vault
 - `file=` Parameter nutzt Wikilink-Aufloesung (Dateiname ohne Pfad/Extension)
-- CWD muss im Claude Vault liegen (oder cd dahin) — `vault=` wird von CLI ignoriert
+- Claude Vault hat KEINEN Automover — `path=` bei create ist zwingend
 
 ### 8. Final Report (Compact)
 

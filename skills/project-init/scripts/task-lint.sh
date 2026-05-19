@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # task-lint.sh - Validates Task-Files against SSOT template
-# SSOT: ~/.claude/skills/project-init/assets/task-md-template.txt
-# Location: ~/.claude/skills/project-init/scripts/task-lint.sh (GLOBAL)
+# SSOT: ${CLAUDE_PLUGIN_ROOT}/skills/project-init/assets/task-md-template.txt
+# Location: ${CLAUDE_PLUGIN_ROOT}/skills/project-init/scripts/task-lint.sh (GLOBAL)
 #
 # Supports TWO metadata formats:
 #   1. YAML frontmatter (new): ---\nuuid: TASK-NNN\nstatus: pending\ntags: [infrastructure]\n---
@@ -154,9 +154,17 @@ validate_file() {
     fi
 
     # Tags soft warning (not an error — does not block commit)
-    local tags_val
+    # Supports both inline (`tags: [a, b]`) and multi-line YAML list (`tags:\n  - a\n  - b`)
+    local tags_val has_list_items
     tags_val="$(get_frontmatter_field "$file" "tags")"
-    if [ -z "$tags_val" ] || [ "$tags_val" = "[]" ]; then
+    # Detect multi-line list: a line "tags:" followed by one or more "  - item" lines within frontmatter
+    has_list_items="$(awk '
+      /^---$/ { fm = !fm; next }
+      fm && /^tags:[[:space:]]*$/ { in_tags = 1; next }
+      fm && in_tags && /^[[:space:]]+-[[:space:]]+/ { print "yes"; exit }
+      fm && in_tags && /^[^[:space:]-]/ { in_tags = 0 }
+    ' "$file")"
+    if { [ -z "$tags_val" ] || [ "$tags_val" = "[]" ]; } && [ -z "$has_list_items" ]; then
       warn "$basename" "No tags set (consider: infrastructure, feature, bugfix, documentation, refactor, security, spike)"
     fi
 

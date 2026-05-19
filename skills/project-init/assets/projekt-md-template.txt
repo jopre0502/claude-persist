@@ -83,20 +83,20 @@ Letzte Aktualisierung: {{DATE}}
 
 ---
 
-## 🔄 Session Execution Model
+## 🔄 Mode: Vault-First oder Local Fallback
 
-### Session-Start Checklist
+**Feature Detection (einmal pro Session):**
 
-- [ ] Read CLAUDE.md (architecture)
-- [ ] Read PROJEKT.md (current tasks)
-- [ ] Check token budget (>65%? Plan restructure)
-- [ ] List next 2-3 high-priority tasks
+```bash
+obsidian.com version  # Verfuegbar → Vault-First | Fehler → Local Fallback
+```
 
-### Session-End (10-15 min)
+| Modus | Task-SSOT | PROJEKT.md Rolle | Task Discovery |
+|-------|-----------|------------------|----------------|
+| **Vault-First** | Vault Base | Executive Summary | `base:query` |
+| **Local Fallback** | PROJEKT.md Task-Tabelle | Task-SSOT + Executive Summary | `/run-next-tasks` parst Tabelle |
 
-1. Update task status in PROJEKT.md
-2. Note blockers/learnings in SESSION-HANDOFF-YYYY-MM-DD.md
-3. If token budget >65%: Trigger `/session-refresh`
+> **Vault-First:** Die Task-Tabelle oben dient nur als initialer Setup-Schritt. Sobald Tasks im Vault existieren, wird die Tabelle optional (kann entfernt oder als Uebersicht beibehalten werden).
 
 ---
 
@@ -128,14 +128,6 @@ Letzte Aktualisierung: {{DATE}}
 ---
 
 ## 📚 Reference Information
-
-### Entscheidungslog
-
-> Bei >10 Eintraegen nach `{{DOCS_PATH}}/DECISION-LOG.md` auslagern.
-
-| Datum | Entscheidung | Begruendung | Phase |
-|-------|--------------|-------------|-------|
-| _Noch keine Entscheidungen geloggt_ | | | |
 
 ### Offene Fragen
 

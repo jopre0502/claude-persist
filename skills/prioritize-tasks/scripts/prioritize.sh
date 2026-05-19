@@ -170,9 +170,23 @@ extract_known_issues() {
             in_table = 0
         }
 
-        # Table header detection
+        # Table header detection - dynamische Spalten-Erkennung
+        # Bug-Fix: vorher hardcoded cols[2], was bei Schemas wie
+        # "| Issue | Schwere | Empfehlung |" die Severity statt der
+        # Issue-Beschreibung uebernommen hat.
         in_issues && /^\|.*Issue.*\|/ {
             in_table = 1
+            issue_col = 0
+            n = split($0, hdr, "|")
+            for (i = 1; i <= n; i++) {
+                h = hdr[i]
+                gsub(/^ +| +$/, "", h)
+                if (tolower(h) == "issue") {
+                    issue_col = i - 1  # cols ist 1 Index niedriger als hdr (leading | abgestreift)
+                    break
+                }
+            }
+            if (issue_col == 0) issue_col = 2  # Fallback fuer unbekannte Schemas
             next
         }
 
@@ -189,8 +203,8 @@ extract_known_issues() {
             split(line, cols, "|")
             for (i in cols) gsub(/^ +| +$/, "", cols[i])
 
-            # Extract description (usually column 2) and affected tasks
-            desc = cols[2]
+            # Extract description (header-driven column) and affected tasks
+            desc = cols[issue_col]
             gsub(/\*\*/, "", desc)
 
             # Look for TASK references in any column
@@ -614,6 +628,12 @@ main() {
                 ;;
             pending|in_progress)
                 score=$(calculate_priority_score "$effort_hours" "$deps_count" "$unblocks_count" "$issue_impact")
+                # Tie-Breaker: laufende Tasks erhalten Mini-Bonus, damit sie bei
+                # identischem Score vor pending einsortiert werden (Kontinuitaet
+                # der Arbeit > theoretische Quick-Win-Indifferenz).
+                if [ "$status" = "in_progress" ]; then
+                    score=$(awk -v s="$score" 'BEGIN { printf "%.2f", s + 0.01 }')
+                fi
                 ;;
             *)
                 # Unbekannter Status: niedrige Priorität

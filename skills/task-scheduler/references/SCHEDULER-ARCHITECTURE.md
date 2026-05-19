@@ -462,14 +462,14 @@ EOF
 export DEBUG=true
 
 # Will add -x to bash scripts for execution tracing
-bash -x ~/.claude/skills/task-scheduler/scripts/scheduler.sh
+bash -x ${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/scheduler.sh
 ```
 
 ### Dry-Run Mode
 
 ```bash
 # Analyze without executing:
-~/.claude/skills/task-scheduler/scripts/scheduler.sh docs/PROJEKT.md true
+${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/scheduler.sh docs/PROJEKT.md true
 
 # Output shows:
 # [DRY RUN] would start TASK-005
@@ -480,7 +480,7 @@ bash -x ~/.claude/skills/task-scheduler/scripts/scheduler.sh
 
 ```bash
 # Test task-completion-hook manually:
-cat <<EOF | ~/.claude/skills/task-scheduler/scripts/task-completion-hook.sh
+cat <<EOF | ${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/task-completion-hook.sh
 {
   "task_uuid": "TASK-005",
   "status": "completed",

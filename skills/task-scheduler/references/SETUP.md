@@ -6,7 +6,7 @@
 
 Die Scheduler-Skill wird bereits bereitgestellt in:
 ```
-~/.claude/skills/task-scheduler/
+${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/
 ├── SKILL.md                              # Main Skill Definition
 ├── scripts/
 │   ├── scheduler.sh                     # Task orchestration engine
@@ -26,7 +26,7 @@ Die Scheduler-Skill wird bereits bereitgestellt in:
 cd /mnt/c/Development/Projects/Claude/ObsidianClaude/
 
 # Run scheduler manually (dry-run)
-~/.claude/skills/task-scheduler/scripts/scheduler.sh docs/PROJEKT.md true
+${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/scheduler.sh docs/PROJEKT.md true
 
 # Output:
 # [SCHEDULER] Task Scheduler starting (DRY_RUN=true)
@@ -43,7 +43,7 @@ If you see ready tasks listed, installation is working! ✅
 
 **Option A: Via Hook (Recommended)**
 
-Create `~/.claude/hooks/session-start-scheduler.sh`:
+Create `${CLAUDE_PLUGIN_ROOT}/hooks/session-start-scheduler.sh`:
 
 ```bash
 #!/bin/bash
@@ -52,13 +52,13 @@ EVENT_TYPE=$(echo "$INPUT" | jq -r '.type' 2>/dev/null || echo "")
 
 if [ "$EVENT_TYPE" = "SessionStart" ]; then
     echo "🤖 Running Task Scheduler at session start..."
-    ~/.claude/skills/task-scheduler/scripts/scheduler.sh
+    ${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/scheduler.sh
 fi
 ```
 
 Make executable:
 ```bash
-chmod +x ~/.claude/hooks/session-start-scheduler.sh
+chmod +x ${CLAUDE_PLUGIN_ROOT}/hooks/session-start-scheduler.sh
 ```
 
 Then register in Claude Code (if hook system supports it).
@@ -99,7 +99,7 @@ export SCHEDULER_TOKEN_STOP_PCT=85
 export SCHEDULER_PARALLEL_MODE=false
 
 # Then run:
-~/.claude/skills/task-scheduler/scripts/scheduler.sh
+${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/scheduler.sh
 ```
 
 ### Task Dependencies Format
@@ -126,7 +126,7 @@ export SCHEDULER_PARALLEL_MODE=false
 
 ```bash
 # Check which tasks are ready
-~/.claude/skills/task-scheduler/scripts/scheduler.sh docs/PROJEKT.md true
+${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/scheduler.sh docs/PROJEKT.md true
 
 # Output shows:
 # ✓ READY: TASK-005 - Backlinks Query
@@ -142,7 +142,7 @@ After manually completing a task:
 
 ```bash
 # Send completion notification via hook
-cat <<EOF | ~/.claude/skills/task-scheduler/scripts/task-completion-hook.sh
+cat <<EOF | ${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/task-completion-hook.sh
 {
   "task_uuid": "TASK-005",
   "status": "completed",
@@ -162,7 +162,7 @@ EOF
 
 ```bash
 # Check token usage before starting expensive task
-cat <<EOF | ~/.claude/skills/task-scheduler/scripts/token-watcher.sh
+cat <<EOF | ${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/token-watcher.sh
 {
   "usage_pct": 72,
   "current": 144000,
@@ -214,7 +214,7 @@ which jq
 
 **Solution:**
 ```bash
-chmod +x ~/.claude/skills/task-scheduler/scripts/*.sh
+chmod +x ${CLAUDE_PLUGIN_ROOT}/skills/task-scheduler/scripts/*.sh
 ```
 
 ### Issue: Token-watcher not alerting
@@ -266,7 +266,7 @@ Scheduler kann vault-manager Tasks triggern:
 Um eigene Post-Completion-Logik hinzuzufügen:
 
 ```bash
-# Create ~/.claude/hooks/custom-task-hook.sh
+# Create ${CLAUDE_PLUGIN_ROOT}/hooks/custom-task-hook.sh
 #!/bin/bash
 
 # Called after task-completion-hook.sh

@@ -351,16 +351,21 @@ Read: output_file path
    - Audit Trail: Datum | Aktion | Ergebnis
    - Metadaten: Updated-Datum
 
-3b. Vault Status-Sync (wenn Obsidian CLI verfuegbar):
+3b. Vault Status-Sync (wenn Obsidian CLI verfuegbar — gleichwertig, nicht optional):
    Feature-Detection: `obsidian.com version 2>/dev/null`
    Wenn erfolgreich:
    ```bash
    # Task-Status im Vault aktualisieren
-   obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name"
-   # Projekt-Status aktualisieren (wenn Phase sich aendert)
-   obsidian.com property:set name="phase" value="Phase X: ..." type=text file="PROJECT-xxx"
+   obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name" vault=Claude
+   # Projekt-Dokument aktualisieren (Properties + Body):
+   obsidian.com property:set name="phase" value="Phase X: ..." type=text file="PROJECT-xxx" vault=Claude
+   # Body (Immediate Actions) via Filesystem: file holen → read → Write Tool
+   obsidian.com file file="PROJECT-xxx" vault=Claude
+   obsidian.com read file="PROJECT-xxx" vault=Claude
+   # → Write Tool auf Pfad: Frontmatter erhalten, Immediate Actions aktualisieren
    ```
-   Bei Fehler: Warnung loggen, nicht abbrechen. PROJEKT.md bleibt SSOT.
+   Bei Fehler: Warnung loggen, nicht abbrechen (Graceful Degradation).
+   `vault=Claude` bei ALLEN Commands. NICHT cd zum Vault.
 
 4. Notification Sidecar loeschen:
    ```bash

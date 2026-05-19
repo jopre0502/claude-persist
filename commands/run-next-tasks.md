@@ -1,7 +1,6 @@
 ---
 name: run-next-tasks
 description: Manually trigger the task scheduler to identify and start ready tasks
-model: sonnet
 ---
 
 # /run-next-tasks Command

@@ -210,7 +210,7 @@ EOF
 *Last updated: [Date]*
 EOF
     echo -e "${YELLOW}⚠ CLAUDE.md created - please customize project details!${NC}"
-    echo -e "${GREEN}✓ Workflow reference included (details: ~/.claude/skills/project-init/references/WORKFLOW.md)${NC}"
+    echo -e "${GREEN}✓ Workflow reference included (details: ${CLAUDE_PLUGIN_ROOT}/skills/project-init/references/WORKFLOW.md)${NC}"
 fi
 
 # Step 3: Create PROJEKT.md

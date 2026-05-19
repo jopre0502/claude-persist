@@ -52,18 +52,21 @@ Automatisches Task-Management für dieses Projekt mit Dependency-Auflösung und 
 - Suggest `/project-doc-restructure` bei >70%
 - Recommend `/exit` bei >85%
 
-### 3b. Vault-Enhanced Discovery (wenn Obsidian CLI verfuegbar)
+### 3b. Vault-First Discovery (wenn Obsidian CLI verfuegbar — primaere Quelle)
 
 **Feature-Detection:** `obsidian.com version 2>/dev/null` — wenn erfolgreich:
 
 ```bash
 # Cross-Project Task-Uebersicht (alle Projekte, nicht nur aktuelles PWD)
-obsidian.com base:query path="_dashboards/BASE_Claude_Tasks.base" format=json
+obsidian.com base:query path="_dashboards/BASE_Claude_Tasks.base" format=json vault=Claude
 ```
 
 **Nutzen:** Findet Tasks aus ALLEN Projekten im Claude Vault — nicht nur aus dem aktuellen PROJEKT.md. Ermoeglicht Cross-PWD Dependency-Checks.
 
-**Fallback:** Ohne Obsidian CLI → nur PROJEKT.md-basierte Discovery (bisheriges Verhalten).
+**Prioritaet:** Vault ist primaere Discovery-Quelle. PROJEKT.md ist Fallback (wenn CLI nicht verfuegbar).
+`vault=Claude` bei ALLEN Commands. NICHT cd zum Vault.
+
+**Fallback:** Ohne Obsidian CLI → PROJEKT.md-basierte Discovery (bisheriges Verhalten).
 
 ### 4. Automated PROJEKT.md Updates
 
@@ -73,16 +76,17 @@ obsidian.com base:query path="_dashboards/BASE_Claude_Tasks.base" format=json
 - Trigger nächste Ready-Tasks automatisch
 - Aktualisiere Phase-Status
 
-### 4b. Vault Status-Sync (wenn Obsidian CLI verfuegbar)
+### 4b. Vault Status-Sync (wenn Obsidian CLI verfuegbar — gleichwertig)
 
 **Nach jedem PROJEKT.md-Update zusaetzlich:**
 
 ```bash
 # Task-Status im Vault aktualisieren
-obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name"
+obsidian.com property:set name="status" value="completed" type=text file="TASK-NNN-name" vault=Claude
 ```
 
-**Wichtig:** PROJEKT.md bleibt SSOT. Vault-Updates sind Sync, nicht Ersatz. Bei Konflikten gilt PROJEKT.md.
+**Wichtig:** File + Vault sind beide Pflicht wenn CLI verfuegbar. `vault=Claude` bei ALLEN Commands.
+Bei Vault-Fehlern: Warnung loggen, nicht abbrechen (Graceful Degradation).
 
 ## Komponenten
 
