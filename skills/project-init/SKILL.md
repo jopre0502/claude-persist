@@ -7,6 +7,8 @@ description: |
 
   Implements: UUID-based task tracking (TASK-001, etc.), session-refresh automation, token budget awareness, phase-based workflow.
 
+  Phase 4 (optional, Windows only): Quickstart artifacts — project icon, Windows Terminal profile with tabColor/tabTitle, Desktop .lnk shortcut. Silently skipped on Linux/Mac.
+
 tools: Read, Edit, Bash, Write
 ---
 
@@ -234,7 +236,7 @@ Das Phase-Template (`assets/phase-template.txt`) enthält:
 
 ---
 
-## How It Works: Three-Phase Execution
+## How It Works: Multi-Phase Execution
 
 ### Phase 1: Initialize Infrastructure
 
@@ -303,6 +305,90 @@ The skill:
 
 Next: Customize CLAUDE.md, then /session-refresh
 ```
+
+### Phase 4: Windows Quickstart (Optional)
+
+**Trigger:** Only on Windows with Windows Terminal installed. Silent skip on Linux/Mac/missing wt.exe (`scripts/quickstart-orchestrator.sh` exits 10 or 11 — non-error).
+
+**What it does:** After CLAUDE.md + PROJEKT.md are created (Phases 1-3), this phase produces three convenience artifacts to make `claude` start instantly from the desktop:
+
+1. **Project icon** at `<PWD>\.claude-icon.ico` (multi-resolution 16/32/48/256, V2-squircle variant with project-themed symbol)
+2. **Windows Terminal profile** in `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json` with `commandline` (`pwsh -NoExit -Command "Set-Location ...; claude"`), `tabColor` (matches icon accent color), `tabTitle`, `icon`, and UUID v4 `guid`
+3. **Desktop shortcut** `<Desktop>\<project-name>.lnk` targeting `wt.exe -p "<project-name>"` with the project icon
+
+#### User Interaction (LLM-Skill-Layer)
+
+Before delegating to `quickstart-orchestrator.sh`, ask via AskUserQuestion:
+
+> "Windows Quickstart erstellen? (Desktop-Verknuepfung + WT-Profil + Icon)"
+> — Default: "Ja, erstellen" / Alternative: "Ueberspringen"
+
+If accepted, derive **SYMBOL** + **ACCENT_HEX** from the freshly created `CLAUDE.md`:
+
+- **SYMBOL** — one of: `sparkle`, `code`, `search`, `shield`, `gear`, `diamond`, `layers`, `lightning`, `compass`, `pen`, `book`, `puzzle`, `brain`, `cloud`, `terminal`. Pick the symbol that best represents the project's purpose.
+- **ACCENT_HEX** — hex color that harmonizes with Claude Orange (`#D4724A`). Use a complementary or analogous tone derived from the project theme.
+
+Fallback if CLAUDE.md analysis is inconclusive: `sparkle` + `#D4724A`.
+
+#### Invocation
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/project-init/scripts/quickstart-orchestrator.sh" \
+  "$PWD" "$PROJECT_NAME" "$SYMBOL" "$ACCENT_HEX"
+```
+
+The orchestrator chains three helpers:
+
+1. `quickstart-icon.py` — generates `.claude-icon.ico` + `.claude-icon.meta.json`, prints meta JSON to stdout (parsed via `jq` for the resolved accent color)
+2. `quickstart-wt-profile.py` — inserts WT profile with UUID v4, creates `settings.json.bak.YYYYMMDD-HHMMSS`, validates JSON beidseitig
+3. `quickstart-shortcut.ps1` — creates `.lnk` via `WScript.Shell` COM (invoked through `pwsh.exe -File`)
+
+#### Exit Code Handling
+
+| Exit | Meaning | Skill Response |
+|------|---------|---------------|
+| 0 | Success | Show summary + "Restart Windows Terminal once" hint |
+| 10 | Not Windows | Silent skip (Linux/Mac/other) — no Phase 4 output |
+| 11 | wt.exe not installed | Inform user: "Windows Terminal not installed — Phase 4 skipped" |
+| 20 | settings.json not found | Error: Preview/Unpackaged WT installations not supported |
+| 21 | pwsh.exe not found | Error: ask user to install PowerShell 7+ |
+| 30 | Icon generation failed | Show stderr, suggest `pip install Pillow` if missing |
+| 31 | WT profile insert failed | Show stderr, manual recovery from `.bak` if needed |
+| 32 | Profile name already exists | AskUserQuestion: ueberschreiben (re-run with FORCE=true) / abbrechen |
+| 33 | Shortcut creation failed | Show stderr, suggest manual `.lnk` creation |
+| 34 | Shortcut already exists | AskUserQuestion: ueberschreiben (re-run with FORCE=true) / abbrechen |
+| 40 | Missing dependency | Inform user: `python` or `jq` not in PATH |
+
+#### Force-Retry Pattern
+
+When exit code 32 or 34 returns "Profile/Shortcut already exists" and the user chooses to overwrite:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/skills/project-init/scripts/quickstart-orchestrator.sh" \
+  "$PWD" "$PROJECT_NAME" "$SYMBOL" "$ACCENT_HEX" true
+```
+
+The fifth argument `true` enables `--force` (passed to `quickstart-wt-profile.py`) and `-Force` (passed to `quickstart-shortcut.ps1`). Original GUID is preserved on profile overwrite (idempotent identity).
+
+#### Output JSON
+
+On success (exit 0), the orchestrator prints a machine-readable summary to stdout:
+
+```json
+{
+  "status": "ok",
+  "icon": "C:\\Development\\Projects\\Claude\\MyProject\\.claude-icon.ico",
+  "wt_profile": {"name": "MyProject", "tab_color": "#D4724A", "guid": "{xxxxxxxx-xxxx-...}"},
+  "shortcut": "C:\\Users\\Jonas\\Desktop\\MyProject.lnk"
+}
+```
+
+#### Important Notes
+
+- **Restart required:** Windows Terminal caches profiles at startup. After Phase 4 completes, the user must close + reopen Windows Terminal once for the new profile to appear in the dropdown.
+- **Icon in PWD:** The `.claude-icon.ico` lives in the project root. Consider adding it to `.gitignore` if the project repo should stay icon-free; commit it if you want the icon to travel with the project.
+- **Idempotency:** Re-running Phase 4 on an unchanged project is safe — icon overwrites in place (no suffix counter), profile/shortcut require FORCE=true to overwrite (deliberate guard).
+- **Public Release Safety:** The OS-gate ensures Linux/Mac users never see Phase 4. The PowerShell helper is shipped in the public `claude-persist` repo but only executed on Windows.
 
 ---
 

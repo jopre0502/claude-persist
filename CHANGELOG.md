@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-05-21
+
+### Added
+
+- **`skills/project-init` Phase 4 (Windows Quickstart)** — Optionaler vierter Schritt im `/project-init` Workflow. Nur auf Windows mit installiertem Windows Terminal aktiv (silent skip auf Linux/Mac via OS-Gate). Erzeugt drei Convenience-Artefakte:
+  - **Projekt-Icon** `<PWD>\.claude-icon.ico` (multi-resolution 16/32/48/256, V2-squircle-Variante mit projekt-themed Symbol)
+  - **Windows Terminal Profil** in `settings.json` mit UUID v4 `guid`, `tabColor` (matches Icon-Accent), `tabTitle`, `icon`, `commandline` (`pwsh -NoExit -Command "Set-Location ...; claude"`)
+  - **Desktop-Verknuepfung** `<Desktop>\<project>.lnk` mit Target `wt.exe -p "<project>"` und Projekt-Icon
+- **4 neue Helper-Skripte** unter `skills/project-init/scripts/`:
+  - `quickstart-icon.py` — Pillow-basierter `.ico` Generator mit Meta-JSON Sidecar (`<PWD>\.claude-icon.meta.json`)
+  - `quickstart-wt-profile.py` — WT `settings.json` Profile-Editor (UUID v4, Timestamped Backup `.bak.YYYYMMDD-HHMMSS`, JSON-Validierung beidseitig)
+  - `quickstart-shortcut.ps1` — Desktop `.lnk` Creator via `WScript.Shell` COM
+  - `quickstart-orchestrator.sh` — OS-gated Orchestrator mit strukturierten Exit-Codes (0/10-11/20-21/30-34/40), Force-Retry-Pattern, Stdout-JSON-Summary
+
+### Changed
+
+- **`skills/project-init/SKILL.md`** — Phase 4 dokumentiert: Trigger-Bedingungen, User-Interaction-Pattern (AskUserQuestion), Exit-Code-Tabelle mit Skill-Responses, Force-Retry-Pattern, Restart-Hinweis. Header "Three-Phase" -> "Multi-Phase" Execution.
+
+### Notes
+
+- **Public-Release-Safety:** OS-Gate macht Phase 4 fuer Linux/Mac-User unsichtbar. PowerShell-Helper wird im Snapshot mit-released, aber nur auf Windows ausgefuehrt.
+- **Idempotenz:** Re-Run im selben PWD bricht bei Profil/`.lnk`-Konflikten mit Exit 32/34 ab (Skill-Layer prompt FORCE-Retry). FORCE-Retry erhaelt GUID-Identitaet beim Profile-Overwrite.
+- **PowerShell-Lesson (aus Bug-Fix waehrend Entwicklung):** `Write-Error` unter `$ErrorActionPreference = 'Stop'` wirft terminating Exception VOR `exit N` Statement — alle expliziten Exit-Codes unreachable. Fix mittels `[Console]::Error.WriteLine()` fuer non-fatal stderr, `'Stop'` nur innerhalb COM-`try/catch`.
+
+---
+
+## [1.4.0] - 2026-05-19
+
+### Added
+
+- **`hooks/git-safety-guard.sh`** — Deterministischer PreToolUse-Hook auf Matcher `Bash` (5s Timeout). Drei Pattern-Checks via Bash-Regex auf tokenisierte Sub-Commands (Pipeline-Split bei `&&`, `||`, `;`, `|`):
+  - **Hook A:** `git add` mit `-f` oder `--force` blockiert (`.gitignore` als Sicherheitsgrenze)
+  - **Hook B:** `--no-verify` oder `--no-gpg-sign` auf `commit`/`push` blockiert (Hook-/Signatur-Skip)
+  - **Hook C:** `git push --force`/`-f` auf `main`/`master` blockiert (`--force-with-lease` explizit erlaubt — modernes Best-Practice mit Upstream-Hash-Check)
+- **Override-Mechanismus:** Inline-Marker `# CLAUDE-ALLOW-DESTRUCTIVE` am Command-Ende fuer dokumentierte Notfall-Bypaesse. Voller Audit-Trail in Bash-History.
+
+### Changed
+
+- **`.claude-plugin/plugin.json`** — Neuer PreToolUse-Hook-Eintrag (Matcher `Bash`). Plugin-Description erweitert um "deterministic git-safety guards".
+
+### Notes
+
+- **Test-Matrix:** 8/8 passing. A1/B1/C1 blocken korrekt, C4 (`--force-with-lease`) + C5 (Feature-Branch) + O1 (Override) erlaubt.
+- **Silent-Allow bei Parse-Errors:** Hook darf nie selbst Tool-Use blockieren (Anti-Pattern: Hook-Bug blockt User).
+- **API-Limitierung:** PreToolUse-Hook bekommt nur `tool_name` + `tool_input` (kein User-Prompt-Zugriff) — Override muss im Tool-Input kodiert sein.
+
+---
+
 ## [1.3.0] - 2026-05-19
 
 ### Added

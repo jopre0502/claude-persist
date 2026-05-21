@@ -1,7 +1,7 @@
 {
   "name": "persist",
-  "description": "Session-Continuity Framework: Task scheduling, session refresh, project initialization, and documentation management for Claude Code.",
-  "version": "1.3.0",
+  "description": "Session-Continuity Framework: Task scheduling, session refresh, project initialization, documentation management, and deterministic git-safety guards for Claude Code.",
+  "version": "1.5.0",
   "author": {
     "name": "Jonas Prechtel"
   },
@@ -14,6 +14,18 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session-handoff-loader.sh",
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/git-safety-guard.sh",
+            "timeout": 5
           }
         ]
       }
